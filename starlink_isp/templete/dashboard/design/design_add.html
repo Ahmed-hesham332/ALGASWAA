@@ -1,0 +1,334 @@
+{% extends "dashboard/base.html" %}
+{% block title %}إضافة تصميم{% endblock %}
+{% block page_title %}إضافة تصميم{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: #f4f6f8;
+    }
+
+    .page-wrapper {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+    }
+
+    /* -------- CONTROL PANEL -------- */
+    .control-panel {
+        width: 320px;
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .control-panel label {
+        font-weight: 600;
+        margin-top: 14px;
+        display: block;
+    }
+
+    .control-panel input {
+        width: 100%;
+        margin-top: 6px;
+        padding: 9px 12px;
+        border-radius: 10px;
+        border: 1px solid #d0d0d0;
+    }
+
+    /* -------- SAVE BUTTON -------- */
+    .save-btn {
+        width: 100%;
+        margin-top: 24px;
+        padding: 12px;
+        border-radius: 12px;
+        border: none;
+        font-size: 16px;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        cursor: pointer;
+        transition: all 0.25s ease;
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
+    }
+
+    .save-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(79, 70, 229, 0.45);
+    }
+
+    /* -------- DESIGN BOARD -------- */
+    .design-board {
+        flex: 1;
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .preview-title {
+        text-align: center;
+        font-weight: 700;
+        margin-bottom: 14px;
+        color: #555;
+    }
+
+    /* -------- CARD SIZE (A4 / 50) -------- */
+    .design-wrapper {
+        position: relative;
+        width: 160px;
+        height: 113px;
+        border: 1px dashed #cfcfcf;
+        background: #ffffff;
+
+        transform: scale(3);
+        transform-origin: center;
+    }
+
+    #designCanvas {
+        width: 160px;
+        height: 113px;
+    }
+
+    /* -------- VISUAL ZOOM (DESIGNER ONLY) -------- */
+    .zoom-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        /* reserve space for scaled card */
+        width: 480px;
+        /* 160 × 3 */
+        height: 339px;
+        /* 113 × 3 */
+
+        margin: 0 auto;
+    }
+
+    /* -------- SERIAL TEXT -------- */
+    #serial-element {
+        position: absolute;
+        cursor: grab;
+        font-weight: bold;
+        user-select: none;
+        padding: 0;
+        background: none;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    /* -------- RESPONSIVE (≤ 640px) -------- */
+    @media (max-width: 640px) {
+
+        .page-wrapper {
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .control-panel,
+        .design-board {
+            width: calc(100% - 24px);
+            max-width: 420px;
+        }
+
+        .design-board {
+            padding: 16px;
+            overflow: hidden;
+            /* prevent weird horizontal scroll */
+        }
+
+        .preview-title {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        /* ✅ Mobile preview viewport (holds the scaled card nicely) */
+        .zoom-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            /* give it enough height for the scaled card */
+            min-height: 260px;
+
+            overflow: hidden;
+        }
+
+        /* scale only the card (visual only), keep print ratio unchanged */
+        .design-wrapper {
+            transform: scale(2);
+            transform-origin: center;
+        }
+    }
+</style>
+
+<div class="page-wrapper">
+
+    <!-- LEFT PANEL -->
+    <form method="POST" enctype="multipart/form-data" class="control-panel">
+        {% csrf_token %}
+
+        <label>اسم التصميم</label>
+        {{ form.name }}
+
+        <label>الخلفية</label>
+        {{ form.background_image }}
+
+        <label>حجم الخط</label>
+        {{ form.serial_font_size }}
+
+        <label>اللون</label>
+        {{ form.serial_color }}
+
+        {{ form.serial_x }}
+        {{ form.serial_y }}
+
+        <button class="save-btn">💾 حفظ التصميم</button>
+    </form>
+
+    <!-- RIGHT PANEL -->
+    <div class="design-board">
+        <div class="preview-title">معاينة بطاقة واحدة (A4 / 50)</div>
+
+        <div class="zoom-wrapper">
+            <div class="design-wrapper">
+                <canvas id="designCanvas" width="640" height="452"></canvas>
+
+                <div id="serial-element" style="left: 40px; top: 40px;">
+                    12345678
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    /* ===============================
+         SCALE DETECTION (MUST BE FIRST)
+      =============================== */
+    function getScale() {
+        const el = document.querySelector('.design-wrapper');
+        const transform = window.getComputedStyle(el).transform;
+
+        if (transform === 'none') return 1;
+
+        const matrix = new DOMMatrixReadOnly(transform);
+        return matrix.a; // scaleX
+    }
+
+    /* ===============================
+       CANVAS
+    =============================== */
+    const canvas = document.getElementById("designCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let bg = new Image();
+    const scaleFactor = 4;
+
+    bg.onload = () => {
+        ctx.setTransform(scaleFactor, 0, 0, scaleFactor, 0, 0);
+        ctx.drawImage(bg, 0, 0, 160, 113);
+    };
+
+    bg.src = "{{ design.background_image.url }}";
+
+    /* ===============================
+       SERIAL DRAG (MOUSE + TOUCH)
+    =============================== */
+    const serial = document.getElementById("serial-element");
+
+    let drag = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    function startDrag(clientX, clientY) {
+        const scale = getScale();
+        drag = true;
+
+        offsetX = clientX / scale - serial.offsetLeft;
+        offsetY = clientY / scale - serial.offsetTop;
+    }
+
+    function moveDrag(clientX, clientY) {
+        if (!drag) return;
+
+        const scale = getScale();
+        const wrapper = document.querySelector(".design-wrapper");
+
+        let x = clientX / scale - offsetX;
+        let y = clientY / scale - offsetY;
+
+        const maxX = wrapper.clientWidth - serial.offsetWidth;
+        const maxY = wrapper.clientHeight - serial.offsetHeight;
+
+        x = Math.max(0, Math.min(x, maxX));
+        y = Math.max(0, Math.min(y, maxY));
+
+        serial.style.left = x + "px";
+        serial.style.top = y + "px";
+    }
+
+    function stopDrag() {
+        drag = false;
+    }
+
+    /* -------- MOUSE -------- */
+    serial.addEventListener("mousedown", e => {
+        e.preventDefault();
+        startDrag(e.clientX, e.clientY);
+    });
+
+    document.addEventListener("mousemove", e => {
+        moveDrag(e.clientX, e.clientY);
+    });
+
+    document.addEventListener("mouseup", stopDrag);
+
+    /* -------- TOUCH (MOBILE) -------- */
+    serial.addEventListener("touchstart", e => {
+        e.preventDefault();
+        const t = e.touches[0];
+        startDrag(t.clientX, t.clientY);
+    }, { passive: false });
+
+    document.addEventListener("touchmove", e => {
+        if (!drag) return;
+        const t = e.touches[0];
+        moveDrag(t.clientX, t.clientY);
+    }, { passive: false });
+
+    document.addEventListener("touchend", stopDrag);
+
+    /* ===============================
+       SAVE POSITION
+    =============================== */
+    document.querySelector("form").addEventListener("submit", () => {
+        document.getElementById("id_serial_x").value = parseInt(serial.style.left);
+        document.getElementById("id_serial_y").value = parseInt(serial.style.top);
+    });
+
+    /* -------- LIVE FONT SIZE -------- */
+    const fontSizeInput = document.getElementById("id_serial_font_size");
+    if (fontSizeInput) {
+        fontSizeInput.addEventListener("input", () => {
+            serial.style.fontSize = fontSizeInput.value + "px";
+        });
+    }
+
+    /* -------- LIVE BACKGROUND IMAGE -------- */
+    const bgInput = document.getElementById("id_background_image");
+    if (bgInput) {
+        bgInput.addEventListener("change", e => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            bg.src = URL.createObjectURL(file);
+        });
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+librouteros
+django
+djangorestframework
+djangorestframework-simplejwt
+pillow
+reportlab
+dateutil
+django-cors-headers
+mysqlclient
+gunicorn

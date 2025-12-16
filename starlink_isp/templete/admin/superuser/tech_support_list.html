@@ -1,0 +1,196 @@
+{% extends "admin/base.html" %}
+{% block title %}إدارة الدعم الفني{% endblock %}
+{% block content %}
+{% csrf_token %}
+
+<style>
+    /* 🔁 SAME STYLES FROM RESELLER LIST (UNCHANGED) */
+    .search-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        direction: rtl;
+    }
+
+    .search-form input {
+        flex: 1;
+        min-width: 260px;
+        height: 48px;
+        padding: 0 14px;
+        font-size: 16px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+    }
+
+    .search-form button {
+        height: 48px;
+        padding: 0 22px;
+        border-radius: 10px;
+        background: #991b1b;
+        color: white;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+    }
+
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        padding: 14px;
+        border-bottom: 1px solid #eee;
+        text-align: right;
+    }
+
+    .admin-table th {
+        background: #f9fafb;
+        font-weight: 700;
+    }
+
+    .admin-table td[data-label="الإجراءات"] a {
+        margin-left: 6px;
+    }
+
+    @media (max-width: 640px) {
+
+        .admin-table,
+        .admin-table thead,
+        .admin-table tbody,
+        .admin-table th,
+        .admin-table td,
+        .admin-table tr {
+            display: block;
+            width: 100%;
+        }
+
+        .admin-table thead {
+            display: none;
+        }
+
+        .admin-table tr {
+            background: #fff;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .admin-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            direction: rtl;
+            font-size: 14px;
+        }
+
+        .admin-table td:last-child {
+            border-bottom: none;
+        }
+
+        .admin-table td::before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: #555;
+        }
+
+        .admin-table td[data-label="الإجراءات"] {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .admin-table td[data-label="الإجراءات"] a {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+<div style="margin-bottom: 2rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+        <h2>موظفي الدعم الفني</h2>
+        <a href="{% url 'adminpanel:tech_support_add' %}" class="btn btn-primary">
+            إضافة دعم فني
+        </a>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>اسم المستخدم</th>
+                <th>الاسم</th>
+                <th>رقم الهاتف</th>
+                <th>الإجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tech in tech_supports %}
+            <tr>
+                <td data-label="اسم المستخدم">{{ tech.user.username }}</td>
+                <td data-label="الاسم">{{ tech.name }}</td>
+                <td data-label="رقم الهاتف">{{ tech.phone }}</td>
+                <td data-label="الإجراءات">
+                    <a href="{% url 'adminpanel:tech_support_edit' tech.id %}" class="btn btn-warning">
+                        تعديل
+                    </a>
+                    <a href="{% url 'adminpanel:tech_support_delete' tech.id %}" class="btn btn-danger" data-confirm
+                        data-msg="هل أنت متأكد من حذف موظف الدعم الفني؟ سيتم حذف الحساب بالكامل.">
+                        حذف
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align:center">
+                    لا يوجد موظفي دعم فني حالياً
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- ✅ CONFIRM DELETE MODAL (SAME AS RESELLERS) -->
+<div id="confirmModal" style="display:none;position:fixed;inset:0;z-index:50;">
+    <div id="cmBack" style="position:absolute;inset:0;background:rgba(0,0,0,.3);"></div>
+
+    <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+                background:#fff;padding:20px;border-radius:10px;max-width:420px;width:92%;">
+        <p id="cmText"></p>
+        <div style="margin-top:16px;display:flex;justify-content:flex-end;gap:10px;">
+            <button id="cmCancel" class="btn">إلغاء</button>
+            <a id="cmOk" class="btn btn-danger">حذف</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById("confirmModal");
+        const text = document.getElementById("cmText");
+        const ok = document.getElementById("cmOk");
+        const cancel = document.getElementById("cmCancel");
+        const back = document.getElementById("cmBack");
+
+        let target = null;
+
+        document.querySelectorAll("[data-confirm]").forEach(btn => {
+            btn.addEventListener("click", e => {
+                e.preventDefault();
+                target = btn.href;
+                text.textContent = btn.dataset.msg || "هل أنت متأكد؟";
+                modal.style.display = "block";
+            });
+        });
+
+        cancel.onclick = back.onclick = () => modal.style.display = "none";
+        ok.onclick = () => target && (window.location.href = target);
+    });
+</script>
+
+{% endblock %}

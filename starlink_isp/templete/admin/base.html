@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم</title>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="admin-header">
+        <h1>لوحة التحكم</h1>
+        <a href="{% url 'logout' %}" class="logout-btn">تسجيل الخروج</a>
+    </div>
+
+    <!-- Main Container -->
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <ul>
+                {% if user.is_superuser %}
+                <li><a href="{% url 'adminpanel:tech_support_list' %}">الدعم الفني</a></li>
+                <li><a href="{% url 'adminpanel:plan_list' %}">الخطط</a></li>
+                {% endif %}
+
+                {% if user.is_tech_support or request.session.is_tech_support %}
+                <li><a href="{% url 'adminpanel:reseller_list' %}">المشتركين</a></li>
+                <li><a href="{% url 'adminpanel:server_list' %}">الخوادم</a></li>
+                <li><a href="{% url 'adminpanel:profile' %}">الملف الشخصي</a></li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- Content -->
+        <div class="admin-content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+
+</html>

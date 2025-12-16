@@ -1,0 +1,144 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القصواء - خدمات ISP الحديثة</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav>
+        <div class="logo">
+            <img src="/media/logos/Algaswaa3.png" alt="القصواء">
+        </div>
+
+        <ul>
+            <li><a href="#features">المزايا</a></li>
+            <li><a href="#pricing">الباقات</a></li>
+        </ul>
+
+        <a href="{% url 'login' %}" class="btn-login">دخول</a>
+    </nav>
+
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+
+        <!-- TEXT -->
+        <div class="hero-content">
+            <h1>منصة القصواء</h1>
+            <p>
+                أسرع وأسهل طريقة لإدارة الخوادم والكروت والعملاء — كل ذلك
+                في لوحة معلومات واحدة
+            </p>
+
+            <div class="hero-buttons">
+                <a href="#pricing"><button class="btn-primary">اختر خطتك</button></a>
+            </div>
+        </div>
+
+        <!-- IMAGES -->
+        <div class="hero-images">
+            <img class="img-main" src="/media/dashboard/dash1.png" alt="">
+            <img class="img-second" src="/media/dashboard/dash2.png" alt="">
+        </div>
+
+    </section>
+
+
+    <section class="features" id="features">
+        <h2>مميزات خدمتنا</h2>
+        <p class="section-subtitle">نوفر لك أفضل حلول الإنترنت مع سرعة عالية وأداء مستقر ومتطلبات أكثر</p>
+
+        <div class="feature-grid">
+
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>أمان متقدم</h3>
+                <p>حماية كاملة ضد التهديدات مع تشفير متطور</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>إدارة قوية</h3>
+                <p>لوحة تحكم شاملة لإدارة السيرفرات والكروت</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>تصاميم متعددة</h3>
+                <p>خطط وبوابات مرنة مع إمكانية التخصيص الكامل</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">24/7</div>
+                <h3>دعم مستمر</h3>
+                <p>فريق دعم متخصص يعمل على مدار الساعة</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>أسعار منافسة</h3>
+                <p>خطط مناسبة تلبي احتياجاتك وميزانيتك</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎟️</div>
+                <h3>نظام فواتير</h3>
+                <p>إدارة فواتير احترافية وسهلة</p>
+            </div>
+
+        </div>
+    </section>
+
+
+
+
+    <!-- PRICING SECTION -->
+    <section id="pricing" class="pricing">
+
+        <h2>اختر خطتك</h2>
+        <p class="section-subtitle">نقدم لك خطط متنوعة تناسب جميع احتياجاتك وميزانيتك</p>
+        <div id="pricing" class="pricing-grid">
+
+            {% for plan in plans %}
+            <div class="plan-card {% if forloop.counter == 2 %}featured{% endif %}">
+
+                <h3 class="plan-title">{{ plan.name }}</h3>
+
+                <p>{{ plan.description }}</p>
+
+                <div class="plan-price">{{ plan.price_display }}</div>
+
+                <div class="plan-divider"></div>
+
+                <ul class="plan-features">
+                    <li>عدد العملاء: {{ plan.number_of_clients }}</li>
+                    <li>عدد السيرفرات: {{ plan.number_of_servers }}</li>
+                    <li>عدد الكروت: {{ plan.number_of_vouchers }}</li>
+                </ul>
+
+                <a href="https://wa.me/966501234567" class="btn-subscribe">
+                    تواصل معنا للاشتراك
+                </a>
+
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+
+
+    <!-- FOOTER -->
+    <footer>
+        <p>© 2025 القصواء — جميع الحقوق محفوظة</p>
+    </footer>
+
+</body>
+
+</html>

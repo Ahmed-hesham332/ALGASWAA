@@ -1,0 +1,59 @@
+{% extends "dashboard/base.html" %}
+{% block title %}إضافة مجموعة كروت{% endblock %}
+
+{% block content %}
+{% if request.user.status %}
+<div class="p-6">
+    {% if messages %}
+    <div>
+        {% for message in messages %}
+        <div class="bg-red-100 border border-red-300 text-red-700 p-4 rounded-lg mb-4">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <h2 class="text-2xl font-bold mb-4">إضافة مجموعة كروت جديدة</h2>
+
+    <div class="bg-white shadow-sm border rounded-lg p-6">
+        <form method="POST" class="space-y-5">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="bg-red-100 border border-red-300 text-red-700 p-4 rounded-lg">
+                <p class="font-bold mb-2">يرجى تصحيح الأخطاء التالية:</p>
+                <ul class="list-disc pr-6 text-sm">
+                    {% for field in form %}
+                    {% for error in field.errors %}
+                    <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <div class="space-y-4">
+                {{ form.as_p }}
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    إنشاء المجموعة وتوليد الكروت
+                </button>
+
+                <a href="{% url 'vouchers:list' %}" class="px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+                    إلغاء
+                </a>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% else %}
+{% include "dashboard/suspended.html" %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div class="form-container">
+    <h2>تعديل الوكيل: {{ reseller.username }}</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="network_name">اسم الشبكة</label>
+            {{ form.Network_Name }}
+        </div>
+
+        <div class="form-group">
+            <label for="manager_name">اسم المدير</label>
+            {{ form.Manager_Name }}
+        </div>
+
+        <div class="form-group">
+            <label for="username">اسم المستخدم</label>
+            {{ form.username }}
+        </div>
+
+        <div class="form-group">
+            <label for="phone">رقم الهاتف</label>
+            {{ form.Phone_Number }}
+        </div>
+
+        <div class="form-group">
+            <label for="plan">الخطة</label>
+            {{ form.plan }}
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'adminpanel:reseller_list' %}" class="btn btn-secondary">رجوع</a>
+            <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

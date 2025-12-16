@@ -1,0 +1,204 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2>الخطط</h2>
+        <a href="{% url 'adminpanel:plan_add' %}" class="btn btn-primary">إضافة خطة</a>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>اسم الخطة</th>
+                <th>الوصف</th>
+                <th>السعر</th>
+                <th>عدد العملاء</th>
+                <th>عدد الخوادم</th>
+                <th>عدد الكروت</th>
+                <th>الإجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in plans %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ p.name }}</td>
+                <td>{{ p.description }}</td>
+                <td>{{ p.price_display }}</td>
+                <td>{{ p.number_of_clients }}</td>
+                <td>{{ p.number_of_servers }}</td>
+                <td>{{ p.number_of_vouchers }}</td>
+                <td>
+                    <a href="{% url 'adminpanel:plan_edit' p.id %}" class="btn btn-warning"
+                        style="font-size: 0.8rem;">تعديل</a>
+
+                    <a href="{% url 'adminpanel:plan_delete' p.id %}" class="btn btn-danger" data-confirm
+                        data-msg="هل أنت متأكد من حذف هذه الخطة؟">
+                        حذف
+                    </a>
+
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const modal = document.getElementById("confirmModal");
+        const back = document.getElementById("cmBack");
+        const text = document.getElementById("cmText");
+        const okBtn = document.getElementById("cmOk");
+        const cancel = document.getElementById("cmCancel");
+
+        let targetHref = null;
+
+        function openModal(message, href) {
+            text.textContent = message || "هل أنت متأكد؟";
+            targetHref = href;
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+            targetHref = null;
+        }
+
+        // Attach to ALL delete links
+        document.querySelectorAll("a[data-confirm]").forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault(); // ⛔ stop delete
+                openModal(
+                    link.dataset.msg,
+                    link.getAttribute("href")
+                );
+            });
+        });
+
+        // Confirm delete
+        okBtn.addEventListener("click", function () {
+            if (targetHref) {
+                window.location.href = targetHref; // ✅ NOW delete
+            }
+        });
+
+        // Cancel / close
+        cancel.addEventListener("click", closeModal);
+        back.addEventListener("click", closeModal);
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") closeModal();
+        });
+
+    });
+</script>
+
+
+<div id="confirmModal" class="fixed inset-0 hidden z-50">
+    <div id="cmBack" class="absolute inset-0 bg-black/30"></div>
+
+    <div class="absolute left-1/2 top-1/2 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2
+              bg-white border rounded-lg shadow p-5">
+        <p id="cmText" class="text-sm text-gray-800"></p>
+
+        <div class="mt-4 flex justify-end gap-2">
+            <button id="cmCancel" class="px-3 py-2 text-sm rounded-md bg-gray-100 hover:bg-gray-200">
+                إلغاء
+            </button>
+            <a id="cmOk" class="px-3 py-2 text-sm rounded-md bg-red-600 hover:bg-red-700 text-white">
+                حذف
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ===============================
+   CONFIRM MODAL
+================================ */
+
+    /* Wrapper */
+    #confirmModal {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: none;
+        /* hidden by default */
+    }
+
+    /* Show modal */
+    #confirmModal.active {
+        display: block;
+    }
+
+    /* Background overlay */
+    #cmBack {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Modal box */
+    #confirmModal>div:last-child {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 92%;
+        max-width: 420px;
+        transform: translate(-50%, -50%);
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        padding: 20px;
+    }
+
+    /* Text */
+    #cmText {
+        font-size: 14px;
+        color: #1f2937;
+        line-height: 1.6;
+    }
+
+    /* Buttons wrapper */
+    #confirmModal .mt-4 {
+        margin-top: 16px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    /* Cancel button */
+    #cmCancel {
+        padding: 8px 14px;
+        font-size: 14px;
+        border-radius: 6px;
+        border: none;
+        background: #f3f4f6;
+        color: #374151;
+        cursor: pointer;
+    }
+
+    #cmCancel:hover {
+        background: #e5e7eb;
+    }
+
+    /* Confirm delete button */
+    #cmOk {
+        padding: 8px 14px;
+        font-size: 14px;
+        border-radius: 6px;
+        background: #dc2626;
+        color: #ffffff;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #cmOk:hover {
+        background: #b91c1c;
+    }
+</style>
+{% endblock %}

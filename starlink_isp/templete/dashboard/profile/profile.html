@@ -1,0 +1,73 @@
+{% extends "dashboard/base.html" %}
+{% block title %}الملف الشخصي — Dashboard{% endblock %}
+{% block page_title %}الملف الشخصي{% endblock %}
+
+{% block content %}
+<div class="p-6 max-w-3xl mx-auto">
+
+    <h2 class="text-2xl font-bold mb-6 text-gray-900">إعدادات الحساب</h2>
+
+    <div class="bg-white shadow rounded-lg p-6 border border-gray-100">
+
+        <!-- Profile Info -->
+        <form method="POST">
+            {% csrf_token %}
+            <h3 class="text-lg font-semibold mb-4">المعلومات الشخصية</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm mb-2">اسم الشبكة</label>
+                    {{ form.Network_Name }}
+                </div>
+
+                <div>
+                    <label class="block text-sm mb-2">اسم المدير</label>
+                    {{ form.Manager_Name }}
+                </div>
+
+                <div>
+                    <label class="block text-sm mb-2">رقم الجوال (الواتس اب)</label>
+                    {{ form.Phone_Number }}
+                </div>
+            </div>
+
+            <button name="save_info"
+                class="mt-5 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                حفظ التغييرات
+            </button>
+        </form>
+
+        <hr class="my-8">
+
+        <!-- Password Change -->
+        <form method="POST">
+            {% csrf_token %}
+            <h3 class="text-lg font-semibold mb-4">تغيير كلمة المرور</h3>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm mb-2">كلمة المرور القديمة</label>
+                    {{ pass_form.old_password }}
+                </div>
+
+                <div>
+                    <label class="block text-sm mb-2">كلمة المرور الجديدة</label>
+                    {{ pass_form.new_password }}
+                </div>
+
+                <div>
+                    <label class="block text-sm mb-2">تأكيد كلمة المرور</label>
+                    {{ pass_form.confirm_password }}
+                </div>
+            </div>
+
+            <button name="change_password"
+                class="mt-5 px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                تغيير كلمة المرور
+            </button>
+        </form>
+
+    </div>
+
+</div>
+{% endblock %}

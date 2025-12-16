@@ -1,0 +1,305 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم</title>
+
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body>
+
+    <!-- Hamburger button and overlay for mobile menu -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    {% if messages %}
+    <div
+        class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md space-y-2 px-4 pointer-events-none">
+
+        {% for message in messages %}
+        {% if "dashboard_msg" in message.tags %}
+
+        <div class="toast-message pointer-events-auto flex items-center w-full p-4 mb-4 text-gray-500 bg-white 
+                    rounded-lg shadow-lg border-r-4
+                    {% if message.tags == 'error' %}border-red-500
+                    {% elif message.tags == 'success' %}border-green-500
+                    {% else %}border-blue-500{% endif %}" role="alert">
+
+            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg
+                        {% if message.tags == 'error' %}text-red-500 bg-red-100
+                        {% elif message.tags == 'success' %}text-green-500 bg-green-100
+                        {% else %}text-blue-500 bg-blue-100{% endif %}">
+
+                <!-- Icons (same as your original template) -->
+                {% if message.tags == 'error' %}
+                <svg class="w-5 h-5" ...> … </svg>
+                {% elif message.tags == 'success' %}
+                <svg class="w-5 h-5" ...> … </svg>
+                {% else %}
+                <svg class="w-5 h-5" ...> … </svg>
+                {% endif %}
+            </div>
+
+            <div class="mr-3 text-sm font-medium text-gray-800">{{ message }}</div>
+
+            <button type="button" class="mr-auto -mx-1.5 -my-1.5 ..." onclick="this.parentElement.remove()">
+                <svg class="w-3 h-3" ...></svg>
+            </button>
+        </div>
+
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="sidebar" id="sidebar">
+        <h2 class="logo">
+            <img src="/media/logos/algaswaaDashboard.png" alt="">
+        </h2>
+
+        <ul class="menu">
+            <li><a href="/dashboard/">الرئيسية</a></li>
+            <li><a href="/servers/">الخوادم</a></li>
+            <li><a href="/offers/">العروض</a></li>
+            <li><a href="/vouchers/">الكروت</a></li>
+            <li><a href="/online/">الكروت المتصلة</a></li>
+            <li><a href="/income/">المبيعات</a></li>
+            <li><a href="/design/">التصاميم</a></li>
+            <li><a href="/profile/">الملف الشخصي</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{% url 'logout' %}" class="logout-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                تسجيل الخروج
+            </a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <header class="header">
+            <div class="header-content">
+                <button class="hamburger-btn md:hidden" id="hamburgerBtn">☰</button>
+                <div>
+                    <h1>مرحبا، {{ user.username }}</h1>
+                </div>
+                <div class="header-info">
+                    <div class="user-info">
+                        <div class="user-avatar">{{ user.username | first | upper }}</div>
+                        <span class="user-name" style="font-weight: 600; color: var(--dark);">{{ user.username}}</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="content-wrapper">
+                {% if plan %}
+                <div class="plan-hero">
+                    <h2>{{ plan.name }}</h2>
+                    <p>{{ plan.description }}</p>
+
+
+                    <div class="mt-6 rounded-2xl bg-gradient-to-br from-white to-gray-50 border shadow-sm p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                            <!-- SUPPORT CARD -->
+                            <div class="rounded-xl bg-white border p-5 hover:shadow transition">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <div
+                                        class="w-9 h-9 flex items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                                        📞
+                                    </div>
+                                    <h3 class="font-bold text-gray-800">الدعم الفني</h3>
+                                </div>
+
+                                <div class="space-y-3 text-sm">
+                                    <div>
+                                        <div class="text-gray-500">الاسم</div>
+                                        <div class="font-semibold text-gray-900">
+                                            {{ tech_support.name }}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">رقم التواصل</div>
+
+                                        <div
+                                            class="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 mt-1">
+                                            <span class="font-mono">{{ tech_support.phone }}</span>
+
+                                            <div class="flex items-center gap-2">
+                                                <!-- COPY -->
+                                                <button onclick="copyText('{{ tech_support.phone }}')"
+                                                    class="text-xs text-blue-600 hover:underline">
+                                                    نسخ
+                                                </button>
+
+                                                <!-- WHATSAPP -->
+                                                <a href="https://wa.me/{{ tech_support.phone }}" target="_blank"
+                                                    class="flex items-center gap-1 text-green-600 hover:text-green-700 text-xs font-semibold">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
+                                                        viewBox="0 0 24 24" fill="currentColor">
+                                                        <path
+                                                            d="M12.04 2.01C6.58 2.01 2.15 6.44 2.15 11.9c0 1.93.5 3.82 1.45 5.5L2 22l4.7-1.53c1.6.87 3.4 1.32 5.34 1.32h.01c5.46 0 9.89-4.43 9.89-9.89S17.5 2.01 12.04 2.01zm5.73 14.2c-.24.68-1.42 1.3-1.96 1.38-.5.08-1.12.12-1.8-.12-.42-.14-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.4-.15-.2-1.19-1.58-1.19-3.02 0-1.44.75-2.15 1.02-2.45.27-.3.6-.38.8-.38.2 0 .4 0 .57.01.18.01.42-.07.66.5.24.58.82 2 .89 2.15.07.15.12.33.02.53-.1.2-.15.33-.3.5-.15.18-.31.4-.44.54-.15.15-.31.32-.13.63.18.3.8 1.33 1.72 2.15 1.18 1.05 2.17 1.38 2.48 1.53.31.15.5.13.68-.08.18-.2.78-.9.99-1.2.2-.3.4-.25.68-.15.27.1 1.7.8 2 .95.3.15.5.22.57.35.07.12.07.7-.17 1.38z" />
+                                                    </svg>
+                                                    واتساب
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                            <!-- BANK CARD -->
+                            <div class="rounded-xl bg-white border p-5 hover:shadow transition">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <div
+                                        class="w-9 h-9 flex items-center justify-center rounded-full bg-green-100 text-green-600">
+                                        🏦
+                                    </div>
+                                    <h3 class="font-bold text-gray-800">بيانات التحويل البنكي</h3>
+                                </div>
+
+                                <div class="space-y-3 text-sm">
+                                    <div>
+                                        <div class="text-gray-500">اسم البنك</div>
+                                        <div class="font-semibold text-gray-900">
+                                            {{ tech_support.bank_name }}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">اسم صاحب الحساب</div>
+                                        <div
+                                            class="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 mt-1">
+                                            <span class="font-mono">{{ tech_support.bank_account_holder }}</span>
+                                            <button onclick="copyText('{{ tech_support.bank_account_holder }}')"
+                                                class="text-xs text-blue-600 hover:underline">
+                                                نسخ
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">رقم الحساب</div>
+                                        <div
+                                            class="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 mt-1">
+                                            <span class="font-mono">{{ tech_support.bank_account_number }}</span>
+                                            <button onclick="copyText('{{ tech_support.bank_account_number }}')"
+                                                class="text-xs text-blue-600 hover:underline">
+                                                نسخ
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ACCOUNT CARD -->
+                            <div class="rounded-xl bg-white border p-5 hover:shadow transition">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <div
+                                        class="w-9 h-9 flex items-center justify-center rounded-full bg-purple-100 text-purple-600">
+                                        👤
+                                    </div>
+                                    <h3 class="font-bold text-gray-800">معلومات الحساب</h3>
+                                </div>
+
+                                <div class="space-y-3 text-sm">
+                                    <div>
+                                        <div class="text-gray-500">رقم حسابك</div>
+                                        <div class="font-mono font-semibold text-gray-900">
+                                            {{ user.id }}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">موعد الدفع القادم</div>
+                                        <div class="font-semibold text-gray-900">
+                                            {{ next_payment_date }}
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4 text-xs text-gray-500 bg-gray-50 rounded-lg p-3">
+                                        ⚠️ يرجى إرسال التحويل مع رقم الحساب لتسريع التفعيل
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="mt-6">
+
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">عدد الخوادم</div>
+                            <div class="stat-value">{{ total_servers }}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">المتصلون الآن</div>
+                            <div class="stat-value">{{ online_vouchers }}</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-label">إجمالي الكروت المُنشأة</div>
+                            <div class="stat-value">{{ total_vouchers_created }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript for mobile menu toggle functionality -->
+    <script>
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const sidebar = document.getElementById('sidebar');
+        const menuOverlay = document.getElementById('menuOverlay');
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.createElement("div");
+                toast.innerText = "تم النسخ ✔";
+                toast.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-black text-white text-sm px-4 py-2 rounded-lg shadow";
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 1500);
+            });
+        }
+        hamburgerBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+        });
+
+        menuOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            menuOverlay.classList.remove('active');
+        });
+
+        document.querySelectorAll('.menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                menuOverlay.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+
+</html>

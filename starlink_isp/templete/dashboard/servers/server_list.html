@@ -1,0 +1,136 @@
+{% extends "dashboard/base.html" %}
+{% block title %}السيرفرات — Dashboard{% endblock %}
+{% block content %}
+<div class="p-6">
+
+    <div class="mb-6 flex items-center justify-between">
+        <h2 class="text-2xl font-bold text-gray-900">السيرفرات</h2>
+
+        <a href="{% url 'servers:add' %}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            + إضافة سيرفر
+        </a>
+    </div>
+
+    {% if servers %}
+
+    <!-- ✅ WRAPPER NOW SCROLLS ON MOBILE -->
+    <div class="bg-white shadow-sm border border-gray-100 rounded-lg overflow-x-auto">
+
+        <!-- IMPORTANT: table must not be 100% width → use max-content -->
+        <table class="text-right text-sm min-w-max w-full">
+            <thead class="bg-gray-50 border-b">
+                <tr>
+                    <th class="px-6 py-3 whitespace-nowrap">الاسم</th>
+                    <th class="px-6 py-3 whitespace-nowrap">IP / المضيف</th>
+                    <th class="px-6 py-3 whitespace-nowrap">رقم التسلسلي</th>
+                    <th class="px-6 py-3 whitespace-nowrap">الإجراءات</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y">
+                {% for s in servers %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">{{ s.name }}</td>
+
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {{ s.ip_address }}
+                        <!-- <div class="text-gray-500 text-xs">{{ s.hostname }}</div> -->
+                    </td>
+
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">
+                            {{ s.serial_number }}
+                        </span>
+                    </td>
+
+
+                    <td class="px-6 py-4 flex gap-3 whitespace-nowrap">
+
+                        <a href="{% url 'servers:download' s.id %}"
+                            class="text-green-600 hover:text-green-800 font-semibold">
+                            تحميل الإعدادات
+                        </a>
+
+                        <a href="{% url 'servers:edit' s.id %}" class="text-blue-600 hover:text-blue-800">
+                            تعديل
+                        </a>
+
+                        <a href="{% url 'servers:delete' s.id %}" class="text-red-600 hover:text-red-800 font-medium"
+                            data-confirm="1" data-msg="هل أنت متأكد من حذف هذا السيرفر؟">
+                            حذف
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+    {% else %}
+
+    <div class="bg-white p-8 text-center border rounded-lg">
+        <p class="text-gray-500 mb-4">لا توجد سيرفرات حالياً</p>
+        <a href="{% url 'servers:add' %}" class="px-4 py-2 bg-blue-600 text-white rounded-lg">
+            + إضافة أول سيرفر
+        </a>
+    </div>
+
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // -------- Confirm modal logic --------
+        const modal = document.getElementById("confirmModal");
+        const back = document.getElementById("cmBack");
+        const txt = document.getElementById("cmText");
+        const ok = document.getElementById("cmOk");
+        const cancel = document.getElementById("cmCancel");
+
+        function openModal(message, href) {
+            txt.textContent = message || "هل أنت متأكد؟";
+            ok.setAttribute("href", href || "#");
+            modal.classList.remove("hidden");
+        }
+
+        function closeModal() {
+            modal.classList.add("hidden");
+            ok.setAttribute("href", "#");
+        }
+
+        document.querySelectorAll("a[data-confirm]").forEach(a => {
+            a.addEventListener("click", (e) => {
+                e.preventDefault();               // ✅ prevents immediate delete
+                openModal(a.dataset.msg, a.href); // ✅ only deletes if user clicks OK in modal
+            });
+        });
+
+        back.addEventListener("click", closeModal);
+        cancel.addEventListener("click", closeModal);
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeModal();
+        });
+    });
+</script>
+
+
+<div id="confirmModal" class="fixed inset-0 hidden z-50">
+    <div id="cmBack" class="absolute inset-0 bg-black/30"></div>
+
+    <div class="absolute left-1/2 top-1/2 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2
+              bg-white border rounded-lg shadow p-5">
+        <p id="cmText" class="text-sm text-gray-800"></p>
+
+        <div class="mt-4 flex justify-end gap-2">
+            <button id="cmCancel" class="px-3 py-2 text-sm rounded-md bg-gray-100 hover:bg-gray-200">
+                إلغاء
+            </button>
+            <a id="cmOk" class="px-3 py-2 text-sm rounded-md bg-red-600 hover:bg-red-700 text-white">
+                حذف
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,195 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<style>
+    /* ===============================
+   CONFIRM MODAL
+================================ */
+
+    #confirmModal {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: none;
+        /* hidden by default */
+    }
+
+    /* Show modal */
+    #confirmModal.active {
+        display: block;
+    }
+
+    /* Background overlay */
+    #cmBack {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Modal box */
+    #confirmModal .modal-box {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 92%;
+        max-width: 420px;
+        transform: translate(-50%, -50%);
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        padding: 20px;
+    }
+
+    /* Text */
+    #cmText {
+        font-size: 14px;
+        color: #1f2937;
+        line-height: 1.6;
+    }
+
+    /* Buttons wrapper */
+    .modal-actions {
+        margin-top: 16px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    /* Cancel button */
+    #cmCancel {
+        padding: 8px 14px;
+        font-size: 14px;
+        border-radius: 6px;
+        border: none;
+        background: #f3f4f6;
+        color: #374151;
+        cursor: pointer;
+    }
+
+    #cmCancel:hover {
+        background: #e5e7eb;
+    }
+
+    /* Confirm delete button */
+    #cmOk {
+        padding: 8px 14px;
+        font-size: 14px;
+        border-radius: 6px;
+        background: #dc2626;
+        color: #ffffff;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #cmOk:hover {
+        background: #b91c1c;
+    }
+</style>
+
+
+<div style="margin-bottom: 2rem;">
+    <h2 style="margin-bottom: 1.5rem;">الخوادم</h2>
+
+    <form method="get" class="search-bar">
+        <input type="text" name="search" value="{{ search|default:'' }}" placeholder="البحث باسم الخادم أو اسم الوكيل">
+        <button class="btn btn-primary">بحث</button>
+    </form>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>اسم الخادم</th>
+                <th>المشترك</th>
+                <th>عنوان IP</th>
+                <th>تاريخ الإنشاء</th>
+                <th>الإجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for server in servers %}
+            <tr>
+                <td>{{ server.name }}</td>
+                <td>{{ server.owner.username }}</td>
+                <td>{{ server.ip_address }}</td>
+                <td>{{ server.created_at|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <a href="{% url 'adminpanel:server_delete' server.id %}" data-confirm
+                        data-msg="هل أنت متأكد من حذف هذا الخادم؟" class="btn btn-danger">
+                        حذف
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 2rem;">لم يتم العثور على خوادم</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const modal = document.getElementById("confirmModal");
+        const back = document.getElementById("cmBack");
+        const text = document.getElementById("cmText");
+        const okBtn = document.getElementById("cmOk");
+        const cancel = document.getElementById("cmCancel");
+
+        let targetHref = null;
+
+        function openModal(message, href) {
+            text.textContent = message || "هل أنت متأكد؟";
+            targetHref = href;
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+            targetHref = null;
+        }
+
+        // Attach to ALL delete links
+        document.querySelectorAll("a[data-confirm]").forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault(); // ⛔ stop delete
+                openModal(
+                    link.dataset.msg,
+                    link.getAttribute("href")
+                );
+            });
+        });
+
+        // Confirm delete
+        okBtn.addEventListener("click", function () {
+            if (targetHref) {
+                window.location.href = targetHref; // ✅ NOW delete
+            }
+        });
+
+        // Cancel / close
+        cancel.addEventListener("click", closeModal);
+        back.addEventListener("click", closeModal);
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") closeModal();
+        });
+
+    });
+</script>
+
+<div id="confirmModal">
+    <div id="cmBack"></div>
+
+    <div class="modal-box">
+        <p id="cmText"></p>
+
+        <div class="modal-actions">
+            <button id="cmCancel">إلغاء</button>
+            <a id="cmOk">حذف</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

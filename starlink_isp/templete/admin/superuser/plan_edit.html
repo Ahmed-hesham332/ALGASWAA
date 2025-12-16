@@ -1,0 +1,56 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div class="form-container">
+    <h2>تعديل الخطة: {{ plan.name }}</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <!-- NAME -->
+        <div class="form-group">
+            <label>اسم الخطة</label>
+            {{ form.name }}
+            {{ form.name.errors }}
+        </div>
+
+        <!-- CLIENT COUNT -->
+        <div class="form-group">
+            <label>عدد العملاء</label>
+            {{ form.number_of_clients }}
+            {{ form.number_of_clients.errors }}
+        </div>
+
+        <!-- SERVER COUNT -->
+        <div class="form-group">
+            <label>عدد الخوادم</label>
+            {{ form.number_of_servers }}
+            {{ form.number_of_servers.errors }}
+        </div>
+
+        <!-- VOUCHER COUNT -->
+        <div class="form-group">
+            <label>عدد الكروت</label>
+            {{ form.number_of_vouchers }}
+            {{ form.number_of_vouchers.errors }}
+        </div>
+
+        <div class="form-group">
+            <label>السعر</label>
+            {{ form.price_display }}
+            {{ form.price_display.errors }}
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'adminpanel:plan_list' %}" class="btn btn-secondary">رجوع</a>
+            <button type="submit" class="btn btn-primary">حفظ</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

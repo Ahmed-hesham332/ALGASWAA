@@ -1,0 +1,149 @@
+{% extends "dashboard/base.html" %}
+{% block title %}إنشاء مجموعة كروت جديدة{% endblock %}
+{% block page_title %}مجموعة كروت جديدة{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <div class="max-w-3xl mx-auto">
+
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">إنشاء مجموعة كروت جديدة</h2>
+            <p class="text-gray-600 text-sm mt-1">قم بتعبئة بيانات المجموعة وسيتم إنشاء الكروت تلقائياً</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Server + Offer -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.server.label }}
+                        </label>
+                        {{ form.server }}
+                        {% if form.server.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.server.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.offer.label }}
+                        </label>
+                        {{ form.offer }}
+                        {% if form.offer.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.offer.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Name + Quantity -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.name.label }}
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.name.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.quantity.label }}
+                        </label>
+                        {{ form.quantity }}
+                        {% if form.quantity.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.quantity.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Duration + Price -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.duration_days.label }}
+                        </label>
+                        {{ form.duration_days }}
+                        {% if form.duration_days.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.duration_days.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.price_per_voucher.label }}
+                        </label>
+                        {{ form.price_per_voucher }}
+                        {% if form.price_per_voucher.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.price_per_voucher.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Serial Settings -->
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">إعدادات السيريال</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.serial_length.label }}
+                        </label>
+                        {{ form.serial_length }}
+                        {% if form.serial_length.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.serial_length.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.serial_type.label }}
+                        </label>
+                        {{ form.serial_type }}
+                        {% if form.serial_type.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.serial_type.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.prefix.label }}
+                        </label>
+                        {{ form.prefix }}
+                        {% if form.prefix.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.prefix.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Non-field errors -->
+                {% if form.non_field_errors %}
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <!-- Buttons -->
+                <div class="flex gap-3 pt-4 border-t">
+                    <button type="submit"
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+                        إنشاء المجموعة
+                    </button>
+
+                    <a href="{% url 'vouchers:group_list' %}"
+                        class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium">
+                        إلغاء
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,283 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}تعديل العرض — Dashboard{% endblock %}
+
+{% block page_title %}تعديل العرض{% endblock %}
+
+{% block content %}
+
+<div class="p-6">
+
+    <div class="max-w-2xl mx-auto">
+
+        <div class="mb-6">
+
+            <h2 class="text-2xl font-bold text-gray-900">تعديل العرض</h2>
+
+            <p class="text-gray-600 text-sm mt-1">قم بتحديث بيانات العرض أدناه</p>
+
+        </div>
+
+
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+
+            <form method="post" class="space-y-6">
+
+                {% csrf_token %}
+
+
+
+                <!-- Name & Price -->
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                    <div>
+
+                        <label class="block text-sm font-medium text-gray-700 mb-2"
+                            for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+
+                        {{ form.name }}
+
+                        {% if form.name.errors %}
+
+                        <div class="text-red-600 text-sm mt-1">{{ form.name.errors }}</div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-medium text-gray-700 mb-2"
+                            for="{{ form.price.id_for_label }}">{{ form.price.label }}</label>
+
+                        {{ form.price }}
+
+                        {% if form.price.errors %}
+
+                        <div class="text-red-600 text-sm mt-1">{{ form.price.errors }}</div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Speed Section -->
+
+                <div class="border-t pt-5 space-y-5">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                        <div>
+
+                            <label class="block text-sm font-medium text-gray-700 mb-2"
+                                for="{{ form.download_speed.id_for_label }}">{{ form.download_speed.label }}</label>
+
+                            {{ form.download_speed }}
+
+                            {% if form.download_speed.errors %}
+
+                            <div class="text-red-600 text-sm mt-1">{{ form.download_speed.errors }}</div>
+
+                            {% endif %}
+
+                        </div>
+
+                        <div>
+
+                            <label class="block text-sm font-medium text-gray-700 mb-2"
+                                for="{{ form.upload_speed.id_for_label }}">{{ form.upload_speed.label }}</label>
+
+                            {{ form.upload_speed }}
+
+                            {% if form.upload_speed.errors %}
+
+                            <div class="text-red-600 text-sm mt-1">{{ form.upload_speed.errors }}</div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Duration Section -->
+
+                <div class="border-t pt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                    <div>
+
+                        <label class="block text-sm font-medium text-gray-700 mb-2"
+                            for="{{ form.duration_type.id_for_label }}">{{ form.duration_type.label }}</label>
+
+                        {{ form.duration_type }}
+
+                        {% if form.duration_type.errors %}
+
+                        <div class="text-red-600 text-sm mt-1">{{ form.duration_type.errors }}</div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-medium text-gray-700 mb-2"
+                            for="{{ form.duration_value.id_for_label }}">{{ form.duration_value.label }}</label>
+
+                        {{ form.duration_value }}
+
+                        {% if form.duration_value.errors %}
+
+                        <div class="text-red-600 text-sm mt-1">{{ form.duration_value.errors }}</div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Quota Section -->
+
+                <div class="border-t pt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                    <div>
+
+                        <label class="block text-sm font-medium text-gray-700 mb-2"
+                            for="{{ form.quota_type.id_for_label }}">{{ form.quota_type.label }}</label>
+
+                        {{ form.quota_type }}
+
+                        {% if form.quota_type.errors %}
+
+                        <div class="text-red-600 text-sm mt-1">{{ form.quota_type.errors }}</div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-medium text-gray-700 mb-2"
+                            for="{{ form.quota_amount.id_for_label }}">{{ form.quota_amount.label }}</label>
+
+                        {{ form.quota_amount }}
+
+                        {% if form.quota_amount.errors %}
+
+                        <div class="text-red-600 text-sm mt-1">{{ form.quota_amount.errors }}</div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- Checkboxes Section -->
+
+                <div class="border-t pt-5 space-y-3">
+
+                    <label class="flex items-start gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+
+                        {{ form.unlimited_speed }}
+
+                        <span class="leading-tight break-words">{{ form.unlimited_speed.label }}</span>
+
+                    </label>
+
+                    <label class="flex items-start gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+
+                        {{ form.block_porn_sites }}
+
+                        <span class="leading-tight break-words">{{ form.block_porn_sites.label }}</span>
+
+                    </label>
+
+                    <label class="flex items-start gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+
+                        {{ form.peak_time }}
+
+                        <span class="leading-tight break-words">{{ form.peak_time.label }}</span>
+
+                    </label>
+
+                    <label class="flex items-start gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+
+                        {{ form.is_available }}
+
+                        <span class="leading-tight break-words">{{ form.is_available.label }}</span>
+
+                    </label>
+
+                    <label class="flex items-start gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+
+                        {{ form.speed_formula }}
+
+                        <span class="leading-tight break-words">{{ form.speed_formula.label }}</span>
+
+                    </label>
+
+                </div>
+
+
+
+                {% if form.non_field_errors %}
+
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+
+                    {{ form.non_field_errors }}
+
+                </div>
+
+                {% endif %}
+
+
+
+                <!-- Action Buttons -->
+
+                <div class="flex gap-3 pt-4 border-t">
+
+                    <button type="submit"
+                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+
+                        حفظ التعديلات
+
+                    </button>
+
+                    <a href="{% url 'offers:offer_list' %}"
+                        class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium">
+
+                        إلغاء
+
+                    </a>
+
+                    <a href="{% url 'offers:offer_delete' offer.id %}"
+                        class="px-6 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition font-medium"
+                        onclick="return confirm('هل أنت متأكد أنك تريد حذف هذا العرض؟');">
+
+                        حذف العرض
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,570 @@
+{% extends "admin/base.html" %}
+{% block content %}
+{% csrf_token %}
+
+<style>
+    /* ===============================
+   CONFIRM MODAL
+================================ */
+
+    /* Wrapper */
+    #confirmModal {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: none;
+        /* hidden by default */
+    }
+
+    /* Show modal */
+    #confirmModal.active {
+        display: block;
+    }
+
+    /* Background overlay */
+    #cmBack {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Modal box */
+    #confirmModal>div:last-child {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 92%;
+        max-width: 420px;
+        transform: translate(-50%, -50%);
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        padding: 20px;
+    }
+
+    /* Text */
+    #cmText {
+        font-size: 14px;
+        color: #1f2937;
+        line-height: 1.6;
+    }
+
+    /* Buttons wrapper */
+    #confirmModal .mt-4 {
+        margin-top: 16px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    /* Cancel button */
+    #cmCancel {
+        padding: 8px 14px;
+        font-size: 14px;
+        border-radius: 6px;
+        border: none;
+        background: #f3f4f6;
+        color: #374151;
+        cursor: pointer;
+    }
+
+    #cmCancel:hover {
+        background: #e5e7eb;
+    }
+
+    /* Confirm delete button */
+    #cmOk {
+        padding: 8px 14px;
+        font-size: 14px;
+        border-radius: 6px;
+        background: #dc2626;
+        color: #ffffff;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    #cmOk:hover {
+        background: #b91c1c;
+    }
+
+    .search-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        direction: rtl;
+    }
+
+    /* SEARCH INPUT */
+    .search-form input,
+    .search-form select {
+        flex: 1;
+        min-width: 200px;
+        height: 48px;
+        padding: 0 14px;
+        font-size: 16px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        background-color: white;
+    }
+
+    /* SEARCH BUTTON */
+    .search-form button {
+        height: 48px;
+        padding: 0 22px;
+        border-radius: 10px;
+        background: #991b1b;
+        color: white;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* CLEAR BUTTON */
+    .search-form .clear-btn {
+        height: 48px;
+        padding: 0 18px;
+        border-radius: 10px;
+        background: #e5e7eb;
+        color: #374151;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+    }
+
+    /* SWITCH CONTAINER */
+    .switch {
+        width: 44px;
+        height: 22px;
+        background: #d1d5db;
+        /* gray */
+        border-radius: 999px;
+        position: relative;
+        display: inline-block;
+        transition: background 0.25s ease;
+    }
+
+    /* ACTIVE STATE */
+    .switch.active {
+        background: #22c55e;
+        /* green */
+    }
+
+    /* SWITCH KNOB */
+    .switch::after {
+        content: "";
+        width: 18px;
+        height: 18px;
+        background: white;
+        border-radius: 50%;
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.25s ease;
+    }
+
+    /* MOVE KNOB WHEN ACTIVE */
+    .switch.active::after {
+        transform: translateX(22px);
+    }
+
+    /* REMOVE LINK STYLING */
+    .switch-link {
+        text-decoration: none;
+    }
+
+    /* ===============================
+   MOBILE VIEW (≤ 640px)
+================================ */
+    @media (max-width: 640px) {
+
+        /* SEARCH FORM */
+        .search-form {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .search-form input,
+        .search-form select {
+            width: 100%;
+            font-size: 17px;
+            height: 52px;
+            text-align: right;
+        }
+
+        .search-form button,
+        .search-form .clear-btn {
+            width: 100%;
+            height: 50px;
+            font-size: 16px;
+            justify-content: center;
+        }
+
+        .admin-table,
+        .admin-table thead,
+        .admin-table tbody,
+        .admin-table th,
+        .admin-table td,
+        .admin-table tr {
+            display: block;
+            width: 100%;
+        }
+
+        .admin-table thead {
+            display: none;
+        }
+
+        .admin-table tr {
+            background: #fff;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .admin-table td {
+            display: flex;
+            justify-content: space-between;
+            /* RTL alignment */
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            text-align: right;
+            direction: rtl;
+            font-size: 14px;
+        }
+
+        .admin-table td:last-child {
+            border-bottom: none;
+        }
+
+        /* LABEL */
+        .admin-table td::before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        /* ACTION BUTTONS STACK */
+        .admin-table td[data-label="الإجراءات"] {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .admin-table td[data-label="الإجراءات"] a {
+            width: 100%;
+            text-align: center;
+        }
+
+        /* SWITCH CENTER */
+        .switch-link {
+            display: flex;
+            justify-content: flex-end;
+        }
+    }
+
+    /* FILTER BAR STYLES (Replaces Tailwind) */
+    .filter-bar {
+        background-color: white;
+        padding: 1rem;
+        /* p-4 */
+        border-radius: 0.5rem;
+        /* rounded-lg */
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        /* shadow-sm */
+        border: 1px solid #f3f4f6;
+        /* border-gray-100 */
+        margin-bottom: 1.5rem;
+        /* mb-6 */
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        /* gap-4 */
+    }
+
+    /* md:grid-cols-4 */
+    @media (min-width: 768px) {
+        .filter-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+
+    .filter-label {
+        font-size: 0.875rem;
+        /* text-sm */
+        color: #4b5563;
+        /* text-gray-600 */
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .filter-input,
+    .filter-select {
+        width: 100%;
+        margin-top: 0.25rem;
+        /* mt-1 */
+        border: 1px solid #d1d5db;
+        /* border-gray-300 */
+        border-radius: 0.5rem;
+        /* rounded-lg */
+        padding: 0.5rem 0.75rem;
+        /* px-3 py-2 */
+        font-size: 0.875rem;
+        /* text-sm */
+        outline: none;
+        box-sizing: border-box;
+        /* ensure padding doesn't swell width */
+    }
+
+    .filter-input:focus,
+    .filter-select:focus {
+        border-color: #6366f1;
+        /* focus:border-indigo-500 */
+        /* could add ring/shadow here if desired */
+    }
+
+    .filter-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1rem;
+        /* mt-4 */
+        gap: 0.75rem;
+    }
+
+    .btn-apply {
+        padding: 0.5rem 1rem;
+        /* px-4 py-2 */
+        background-color: #4f46e5;
+        /* bg-indigo-600 */
+        color: white;
+        border-radius: 0.5rem;
+        /* rounded-lg */
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-apply:hover {
+        background-color: #4338ca;
+        /* hover:bg-indigo-700 */
+    }
+
+    .btn-reset {
+        padding: 0.5rem 1rem;
+        /* px-4 py-2 */
+        margin-right: 0.75rem;
+        /* mr-3 (LTR) / in RTL context ensure spacing */
+        background-color: #e5e7eb;
+        /* bg-gray-200 */
+        color: #1f2937;
+        /* text-gray-800 */
+        border-radius: 0.5rem;
+        /* rounded-lg */
+        text-decoration: none;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-reset:hover {
+        background-color: #d1d5db;
+        /* hover:bg-gray-300 */
+    }
+</style>
+
+<div style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2>المشتركين</h2>
+        <div>
+            <a href="{% url 'adminpanel:delete_unpaid_resellers' %}" class="btn btn-danger"
+                style="background-color: #dc2626; color: white; margin-left: 10px;" data-confirm
+                data-msg="تحذير: هل أنت متأكد من حذف جميع المشتركين غير المدفوعين؟ لا يمكن التراجع عن هذا الإجراء.">
+                حذف المشتركين غير المدفوعين
+            </a>
+            <a href="{% url 'adminpanel:reseller_add' %}" class="btn btn-primary">إضافة مشترك</a>
+        </div>
+    </div>
+
+    <!-- ====== FILTER BAR ====== -->
+    <form method="get" class="filter-bar">
+        <div class="filter-grid">
+
+            <!-- Search Input -->
+            <div>
+                <label class="filter-label">رقم الحساب</label>
+                <input type="number" name="q" value="{{ q }}" placeholder="بحث برقم الحساب..." class="filter-input">
+            </div>
+
+            <!-- Status Filter -->
+            <div>
+                <label class="filter-label">الحالة</label>
+                <select name="status" class="filter-select">
+                    <option value="">الكل</option>
+                    <option value="True" {% if statuses.active %}selected{% endif %}>نشط</option>
+                    <option value="False" {% if statuses.inactive %}selected{% endif %}>غير نشط</option>
+                </select>
+            </div>
+
+            <!-- Payment Filter -->
+            <div>
+                <label class="filter-label">الدفع</label>
+                <select name="has_paied" class="filter-select">
+                    <option value="">الكل</option>
+                    <option value="True" {% if payments.paid %}selected{% endif %}>مدفوع</option>
+                    <option value="False" {% if payments.not_paid %}selected{% endif %}>غير مدفوع</option>
+                </select>
+            </div>
+
+            <!-- Empty column -->
+            <div></div>
+
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn-apply">
+                تطبيق الفلترة
+            </button>
+
+            {% if q or status_filter or has_paied_filter %}
+            <a href="{% url 'adminpanel:reseller_list' %}" class="btn-reset">
+                إعادة التعيين
+            </a>
+            {% endif %}
+        </div>
+    </form>
+    <!-- ====== END FILTER BAR ====== -->
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>اسم الشبكة</th>
+                <th>مدير الشبكة</th>
+                <th>اسم المستخدم</th>
+                <th>الخطة</th>
+                <th>رقم الهاتف</th>
+                <th>الحالة</th>
+                <th>الدفع</th>
+                <th>الإجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in resellers %}
+            <tr>
+                <td data-label="رقم الحساب">{{ r.id }}</td>
+                <td data-label="اسم الشبكة">{{ r.Network_Name }}</td>
+                <td data-label="مدير الشبكة">{{ r.Manager_Name }}</td>
+                <td data-label="اسم المستخدم">{{ r.username }}</td>
+                <td data-label="الخطة">{{ r.plan }}</td>
+                <td data-label="رقم الهاتف">{{ r.Phone_Number }}</td>
+
+                <td data-label="الحالة" class="text-center">
+                    <a href="{% url 'adminpanel:reseller_toggle_status' r.id %}" class="switch-link">
+                        <span class="switch {% if r.status %}active{% endif %}"></span>
+                    </a>
+                </td>
+
+                <td data-label="الدفع" class="text-center">
+                    <a href="{% url 'adminpanel:reseller_toggle_paied' r.id %}" class="switch-link">
+                        <span class="switch {% if r.has_paied %}active{% endif %}"></span>
+                    </a>
+                </td>
+
+                <td data-label="الإجراءات">
+                    <a href="{% url 'adminpanel:reseller_edit' r.id %}" class="btn btn-warning">
+                        تعديل
+                    </a>
+                    <a href="{% url 'adminpanel:reseller_delete' r.id %}" class="btn btn-danger" data-confirm
+                        data-msg="هل أنت متأكد من حذف هذا الوكيل؟">
+                        حذف
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align:center">
+                    لا يوجد مشتركين حالياً
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const modal = document.getElementById("confirmModal");
+        const back = document.getElementById("cmBack");
+        const text = document.getElementById("cmText");
+        const okBtn = document.getElementById("cmOk");
+        const cancel = document.getElementById("cmCancel");
+
+        let targetHref = null;
+
+        function openModal(message, href) {
+            text.textContent = message || "هل أنت متأكد؟";
+            targetHref = href;
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+            targetHref = null;
+        }
+
+        // Attach to ALL delete links
+        document.querySelectorAll("a[data-confirm]").forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault(); // ⛔ stop delete
+                openModal(
+                    link.dataset.msg,
+                    link.getAttribute("href")
+                );
+            });
+        });
+
+        // Confirm delete
+        okBtn.addEventListener("click", function () {
+            if (targetHref) {
+                window.location.href = targetHref; // ✅ NOW delete
+            }
+        });
+
+        // Cancel / close
+        cancel.addEventListener("click", closeModal);
+        back.addEventListener("click", closeModal);
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") closeModal();
+        });
+
+    });
+</script>
+
+<div id="confirmModal" class="fixed inset-0 hidden z-50">
+    <div id="cmBack" class="absolute inset-0 bg-black/30"></div>
+
+    <div class="absolute left-1/2 top-1/2 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2
+              bg-white border rounded-lg shadow p-5">
+        <p id="cmText" class="text-sm text-gray-800"></p>
+
+        <div class="mt-4 flex justify-end gap-2">
+            <button id="cmCancel" class="px-3 py-2 text-sm rounded-md bg-gray-100 hover:bg-gray-200">
+                إلغاء
+            </button>
+            <a id="cmOk" class="px-3 py-2 text-sm rounded-md bg-red-600 hover:bg-red-700 text-white">
+                حذف
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

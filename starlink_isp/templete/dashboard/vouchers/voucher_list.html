@@ -1,0 +1,196 @@
+{% extends "dashboard/base.html" %}
+{% block title %}الكروت — Dashboard{% endblock %}
+{% block page_title %}الكروت{% endblock %}
+
+{% block content %}
+{% if request.user.status %}
+<div class="p-6">
+
+    <!-- HEADER + GENERATE BUTTON -->
+    <div class="mb-6 flex items-center justify-between">
+        <h2 class="text-2xl font-bold text-gray-900">جميع الكروت</h2>
+
+        <div class="flex gap-2">
+            <a href="{% url 'vouchers:batch_list' %}"
+                class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                عرض المجموعات
+            </a>
+            <a href="{% url 'vouchers:voucher_generate' %}"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                + إنشاء مجموعة كروت
+            </a>
+        </div>
+    </div>
+
+    <!-- ====== FILTER BAR ====== -->
+    <form method="GET" class="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+            <!-- Server Filter -->
+            <div>
+                <label class="text-sm text-gray-600">السيرفر</label>
+                <select name="server" class="w-full mt-1 border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    <option value="">كل السيرفرات</option>
+
+                    {% for s in servers %}
+                    <option value="{{ s.id }}" {% if s.is_selected %}selected{% endif %}>
+                        {{ s.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Offer Filter -->
+            <div>
+                <label class="text-sm text-gray-600">العرض</label>
+                <select name="offer" class="w-full mt-1 border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    <option value="">كل العروض</option>
+
+                    {% for o in offers %}
+                    <option value="{{ o.id }}" {% if o.is_selected %}selected{% endif %}>
+                        {{ o.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Group Filter -->
+            <div>
+                <label class="text-sm text-gray-600">المجموعة</label>
+                <select name="group" class="w-full mt-1 border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    <option value="">كل المجموعات</option>
+
+                    {% for g in groups %}
+                    <option value="{{ g.id }}" {% if g.is_selected %}selected{% endif %}>
+                        {{ g.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div>
+                <label class="text-sm text-gray-600">الحالة</label>
+                <select name="status" class="w-full mt-1 border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    <option value="">الكل</option>
+                    <option value="used" {% if statuses.used %}selected{% endif %}>مستخدم</option>
+                    <option value="unused" {% if statuses.unused %}selected{% endif %}>غير مستخدم</option>
+                    <option value="expired" {% if statuses.expired %}selected{% endif %}>منتهي</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="flex justify-end mt-4">
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                تطبيق الفلترة
+            </button>
+
+            <a href="{% url 'vouchers:list' %}"
+                class="px-4 py-2 mr-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+                إعادة التعيين
+            </a>
+        </div>
+    </form>
+    <!-- ====== END FILTER BAR ====== -->
+
+
+
+    {% if vouchers %}
+    <!-- VOUCHERS TABLE -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-right text-sm">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th class="px-4 py-3 font-semibold text-gray-700">#</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">رقم الكارت</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">العرض</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">تاريخ الانشاء</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">تاريخ الشحن</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">تاريخ الانتهاء</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">الكوتا</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">الحالة</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">السعر</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">السيرفر</th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-gray-200">
+                    {% for v in vouchers %}
+                    {%for o in offers %}
+                    {% if v.offer.id == o.id %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-3 text-gray-600">{{ forloop.counter }}</td>
+                        <td class="px-4 py-3 text-gray-900 font-mono text-xs">{{ v.serial }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ v.offer.name }}</td>
+                        <td class="px-4 py-3 text-gray-600 text-xs">{{ v.created_at }}</td>
+                        <td class="px-4 py-3 text-gray-600 text-xs">{{ v.activated_at|default:"—"}}</td>
+                        <td class="px-4 py-3 text-gray-600 text-xs">{{ v.expires_at|default:"—" }}</td>
+                        {% if o.quota_type != "none" %}
+                        <td class="px-4 py-3 text-gray-600">{{ o.quota_amount}}GB</td>
+                        {% else %}
+                        <td class="px-4 py-3 text-gray-600">غير محدود</td>
+                        {% endif %}
+                        <td class="px-4 py-3">
+                            <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                                {{ v.get_is_used_display }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-gray-600 font-medium">{{ v.batch.offer.price }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ v.batch.server.name }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if page_obj.has_other_pages %}
+            <div class="flex justify-center mt-6">
+                <nav class="inline-flex space-x-1">
+
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}"
+                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                        السابق
+                    </a>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <span class="px-3 py-1 bg-blue-600 text-white rounded">{{ num }}</span>
+                    {% else %}
+                    <a href="?page={{ num }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                        {{ num }}
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}"
+                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                        التالي
+                    </a>
+                    {% endif %}
+
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% else %}
+    <!-- EMPTY STATE -->
+    <div class="bg-white rounded-lg p-10 text-center border border-gray-100">
+        <p class="text-gray-500 text-lg mb-4">لا توجد كروت حالياً</p>
+
+        <a href="{% url 'vouchers:voucher_generate' %}"
+            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
+            + إضافة كروت جديدة
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% else %}
+{% include "dashboard/suspended.html" %}
+{% endif %}
+{% endblock %}

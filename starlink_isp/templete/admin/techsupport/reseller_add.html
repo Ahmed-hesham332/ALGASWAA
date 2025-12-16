@@ -1,0 +1,58 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div class="form-container">
+    <h2>إضافة وكيل جديد</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="network_name">اسم الشبكة</label>
+            {{ form.Network_Name }}
+            {{ form.Network_Name.errors }}
+        </div>
+
+        <div class="form-group">
+            <label for="manager_name">اسم المدير</label>
+            {{ form.Manager_Name }}
+            {{ form.Manager_Name.errors }}
+        </div>
+
+        <div class="form-group">
+            <label for="username">اسم المستخدم</label>
+            {{ form.username }}
+            {{ form.username.errors }}
+        </div>
+
+        <div class="form-group">
+            <label for="password">كلمة المرور</label>
+            {{ form.password }}
+            {{ form.password.errors }}
+        </div>
+
+        <div class="form-group">
+            <label for="phone">رقم الهاتف</label>
+            {{ form.Phone_Number }}
+            {{ form.Phone_Number.errors }}
+        </div>
+
+        <div class="form-group">
+            <label for="plan">الخطة</label>
+            {{ form.plan }}
+            {{ form.plan.errors }}
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'adminpanel:reseller_list' %}" class="btn btn-secondary">إلغاء</a>
+            <button type="submit" class="btn btn-primary">إنشاء</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

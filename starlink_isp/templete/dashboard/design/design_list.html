@@ -1,0 +1,211 @@
+{% extends "dashboard/base.html" %}
+{% block title %}التصاميم{% endblock %}
+{% block page_title %}التصاميم{% endblock %}
+
+{% block content %}
+{% if request.user.status %}
+<div class="p-6">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">التصاميم</h2>
+            <p class="text-gray-500 text-sm mt-1">إدارة تصاميم الكروت الخاصة بك</p>
+        </div>
+        <a href="{% url 'design:design_add' %}"
+            class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
+            ➕ تصميم جديد
+        </a>
+    </div>
+
+    {% if designs.exists %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {% for d in designs %}
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition overflow-hidden">
+
+            <!-- PREVIEW -->
+            <div class="bg-gray-100 relative w-full" style="aspect-ratio: 42 / 29.7;">
+                {% if d.preview_image %}
+                <img src="{{ d.preview_image.url }}" alt="{{ d.name }}"
+                    class="absolute inset-0 w-full h-full object-contain" />
+                {% else %}
+                <div class="absolute inset-0 flex items-center justify-center text-xs text-gray-400">
+                    لا توجد معاينة
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- BODY -->
+            <div class="p-4 space-y-3">
+
+                <!-- TITLE -->
+                <div>
+                    <div class="font-bold text-gray-900">{{ d.name }}</div>
+                    <div class="text-xs text-gray-500">{{ d.created_at|date:"Y-m-d" }}</div>
+                </div>
+
+                <!-- BATCH SELECT -->
+                <div>
+                    <label class="text-xs font-medium text-gray-600">اختر الباتش</label>
+                    <select class="batch-select w-full border rounded-md p-1 text-sm" data-design="{{ d.id }}">
+                        <option value="">-- اختر باتش --</option>
+                        {% for b in batches %}
+                        <option value="{{ b.id }}">
+                            {{ b.name }} ({{ b.quantity }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- LAYOUT SELECT -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-xs font-medium text-gray-600">الأعمدة</label>
+                        <input type="number" min="1" value="5"
+                            class="cols-input w-full border rounded-md p-1 text-sm text-center"
+                            data-design="{{ d.id }}">
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-gray-600">الصفوف</label>
+                        <input type="number" min="1" value="10"
+                            class="rows-input w-full border rounded-md p-1 text-sm text-center"
+                            data-design="{{ d.id }}">
+                    </div>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="flex justify-between items-center pt-2">
+                    <button
+                        class="download-btn px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:opacity-50"
+                        data-design="{{ d.id }}" disabled>
+                        تحميل PDF
+                    </button>
+
+                    <a href="{% url 'design:delete' d.id %}" class="text-red-600 hover:text-red-800 font-medium"
+                        data-confirm="1" data-msg="هل أنت متأكد من حذف هذا التصميم؟">
+                        حذف
+                    </a>
+
+
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+    <!-- NO DESIGNS STATE -->
+    <div
+        class="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-dashed border-gray-300 text-center">
+        <div class="text-gray-400 mb-4 text-4xl">🖼</div>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">
+            لا توجد تصاميم حتى الآن
+        </h3>
+        <p class="text-sm text-gray-500 mb-6">
+            قم بإنشاء أول تصميم لطباعة الكروت
+        </p>
+        <a href="{% url 'design:design_add' %}"
+            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+            إضافة تصميم جديد
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- JS -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // -------- PDF download button logic --------
+        function updateDownloadButton(designId) {
+            const btn = document.querySelector(`.download-btn[data-design="${designId}"]`);
+            const batchSelect = document.querySelector(`.batch-select[data-design="${designId}"]`);
+            const colsInput = document.querySelector(`.cols-input[data-design="${designId}"]`);
+            const rowsInput = document.querySelector(`.rows-input[data-design="${designId}"]`);
+
+            const batchId = batchSelect.value;
+            const cols = colsInput.value || 5;
+            const rows = rowsInput.value || 10;
+
+            if (batchId) {
+                btn.disabled = false;
+                btn.onclick = () => {
+                    window.location.href = `/design/download/${designId}/?batch=${batchId}&cols=${cols}&rows=${rows}`;
+                };
+            } else {
+                btn.disabled = true;
+                btn.onclick = null;
+            }
+        }
+
+        document.querySelectorAll(".batch-select, .cols-input, .rows-input").forEach(el => {
+            el.addEventListener("change", () => {
+                const designId = el.dataset.design;
+                updateDownloadButton(designId);
+            });
+            // For text inputs, also listen to 'input' event for real-time updates
+            if (el.tagName === 'INPUT') {
+                el.addEventListener("input", () => {
+                    const designId = el.dataset.design;
+                    updateDownloadButton(designId);
+                });
+            }
+        });
+
+        // -------- Confirm modal logic --------
+        const modal = document.getElementById("confirmModal");
+        const back = document.getElementById("cmBack");
+        const txt = document.getElementById("cmText");
+        const ok = document.getElementById("cmOk");
+        const cancel = document.getElementById("cmCancel");
+
+        function openModal(message, href) {
+            txt.textContent = message || "هل أنت متأكد؟";
+            ok.setAttribute("href", href || "#");
+            modal.classList.remove("hidden");
+        }
+
+        function closeModal() {
+            modal.classList.add("hidden");
+            ok.setAttribute("href", "#");
+        }
+
+        document.querySelectorAll("a[data-confirm]").forEach(a => {
+            a.addEventListener("click", (e) => {
+                e.preventDefault();               // ✅ prevents immediate delete
+                openModal(a.dataset.msg, a.href); // ✅ only deletes if user clicks OK in modal
+            });
+        });
+
+        back.addEventListener("click", closeModal);
+        cancel.addEventListener("click", closeModal);
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeModal();
+        });
+    });
+</script>
+
+
+<div id="confirmModal" class="fixed inset-0 hidden z-50">
+    <div id="cmBack" class="absolute inset-0 bg-black/30"></div>
+
+    <div class="absolute left-1/2 top-1/2 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2
+              bg-white border rounded-lg shadow p-5">
+        <p id="cmText" class="text-sm text-gray-800"></p>
+
+        <div class="mt-4 flex justify-end gap-2">
+            <button id="cmCancel" class="px-3 py-2 text-sm rounded-md bg-gray-100 hover:bg-gray-200">
+                إلغاء
+            </button>
+            <a id="cmOk" class="px-3 py-2 text-sm rounded-md bg-red-600 hover:bg-red-700 text-white">
+                حذف
+            </a>
+        </div>
+    </div>
+</div>
+
+{% else %}
+{% include "dashboard/suspended.html" %}
+{% endif %}
+{% endblock %}

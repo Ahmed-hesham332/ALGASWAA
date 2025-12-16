@@ -1,0 +1,91 @@
+{% extends "dashboard/base.html" %}
+{% block title %}مبيعات الكروت{% endblock %}
+{% block page_title %}مبيعات الكروت{% endblock %}
+
+{% block content %}
+<div class="p-6">
+
+    <!-- FILTER BAR -->
+    <form method="GET" class="bg-white p-4 rounded-lg shadow-sm border mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+            <!-- SERVER SELECT -->
+            <div>
+                <label class="text-sm text-gray-600">اسم السيرفر</label>
+                <select name="server" class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-50">
+                    <option value="all">كل السيرفرات</option>
+                    {% for s in servers %}
+                    <option value="{{ s.id }}" {% if s.is_selected %}selected{% endif %}>
+                        {{ s.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- DATE FROM -->
+            <div>
+                <label class="text-sm text-gray-600">يبدأ من</label>
+                <input type="date" name="date_from" value="{{ date_from }}"
+                    class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-50">
+            </div>
+
+            <!-- DATE TO -->
+            <div>
+                <label class="text-sm text-gray-600">ينتهي في</label>
+                <input type="date" name="date_to" value="{{ date_to }}"
+                    class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-50">
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <div class="flex items-end">
+                <button class="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                    عرض المبيعات
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- TOTAL STATS -->
+    <div class="bg-white p-6 rounded-lg shadow-sm border mb-6">
+        <div class="grid grid-cols-2 text-center">
+            <div>
+                <div class="text-orange-500 text-xl font-bold">{{ total_count }}</div>
+                <div class="text-gray-600">إجمالي عدد الكروت المباعة</div>
+            </div>
+            <div>
+                <div class="text-red-600 text-xl font-bold">{{ total_income }}</div>
+                <div class="text-gray-600">إجمالي المبلغ</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SALES TABLE -->
+    <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-right text-sm min-w-max">
+                <!-- ADD min-w-max -->
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="px-6 py-3">#</th>
+                        <th class="px-6 py-3">اليوم</th>
+                        <th class="px-6 py-3">عدد الكروت</th>
+                        <th class="px-6 py-3">السعر</th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y">
+                    {% for row in summary %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">{{ forloop.counter }}</td>
+                        <td class="px-6 py-4">{{ row.day }}</td>
+                        <td class="px-6 py-4">{{ row.count }}</td>
+                        <td class="px-6 py-4">{{ row.income }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

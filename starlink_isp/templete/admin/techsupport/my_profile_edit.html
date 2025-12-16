@@ -1,0 +1,53 @@
+{% extends "admin/base.html" %}
+{% block title %}تعديل الملف الشخصي{% endblock %}
+{% block content %}
+<div class="form-container">
+    <h2>تعديل بياناتي</h2>
+    <form method="POST">
+        {% csrf_token %}
+
+        <h3 class="section-title">بيانات الدخول</h3>
+        <div class="form-group">
+            <label>{{ user_form.username.label }}</label>
+            {{ user_form.username }}
+            {{ user_form.username.errors }}
+        </div>
+        <div class="form-group">
+            <label>{{ user_form.password.label }} (تواصل معنا لتعديل كلمة المرور)</label>
+            {{ user_form.password }}
+            {{ user_form.password.errors }}
+        </div>
+
+        <h3 class="section-title">المعلومات الشخصية والبنكية</h3>
+        <div class="form-group">
+            <label>{{ profile_form.name.label }}</label>
+            {{ profile_form.name }}
+            {{ profile_form.name.errors }}
+        </div>
+        <div class="form-group">
+            <label>{{ profile_form.phone.label }}</label>
+            {{ profile_form.phone }}
+            {{ profile_form.phone.errors }}
+        </div>
+        <div class="form-group">
+            <label>{{ profile_form.bank_name.label }}</label>
+            {{ profile_form.bank_name }}
+            {{ profile_form.bank_name.errors }}
+        </div>
+        <div class="form-group">
+            <label>{{ profile_form.bank_account_holder.label }}</label>
+            {{ profile_form.bank_account_holder }}
+            {{ profile_form.bank_account_holder.errors }}
+        </div>
+        <div class="form-group">
+            <label>{{ profile_form.bank_account_number.label }}</label>
+            {{ profile_form.bank_account_number }}
+            {{ profile_form.bank_account_number.errors }}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
