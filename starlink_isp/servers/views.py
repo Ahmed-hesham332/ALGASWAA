@@ -42,7 +42,9 @@ def server_download(request, server_id):
 
     config_text = generate_mikrotik_config(
         shared_secret=server.api_password,
-        radius_ip="192.168.1.21"  
+        radius_ip="72.62.26.238", 
+        login_html=login_html,
+        status_html=status_html
     )
 
     response = HttpResponse(config_text, content_type="text/plain")

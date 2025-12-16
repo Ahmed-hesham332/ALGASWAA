@@ -53,7 +53,6 @@ class PlanForm(forms.ModelForm):
         model = Plan
         fields = [
             "name",          
-            "number_of_clients",
             "number_of_servers",
             "number_of_vouchers",
             "price_display",
@@ -61,7 +60,6 @@ class PlanForm(forms.ModelForm):
 
         labels = {
             "name": "اسم الخطة",
-            "number_of_clients": "عدد العملاء",
             "number_of_servers": "عدد الخوادم",
             "number_of_vouchers": "عدد القسائم",
             "price_display": "السعر",

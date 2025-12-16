@@ -4,7 +4,6 @@ from django.conf import settings
 class Plan(models.Model):
     name = models.CharField(max_length=50)
     price_display = models.CharField(max_length=20)
-    number_of_clients = models.IntegerField()
     number_of_servers = models.IntegerField()
     number_of_vouchers = models.IntegerField()
 
