@@ -17,6 +17,29 @@ def server_list(request):
 def server_download(request, server_id):
     server = get_object_or_404(Server, id=server_id, owner=request.user)
 
+    # Define path to mikrotikUI folder
+    from django.conf import settings
+    import os
+
+    mikrotik_ui_path = settings.BASE_DIR / "mikrotikUI"
+    
+    login_html = None
+    status_html = None
+
+    # Read login.html
+    try:
+        with open(mikrotik_ui_path / "login.html", "r", encoding="utf-8") as f:
+            login_html = f.read()
+    except FileNotFoundError:
+        pass
+
+    # Read status.html
+    try:
+        with open(mikrotik_ui_path / "status.html", "r", encoding="utf-8") as f:
+            status_html = f.read()
+    except FileNotFoundError:
+        pass
+
     config_text = generate_mikrotik_config(
         shared_secret=server.api_password,
         radius_ip="192.168.1.21"  
