@@ -10,7 +10,6 @@ urlpatterns = [
     path("resellers/<int:user_id>/edit/", views.reseller_edit, name="reseller_edit"),
     path("resellers/<int:user_id>/delete/", views.reseller_delete, name="reseller_delete"),
     path("servers/", views.server_list, name="server_list"),
-    path("servers/all/", views.all_server_list, name="all_server_list"),
     path("servers/<int:server_id>/delete/", views.server_delete, name="server_delete"),
 
     path("profile/", views.profile, name="profile"),
@@ -36,5 +35,6 @@ urlpatterns = [
     path("plans/add/", views.plan_add, name="plan_add"),
     path("plans/<int:plan_id>/edit/", views.plan_edit, name="plan_edit"),
     path("plans/<int:plan_id>/delete/", views.plan_delete, name="plan_delete"),
+    path("servers/all/", views.all_server_list, name="all_server_list"),
 
 ]

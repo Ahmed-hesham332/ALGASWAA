@@ -24,6 +24,7 @@
             <ul>
                 {% if user.is_superuser %}
                 <li><a href="{% url 'adminpanel:tech_support_list' %}">الدعم الفني</a></li>
+                <li><a href="{% url 'adminpanel:all_server_list' %}">الخوادم</a></li>
                 <li><a href="{% url 'adminpanel:plan_list' %}">الخطط</a></li>
                 {% endif %}
 
