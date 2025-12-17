@@ -86,62 +86,61 @@ def add_radius_expiration(username, expires_at):
     return True
 
 def generate_mikrotik_config(
-        shared_secret, 
-        radius_ip, 
-        login_html=None, 
-        status_html=None,
-        tech_support_name="Technical Support",
-        tech_support_phone="0000000000"
-    ):
-    
+    shared_secret,
+    radius_ip,
+    mikrotik_wan_ip,
+    login_html=None,
+    status_html=None,
+    tech_support_name="Technical Support",
+    tech_support_phone="0000000000"
+):
     config = f"""
-# ===============================
-# RADIUS & HOTSPOT CONFIG WIZARD
-# ===============================
+# ==========================================
+# RADIUS + HOTSPOT CONFIG (AUTO GENERATED)
+# ==========================================
 
-# 1. Configure Radius Client
-/radius add address={radius_ip} secret={shared_secret} service=hotspot authentication-port=1812 accounting-port=1813
+# 1️⃣ Radius Client
+/radius add address={radius_ip} secret={shared_secret} service=hotspot authentication-port=1812 accounting-port=1813 src-address={mikrotik_wan_ip}
 /radius incoming set accept=yes
 
-# 2. Configure Hotspot Profile
-/ip hotspot profile set [find] use-radius=yes login-by=http-chap,cookie,mac-cookie 
+# 2️⃣ Hotspot Profile (Dedicated)
+/ip hotspot profile add name=radius_hotspot use-radius=yes login-by=http-chap,cookie,mac-cookie radius-interim-update=5m idle-timeout=5m
+/ip hotspot set [find] profile=radius_hotspot
 
-# 3. Configure NTP (Recommended for Expiration to work)
+# 3️⃣ Time Sync (MANDATORY)
 /system ntp client set enabled=yes primary-ntp=162.159.200.1 secondary-ntp=162.159.200.123
+# if the preavoius one did not work use this:/system clock set time-zone-name=Africa/Khartoum
 
-# 4. Walled Garden (Optional basics)
-/ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=8000
+# 4️⃣ Walled Garden (Allow your platform)
+/ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=80
+/ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=443
 """
 
-    # Helper to escape string for MikroTik script
     def output_file_script(filename, content):
         if not content:
             return ""
-        
-        # Replace placeholders
         content = content.replace("{{ tech_support_name }}", tech_support_name)
         content = content.replace("{{ tech_support_phone }}", tech_support_phone)
-        
-        # Escape double quotes for MikroTik string
-        escaped_content = content.replace('"', '\\"')
-        
+        escaped = content.replace('"', '\\"').replace("\n", "\\n")
         return f"""
-# Updating {filename}
-/file set [find name="hotspot/{filename}"] contents="{escaped_content}"
+# Update {filename}
+/file set [find name="hotspot/{filename}"] contents="{escaped}"
 """
 
     if login_html:
         config += output_file_script("login.html", login_html)
-        
+
     if status_html:
         config += output_file_script("status.html", status_html)
 
     config += """
-# ===============================
-# DONE
-# ===============================
+# ==========================================
+# CONFIG COMPLETE
+# ==========================================
 """
     return config
+
+
 
 
 def add_radius_client(ip, secret, shortname):

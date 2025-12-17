@@ -40,11 +40,19 @@ def server_download(request, server_id):
     except FileNotFoundError:
         pass
 
+    # Get Tech Support Info
+    tech_support = request.user.tech_support_assigned
+    tech_support_name = tech_support.name if tech_support else "Technical Support"
+    tech_support_phone = tech_support.phone if tech_support else "0000000000"
+
     config_text = generate_mikrotik_config(
         shared_secret=server.api_password,
         radius_ip="72.62.26.238", 
+        mikrotik_wan_ip=server.ip_address,
         login_html=login_html,
-        status_html=status_html
+        status_html=status_html,
+        tech_support_name=tech_support_name,
+        tech_support_phone=tech_support_phone
     )
 
     response = HttpResponse(config_text, content_type="text/plain")
