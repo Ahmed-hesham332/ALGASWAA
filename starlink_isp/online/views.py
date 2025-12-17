@@ -8,7 +8,6 @@ from datetime import timedelta
 
 @login_required
 def online_list(request):
-    update_voucher_status()
 
     user = request.user
 

@@ -161,8 +161,29 @@
                 border-radius: 0 0 1rem 1rem;
             }
 
+            nav ul {
+                gap: 1rem !important; 
+            }
+            
+            /* Extra small screens protection */
+            @media (max-width: 400px) {
+                nav {
+                    padding: 0.5rem !important;
+                }
+                nav ul {
+                    gap: 1.3rem !important;
+                }
+                nav a {
+                    font-size: 0.9rem;
+                }
+                .btn-login {
+                    padding: 0.5rem 0.8rem;
+                    font-size: 0.9rem;
+                }
+            }
+
             .logo img {
-                height: 15px;
+                height: 17px;
             }
 
             .hero {

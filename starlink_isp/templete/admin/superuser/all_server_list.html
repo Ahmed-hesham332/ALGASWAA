@@ -1,0 +1,74 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2>كل الخوادم</h2>
+
+        <!-- Search Form -->
+        <form method="get" style="display: flex; gap: 10px;">
+            <input type="text" name="search" value="{{ search }}"
+                placeholder="بحث باسم السيرفر، الموزع، أو الدعم الفني..." class="form-control"
+                style="padding: 8px; border: 1px solid #ddd; border-radius: 6px; width: 300px;">
+            <button type="submit" class="btn btn-primary">بحث</button>
+            {% if search %}
+            <a href="?" class="btn btn-secondary" style="background: #6c757d; color: white;">إلغاء</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>اسم السيرفر</th>
+                <th>عنوان IP</th>
+                <th>الموزع (المالك)</th>
+                <th>الدعم الفني المسؤول</th>
+                <th>تاريخ الإنشاء</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for server in servers %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ server.name }}</td>
+                <td style="direction: ltr; text-align: right;">{{ server.ip_address }}</td>
+                <td>
+                    {% if server.owner %}
+                    <span class="badge" style="background: #e0f2fe; color: #0284c7;">{{ server.owner.username }}</span>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if server.owner.tech_support_assigned %}
+                    <span class="badge" style="background: #dcfce7; color: #166534;">{{
+                        server.owner.tech_support_assigned.name }}</span>
+                    {% else %}
+                    <span style="color: #9ca3af;">غير مخصص</span>
+                    {% endif %}
+                </td>
+                <td>{{ server.created_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 2rem; color: #6b7280;">لا توجد خوادم مطابقة للبحث.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 0.85em;
+        font-weight: 500;
+    }
+</style>
+
+{% endblock %}

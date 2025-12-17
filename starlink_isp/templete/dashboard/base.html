@@ -94,10 +94,36 @@
                 <div>
                     <h1>مرحبا، {{ user.username }}</h1>
                 </div>
-                <div class="header-info">
-                    <div class="user-info">
+                <div class="header-info relative">
+                    <button class="user-info focus:outline-none" id="userMenuBtn">
                         <div class="user-avatar">{{ user.username | first | upper }}</div>
                         <span class="user-name" style="font-weight: 600; color: var(--dark);">{{ user.username}}</span>
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="userMenuDropdown"
+                        class="hidden absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                        <a href="/profile/"
+                            class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            الملف الشخصي
+                        </a>
+                        <div class="h-px bg-gray-100 my-1"></div>
+                        <a href="{% url 'logout' %}"
+                            class="flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                </path>
+                            </svg>
+                            تسجيل الخروج
+                        </a>
                     </div>
                 </div>
             </div>
@@ -221,15 +247,30 @@
                                 <div class="space-y-3 text-sm">
                                     <div>
                                         <div class="text-gray-500">رقم حسابك</div>
-                                        <div class="font-mono font-semibold text-gray-900">
-                                            {{ user.id }}
+                                        <div
+                                            class="font-mono font-semibold text-gray-900 flex items-center justify-between">
+                                            <span>{{ user.id }}</span>
+                                            <button onclick="copyText('{{ user.id }}')"
+                                                class="text-xs text-blue-600 hover:underline mr-2">
+                                                نسخ
+                                            </button>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <div class="text-gray-500">موعد الدفع القادم</div>
                                         <div class="font-semibold text-gray-900">
                                             {{ next_payment_date }}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">المبلغ المستحق</div>
+                                        <div class="font-semibold text-red-600">
+                                            {% if user.has_paied %}
+                                            0
+                                            {% else %}
+                                            {{ user.plan.price }}
+                                            {% endif %}
                                         </div>
                                     </div>
 
@@ -275,14 +316,53 @@
         const sidebar = document.getElementById('sidebar');
         const menuOverlay = document.getElementById('menuOverlay');
         function copyText(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                const toast = document.createElement("div");
-                toast.innerText = "تم النسخ ✔";
-                toast.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-black text-white text-sm px-4 py-2 rounded-lg shadow";
-                document.body.appendChild(toast);
-                setTimeout(() => toast.remove(), 1500);
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => showToast("تم النسخ ✔"), () => fallbackCopyTextToClipboard(text));
+            } else {
+                fallbackCopyTextToClipboard(text);
+            }
+        }
+        function fallbackCopyTextToClipboard(text) {
+            var textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";  // Avoid scrolling to bottom
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                var successful = document.execCommand('copy');
+                if (successful) showToast("تم النسخ ✔");
+                else showToast("فشل النسخ ❌");
+            } catch (err) {
+                showToast("فشل النسخ ❌");
+            }
+            document.body.removeChild(textArea);
+        }
+        function showToast(msg) {
+            const toast = document.createElement("div");
+            toast.innerText = msg;
+            toast.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-black text-white text-sm px-4 py-2 rounded-lg shadow z-[60]";
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 1500);
+        }
+
+        // Dropdown toggle
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userMenuDropdown = document.getElementById('userMenuDropdown');
+
+        if (userMenuBtn && userMenuDropdown) {
+            userMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userMenuDropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!userMenuDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) {
+                    userMenuDropdown.classList.add('hidden');
+                }
             });
         }
+
         hamburgerBtn.addEventListener('click', () => {
             sidebar.classList.toggle('active');
             menuOverlay.classList.toggle('active');

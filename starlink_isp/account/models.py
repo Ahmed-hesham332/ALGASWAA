@@ -43,3 +43,13 @@ class CustomUser(AbstractUser):
     @property
     def is_tech_support(self):
         return hasattr(self, "tech_support_profile")
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            import random
+            while True:
+                new_id = random.randint(1000000, 9999999)
+                if not CustomUser.objects.filter(pk=new_id).exists():
+                    self.pk = new_id
+                    break
+        super().save(*args, **kwargs)

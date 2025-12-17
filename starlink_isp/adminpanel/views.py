@@ -7,6 +7,7 @@ from servers.models import Server
 from .models import Plan, TechSupport
 from .forms import ResellerForm, PlanForm, TechSupportForm, TechSupportUserForm
 from django.http import JsonResponse
+from django.db.models import Q
 
 def admin_only(user):
     return user.is_superuser
@@ -377,3 +378,22 @@ def tech_support_delete(request, tech_id):
     return redirect("adminpanel:tech_support_list")
 
 
+
+@user_passes_test(admin_only)
+def all_server_list(request):
+    servers = Server.objects.all().select_related("owner", "owner__tech_support_assigned")
+    
+    search_query = request.GET.get("search", "")
+
+    if search_query:
+        servers = servers.filter(
+            Q(name__icontains=search_query) |
+            Q(owner__username__icontains=search_query) |
+            Q(owner__tech_support_assigned__user__username__icontains=search_query) | 
+            Q(owner__tech_support_assigned__name__icontains=search_query)
+        )
+
+    return render(request, "admin/superuser/all_server_list.html", {
+        "servers": servers,
+        "search": search_query
+    })

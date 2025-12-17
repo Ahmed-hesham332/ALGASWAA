@@ -31,8 +31,8 @@ def generate_serial(length=8, serial_type="numeric", prefix=""):
 
 
 def update_voucher_status():
+    
     cursor = connections['radius'].cursor()
-
     cursor.execute("""
         SELECT 
             voucher_number, 

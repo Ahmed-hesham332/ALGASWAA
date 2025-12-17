@@ -27,6 +27,7 @@ body {
     color: white;
     width: 260px;
     height: 100vh;
+    height: 100dvh;
     position: fixed;
     right: 0;
     top: 0;
@@ -377,6 +378,7 @@ select:focus {
         top: 0 !important;
         right: 0 !important;
         height: 100vh !important;
+        height: 100dvh !important;
         width: 60vw !important;
         transform: translateX(100%) !important;
         z-index: 2000 !important;
