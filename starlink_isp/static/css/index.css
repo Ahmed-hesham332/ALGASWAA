@@ -171,7 +171,7 @@
                     padding: 0.5rem !important;
                 }
                 nav ul {
-                    gap: 1.3rem !important;
+                    gap: 1.1rem !important;
                 }
                 nav a {
                     font-size: 0.9rem;
@@ -183,7 +183,7 @@
             }
 
             .logo img {
-                height: 17px;
+                height: 18px;
             }
 
             .hero {

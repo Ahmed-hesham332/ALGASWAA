@@ -258,18 +258,19 @@
                                     </div>
 
                                     <div>
+                                        <div class="text-gray-500 mb-1">تاريخ الدفع التالي</div>
                                         <div class="font-semibold text-gray-900">
                                             {{ next_payment_date }}
                                         </div>
                                     </div>
 
                                     <div>
-                                        <div class="text-gray-500">المبلغ المستحق</div>
+                                        <div class="text-gray-500 mb-1">المبلغ المستحق</div>
                                         <div class="font-semibold text-red-600">
                                             {% if user.has_paied %}
                                             0
                                             {% else %}
-                                            {{ user.plan.price }}
+                                            {{ user.plan.price_display }}
                                             {% endif %}
                                         </div>
                                     </div>

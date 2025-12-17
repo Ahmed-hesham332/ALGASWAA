@@ -48,7 +48,7 @@ def reseller_toggle_paied(request, reseller_id):
     )
 
     reseller.has_paied = not reseller.has_paied
-    reseller.save(update_fields=["has_paied"])
+    reseller.save()
 
     return redirect("adminpanel:reseller_list")
 
