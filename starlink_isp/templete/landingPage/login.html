@@ -35,9 +35,11 @@
             {% if messages %}
             <div class="messages-container">
                 {% for message in messages %}
+                {% if 'error' in message.tags %}
                 <div class="notification {{ message.tags }}">
                     {{ message }}
                 </div>
+                {% endif %}
                 {% endfor %}
             </div>
             {% endif %}
