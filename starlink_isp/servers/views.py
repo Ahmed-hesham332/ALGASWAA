@@ -32,7 +32,6 @@ def server_download(request, server_id):
     response["Content-Disposition"] = f'attachment; filename="AlGaswaa_Install_{server.id}.rsc"'
     return response
 
-
 @login_required
 def server_add(request):
     user = request.user
@@ -48,15 +47,14 @@ def server_add(request):
             server.owner = user
             server.save()
 
-            # ADD CLIENT TO FREERADIUS
-            # Use constant secret
+            # Add to RADIUS using NAS-Identifier (token)
             from radius_integration.services import RADIUS_SECRET
             add_radius_client(
-                ip=server.ip_address,
-                secret=RADIUS_SECRET,
-                shortname=server.name.replace(" ", "_")
+                hostname=server.install_token,
+                shortname=server.name,
+                secret=RADIUS_SECRET
             )
-
+            
             messages.success(request, "تم إضافة السيرفر")
 
             return redirect("servers:list")
@@ -93,7 +91,7 @@ def server_delete(request, server_id):
         voucher.delete()
 
     # DELETE FROM RADIUS NAS TABLE
-    radius_delete_client(server.ip_address)
+    radius_delete_client(server.hostname)
     
     # DELETE FROM DJANGO
     server.delete()

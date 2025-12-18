@@ -30,3 +30,13 @@ class Server(models.Model):
 
     def __str__(self):
         return self.name
+
+# Signal to delete from RADIUS when Server is deleted
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from radius_integration.services import radius_delete_client
+
+@receiver(post_delete, sender=Server)
+def delete_server_from_radius(sender, instance, **kwargs):
+    if instance.hostname:
+        radius_delete_client(instance.hostname)

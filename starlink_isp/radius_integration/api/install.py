@@ -19,12 +19,17 @@ def mikrotik_install(request, token, version):
     
     # Get IP from request
     mikrotik_ip = request.META.get("REMOTE_ADDR")
-
+    
+    # Update Server IP Address
+    if server.ip_address != mikrotik_ip:
+        server.ip_address = mikrotik_ip
+        server.save(update_fields=['ip_address'])
+    
     # Ensure RADIUS client exists/updated with new IP
     add_radius_client(
-        ip=mikrotik_ip,
-        secret=RADIUS_SECRET,
-        shortname=token
+        hostname=token,
+        shortname=server.name,
+        secret=RADIUS_SECRET
     )
     
     # Generate Config
@@ -54,6 +59,14 @@ def mikrotik_install(request, token, version):
     except FileNotFoundError:
         status_html = None
 
+    # Fetch Tech Support Info
+    ts_name = "Support"
+    ts_phone = "0000000000"
+    
+    if server.owner.tech_support_assigned:
+        ts_name = server.owner.tech_support_assigned.name
+        ts_phone = server.owner.tech_support_assigned.phone
+
     config_text = generate_mikrotik_config(
         shared_secret=RADIUS_SECRET,
         radius_ip="72.62.26.238", 
@@ -62,8 +75,8 @@ def mikrotik_install(request, token, version):
         routeros_version=ver_int,
         login_html=login_html,
         status_html=status_html,
-        tech_support_name="Support",
-        tech_support_phone="0000000000"
+        tech_support_name=ts_name,
+        tech_support_phone=ts_phone
     )
 
     return HttpResponse(config_text, content_type="text/plain; charset=utf-8")

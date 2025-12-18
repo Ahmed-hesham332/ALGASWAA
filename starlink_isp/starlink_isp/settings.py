@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'dashboard',
     'adminpanel', 
     'radius_integration',
-    'distributers'
+    'distributers',
     'whitenoise'
 ]
 
@@ -102,7 +102,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     },
-     "radius": {
+    "radius": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "radius",
         "USER": "django",

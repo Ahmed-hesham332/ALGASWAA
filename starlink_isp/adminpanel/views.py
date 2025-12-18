@@ -215,6 +215,15 @@ def server_delete(request, server_id):
         owner__tech_support_assigned__user=request.user
     )
 
+    # 1. Delete Vouchers from RADIUS
+    vouchers = server.voucher_set.all()
+    for voucher in vouchers:
+        voucher_radius_delete(voucher.serial)
+
+    # 2. Delete NAS Client from RADIUS
+    radius_delete_client(server.hostname)
+    
+    # 3. Delete from Django
     server.delete()
     messages.success(request, "تم حذف الخادم.")
     return redirect("adminpanel:server_list")

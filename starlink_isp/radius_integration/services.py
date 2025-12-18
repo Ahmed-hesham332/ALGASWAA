@@ -1,10 +1,9 @@
 from django.db import connections
 from django.utils import timezone
-from vouchers.models import Voucher
 
 RADIUS_SECRET = "mikroConnectsecret"
 
-def radius_add_user(serial, offer, ip_address):
+def radius_add_user(serial, offer, token):
     cursor = connections["radius"].cursor()
 
     # 1️⃣ Calculate Session Timeout 
@@ -21,8 +20,8 @@ def radius_add_user(serial, offer, ip_address):
     # Insert NAS IP Address 
     cursor.execute("""
         INSERT INTO radcheck (username, attribute, op, value)
-        VALUES (%s, 'NAS-IP-Address', '==', %s)
-    """, [serial, ip_address])
+        VALUES (%s, 'NAS-Identifier', '==', %s)
+    """, [serial, token])
 
     # Insert password 
     cursor.execute("""
@@ -133,6 +132,7 @@ def generate_mikrotik_config(
     # ---------- TIME SYNC (CRITICAL) ----------
     ntp_cmd = """
 /system ntp client set enabled=yes primary-ntp=162.159.200.1 secondary-ntp=162.159.200.123
+/system clock set time-zone-name=Africa/Khartoum
 """
 
     # ---------- WALLED GARDEN ----------
@@ -197,7 +197,7 @@ def generate_mikrotik_config(
     return config
 
 
-def add_radius_client(ip, secret, shortname):
+def add_radius_client(hostname, shortname, secret):
     conn = connections["radius"]
     cursor = conn.cursor()
 
@@ -205,7 +205,7 @@ def add_radius_client(ip, secret, shortname):
         INSERT INTO nas (nasname, shortname, type, secret)
         VALUES (%s, %s, 'mikrotik', %s)
         ON DUPLICATE KEY UPDATE secret = VALUES(secret);
-    """, [ip, shortname, secret])
+    """, [hostname, shortname, secret])
 
     conn.commit()
     cursor.close()
@@ -239,12 +239,12 @@ def get_voucher_status(username):
     }
     cursor.close()
 
-def radius_delete_client(ip):
+def radius_delete_client(token):
     """
     Delete NAS client from FreeRADIUS by IP address.
     """
     cursor = connections['radius'].cursor()
-    cursor.execute("DELETE FROM nas WHERE nasname = %s", [ip])
+    cursor.execute("DELETE FROM nas WHERE nasname = %s", [token])
     cursor.close()
 
 def voucher_radius_delete(username):
@@ -262,6 +262,7 @@ def radius_suspend_unused_vouchers(reseller):
 
     cursor = connections["radius"].cursor()
 
+    from vouchers.models import Voucher
     unused_serials = Voucher.objects.filter(
         batch__reseller=reseller,
         is_used="unused"

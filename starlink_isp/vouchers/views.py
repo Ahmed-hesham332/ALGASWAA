@@ -185,9 +185,10 @@ def voucher_generate(request):
                     offer=batch.offer,
                     serial=serial,
                     ip_address=batch.server.ip_address,
+                    token=batch.server.hostname,
                 )
 
-                radius_add_user(serial, batch.offer, v.ip_address)
+                radius_add_user(serial, batch.offer, v.token)
                 vouchers.append(v)
 
             messages.success(request, f"تم إنشاء {len(vouchers)} كارت بنجاح!")
