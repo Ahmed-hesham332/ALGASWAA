@@ -101,8 +101,8 @@
 
         document.querySelectorAll("a[data-confirm]").forEach(a => {
             a.addEventListener("click", (e) => {
-                e.preventDefault();               // ✅ prevents immediate delete
-                openModal(a.dataset.msg, a.href); // ✅ only deletes if user clicks OK in modal
+                e.preventDefault();
+                openModal(a.dataset.msg, a.href);
             });
         });
 
