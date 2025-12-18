@@ -251,7 +251,7 @@ def voucher_radius_delete(username):
     cursor = connections['radius'].cursor()
     cursor.execute("DELETE FROM radcheck WHERE username = %s", [username])
     cursor.execute("DELETE FROM radreply WHERE username = %s", [username])
-    cursor.execute("DELETE FROM vouchers WHERE serial = %s", [username])
+    cursor.execute("DELETE FROM vouchers WHERE voucher_number = %s", [username])
     cursor.close()
 
 def radius_suspend_unused_vouchers(reseller):
