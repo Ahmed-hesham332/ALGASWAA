@@ -46,10 +46,10 @@
 
                     <td class="px-6 py-4 flex gap-3 whitespace-nowrap">
 
-                        <a href="{% url 'servers:download' s.id %}"
-                            class="text-green-600 hover:text-green-800 font-semibold">
-                            تحميل الإعدادات
-                        </a>
+                        <button data-copy-url="{% url 'servers:download' s.id %}"
+                            class="text-green-600 hover:text-green-800 font-semibold focus:outline-none">
+                            نسخ الاعدادات
+                        </button>
 
                         <a href="{% url 'servers:edit' s.id %}" class="text-blue-600 hover:text-blue-800">
                             تعديل
@@ -109,8 +109,35 @@
         back.addEventListener("click", closeModal);
         cancel.addEventListener("click", closeModal);
 
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") closeModal();
+        if (e.key === "Escape") closeModal();
+    });
+
+    // -------- Copy Script Logic --------
+    document.querySelectorAll("button[data-copy-url]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const url = btn.dataset.copyUrl;
+            const originalText = btn.textContent;
+
+            try {
+                btn.textContent = "جاري النسخ...";
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Network error");
+                const text = await response.text();
+
+                await navigator.clipboard.writeText(text);
+
+                btn.textContent = "تم النسخ!";
+                btn.classList.add("text-green-700", "font-bold");
+
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove("text-green-700", "font-bold");
+                }, 2000);
+            } catch (err) {
+                console.error("Copy failed", err);
+                btn.textContent = "فشل النسخ";
+                setTimeout(() => btn.textContent = originalText, 2000);
+            }
         });
     });
 </script>

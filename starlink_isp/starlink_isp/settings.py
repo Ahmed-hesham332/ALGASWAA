@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-import os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-lw2cdvd3g=%ae%clm#$&pgf$tn_$z2_(po7ryf6afcw_7i!er_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['72.62.26.238', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['192.168.1.57', 'localhost', '127.0.0.1', '192.168.1.21']
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -70,7 +70,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'dashboard.middleware.DashboardMessageMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'starlink_isp.urls'
@@ -104,9 +103,9 @@ DATABASES = {
      "radius": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "radius",
-        "USER": "radius",
-        "PASSWORD": "modi@2000",
-        "HOST":"127.0.0.1",
+        "USER": "django",
+        "PASSWORD": "ahmed",
+        "HOST": "192.168.1.21",  # <-- Your FreeRADIUS VM IP
         "PORT": "3306",
         "OPTIONS": {
             "charset": "utf8mb4",
@@ -115,23 +114,6 @@ DATABASES = {
         }
     },
 }
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-        },
-    },
-    "loggers": {
-        "django.db.backends": {
-            "handlers": ["console"],
-            "level": "DEBUG",
-        },
-    },
-}
-
 
 
 # Password validation
@@ -158,7 +140,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Africa/Khartoum'
+TIME_ZONE = 'Asia/Qatar'
 
 USE_I18N = True
 
@@ -176,6 +158,4 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
