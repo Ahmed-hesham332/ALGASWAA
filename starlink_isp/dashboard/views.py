@@ -114,8 +114,8 @@ def home(request):
 
     if not tech_support:
         tech_support = TechSupport.objects.first()
-
     today = timezone.localdate()
+    
     next_payment_date = get_next_payment_date(today)
 
     return render(request, "dashboard/base.html", {

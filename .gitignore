@@ -22,4 +22,5 @@ coverage.xml
 .idea
 .vscode
 staticfiles
+db.sqlite3
 

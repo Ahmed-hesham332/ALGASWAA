@@ -56,11 +56,13 @@ INSTALLED_APPS = [
     'adminpanel', 
     'radius_integration',
     'distributers'
+    'whitenoise'
 ]
 
 AUTH_USER_MODEL = "account.CustomUser"
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",

@@ -39,7 +39,7 @@
 
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">
-                            {{ s.serial_number }}
+                            {{ s.hostname }}
                         </span>
                     </td>
 
@@ -109,35 +109,61 @@
         back.addEventListener("click", closeModal);
         cancel.addEventListener("click", closeModal);
 
-        if (e.key === "Escape") closeModal();
-    });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeModal();
+        });
 
-    // -------- Copy Script Logic --------
-    document.querySelectorAll("button[data-copy-url]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-            const url = btn.dataset.copyUrl;
-            const originalText = btn.textContent;
-
-            try {
-                btn.textContent = "جاري النسخ...";
-                const response = await fetch(url);
-                if (!response.ok) throw new Error("Network error");
-                const text = await response.text();
-
-                await navigator.clipboard.writeText(text);
-
-                btn.textContent = "تم النسخ!";
-                btn.classList.add("text-green-700", "font-bold");
-
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.classList.remove("text-green-700", "font-bold");
-                }, 2000);
-            } catch (err) {
-                console.error("Copy failed", err);
-                btn.textContent = "فشل النسخ";
-                setTimeout(() => btn.textContent = originalText, 2000);
+        // -------- Copy Script Logic (HTTP Safe) --------
+        async function copyToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text);
+            } else {
+                return new Promise((resolve, reject) => {
+                    const textarea = document.createElement("textarea");
+                    textarea.value = text;
+                    textarea.style.position = "fixed";
+                    document.body.appendChild(textarea);
+                    textarea.focus();
+                    textarea.select();
+                    try {
+                        const successful = document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        if (successful) resolve();
+                        else reject(new Error("execCommand failed"));
+                    } catch (err) {
+                        document.body.removeChild(textarea);
+                        reject(err);
+                    }
+                });
             }
+        }
+
+        document.querySelectorAll("button[data-copy-url]").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const url = btn.dataset.copyUrl;
+                const originalText = btn.textContent;
+
+                try {
+                    btn.textContent = "جاري النسخ...";
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error("Network error");
+                    const text = await response.text();
+
+                    await copyToClipboard(text);
+
+                    btn.textContent = "تم النسخ!";
+                    btn.classList.add("text-green-700", "font-bold");
+
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.classList.remove("text-green-700", "font-bold");
+                    }, 2000);
+                } catch (err) {
+                    console.error("Copy failed", err);
+                    btn.textContent = "فشل النسخ";
+                    setTimeout(() => btn.textContent = originalText, 2000);
+                }
+            });
         });
     });
 </script>

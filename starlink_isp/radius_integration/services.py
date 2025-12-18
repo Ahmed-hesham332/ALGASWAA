@@ -116,7 +116,7 @@ def generate_mikrotik_config(
     if routeros_version >= 7 and mikrotik_wan_ip:
         radius_cmd = radius_cmd.replace(
             "nas-identifier",
-            f"src-address={mikrotik_wan_ip} \\\n nas-identifier"
+            f"src-address={mikrotik_wan_ip} nas-identifier"
         )
 
     # incoming exists only in v6
