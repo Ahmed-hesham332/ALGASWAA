@@ -10,16 +10,23 @@ class Server(models.Model):
     )
 
     name = models.CharField(max_length=200)
-    serial_number = models.CharField(null=False, blank=False, default="")
-    ip_address = models.GenericIPAddressField(null=False, blank=False)
-    api_password = models.CharField(max_length=200, blank=False)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    id = models.AutoField(primary_key=True) 
     created_at = models.DateTimeField(auto_now_add=True)
+    hostname = models.CharField(max_length=64, unique=True, blank=True, null=True)
 
-    def connection_info(self):
-        return {
-            "ip": self.ip_address,
-            "api_password": self.api_password,
-        }
+    def save(self, *args, **kwargs):
+        if not self.id:
+            super().save(*args, **kwargs)
+        
+        if not self.hostname:
+            self.hostname = f"{self.owner.id}_{self.id}"
+            super().save(update_fields=['hostname'])
+
+
+    @property
+    def install_token(self):
+        return f"{self.owner.id}_{self.id}"
 
     def __str__(self):
         return self.name

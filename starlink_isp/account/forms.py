@@ -9,3 +9,5 @@ class LoginForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         set_arabic_error_messages(self)
+
+

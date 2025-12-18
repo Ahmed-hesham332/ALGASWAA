@@ -22,6 +22,7 @@
                         <th class="px-6 py-3 font-semibold text-gray-700">السعر</th>
                         <th class="px-6 py-3 font-semibold text-gray-700">السرعة</th>
                         <th class="px-6 py-3 font-semibold text-gray-700">الكوتا</th>
+                        <th class="px-6 py-3 font-semibold text-gray-700">الموزع</th>
                         <th class="px-6 py-3 font-semibold text-gray-700">الإجراءات</th>
                     </tr>
                 </thead>
@@ -47,7 +48,13 @@
                             {{ o.quota_amount }} جيجا
                             {% endif %}
                         </td>
-
+                        <td class="px-6 py-4 text-gray-600 text-sm">
+                            {% if o.distributer %}
+                            {{ o.distributer.user.username }}
+                            {% else %}
+                            غير محدد
+                            {% endif %}
+                        </td>
                         <td class="px-6 py-4 flex gap-3 whitespace-nowrap">
 
                             <a href="{% url 'offers:offer_edit' o.id %}" class="text-blue-600 hover:text-blue-800">

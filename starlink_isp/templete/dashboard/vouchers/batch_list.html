@@ -25,6 +25,7 @@
                         <th class="px-4 py-3 font-semibold text-gray-700">مستخدم</th>
                         <th class="px-4 py-3 font-semibold text-gray-700">منتهي</th>
                         <th class="px-4 py-3 font-semibold text-gray-700">اسم العرض</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">الموزع</th>
                         <th class="px-4 py-3 font-semibold text-gray-700">تاريخ الإنشاء</th>
                     </tr>
                 </thead>
@@ -38,6 +39,13 @@
                         <td class="px-4 py-3 text-blue-600 font-medium">{{ batch.used_cards }}</td>
                         <td class="px-4 py-3 text-red-600 font-medium">{{ batch.expired_cards }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ batch.offer.name }}</td>
+                        <td class="px-6 py-4 text-gray-600 text-sm">
+                            {% if batch.distributer %}
+                            {{ batch.distributer.user.username }}
+                            {% else %}
+                            غير محدد
+                            {% endif %}
+                        </td>
                         <td class="px-4 py-3 text-gray-600 text-xs" dir="ltr">{{ batch.created_at|date:"Y-m-d H:i" }}
                         </td>
                     </tr>

@@ -8,24 +8,31 @@ from datetime import timedelta
 
 @login_required
 def online_list(request):
-
     user = request.user
-
-    # 1️⃣ Reseller servers
-    servers = Server.objects.filter(owner=user)
-
     selected_server = request.GET.get("server", "all")
     search_query = request.GET.get("search", "").strip()
+
+    if user.is_distributer:
+        distributer = user.distributer_profile
+        if not distributer.can_view_vouchers:
+             messages.error(request, "ليس لديك صلاحية لعرض الكروت المتصلة.")
+             return redirect("dashboard:home")
+             
+        servers = distributer.servers.all()
+        valid_serials = list(
+            Voucher.objects.filter(batch__distributer=distributer)
+            .values_list("serial", flat=True)
+        )
+    else:
+        servers = Server.objects.filter(owner=user)
+        valid_serials = list(
+            Voucher.objects.filter(batch__reseller=user)
+            .values_list("serial", flat=True)
+        )
 
     # Add is_selected flag
     for s in servers:
         s.is_selected = (str(s.id) == selected_server)
-
-    # 2️⃣ Get all voucher serials of this reseller
-    valid_serials = list(
-        Voucher.objects.filter(batch__reseller=user)
-        .values_list("serial", flat=True)
-    )
 
     if not valid_serials:
         return render(request, "dashboard/online/online_list.html", {

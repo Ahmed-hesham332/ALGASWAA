@@ -6,6 +6,12 @@ from servers.models import Server
 
 class VoucherBatch(models.Model):
     reseller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    distributer = models.ForeignKey(
+        "distributers.Distributer",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
     server = models.ForeignKey(Server, on_delete=models.CASCADE)
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE)
 

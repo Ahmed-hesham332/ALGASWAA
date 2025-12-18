@@ -2,6 +2,8 @@
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
+
 
 class CustomUser(AbstractUser):
     
@@ -44,6 +46,16 @@ class CustomUser(AbstractUser):
     def is_tech_support(self):
         return hasattr(self, "tech_support_profile")
 
+    @property
+    def is_distributer(self):
+        return hasattr(self, "distributer")
+
+    @property
+    def distributer_profile(self):
+        if hasattr(self, "distributer"):
+            return self.distributer
+        return None
+
     def save(self, *args, **kwargs):
         if not self.pk:
             import random
@@ -53,3 +65,7 @@ class CustomUser(AbstractUser):
                     self.pk = new_id
                     break
         super().save(*args, **kwargs)
+
+
+
+

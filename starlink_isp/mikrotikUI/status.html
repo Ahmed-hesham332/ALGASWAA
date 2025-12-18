@@ -98,7 +98,7 @@
         }
         (function () {
             const username = "$(username)";
-            const apiUrl = "http://72.62.26.238:8000/radius-integration/api/usage?username=" + encodeURIComponent(username);
+            const apiUrl = "http://72.62.26.238:8000/radius-integration/active/voucher/usage?username=" + encodeURIComponent(username);
 
             fetch(apiUrl)
                 .then(res => res.json())
@@ -157,7 +157,7 @@
 
             <!-- Footer -->
             <div class="footer">
-                <span>📞 برمجة وتركيب م/ أحمد حيدر</span>
+                <span>📞 {{ tech_support_name }} {{ tech_support_phone }}</span>
             </div>
 
         </div>

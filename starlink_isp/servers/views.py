@@ -17,46 +17,19 @@ def server_list(request):
 def server_download(request, server_id):
     server = get_object_or_404(Server, id=server_id, owner=request.user)
 
-    # Define path to mikrotikUI folder
-    from django.conf import settings
-    import os
-
-    mikrotik_ui_path = settings.BASE_DIR / "mikrotikUI"
-    
-    login_html = None
-    status_html = None
-
-    # Read login.html
-    try:
-        with open(mikrotik_ui_path / "login.html", "r", encoding="utf-8") as f:
-            login_html = f.read()
-    except FileNotFoundError:
-        pass
-
-    # Read status.html
-    try:
-        with open(mikrotik_ui_path / "status.html", "r", encoding="utf-8") as f:
-            status_html = f.read()
-    except FileNotFoundError:
-        pass
-
-    # Get Tech Support Info
-    tech_support = request.user.tech_support_assigned
-    tech_support_name = tech_support.name if tech_support else "Technical Support"
-    tech_support_phone = tech_support.phone if tech_support else "0000000000"
-
-    config_text = generate_mikrotik_config(
-        shared_secret=server.api_password,
-        radius_ip="72.62.26.238", 
-        mikrotik_wan_ip=server.ip_address,
-        login_html=login_html,
-        status_html=status_html,
-        tech_support_name=tech_support_name,
-        tech_support_phone=tech_support_phone
-    )
-
-    response = HttpResponse(config_text, content_type="text/plain")
-    response["Content-Disposition"] = f'attachment; filename="Config_{server.id}.rsc"'
+    # Bootstrap Script
+    domain = "72.62.26.238"
+    # routeros fetch command
+    # Assuming token is available as property on server
+    fetch_script = f"""
+[:local ver [:pick  [/system resource get version] 0 1];
+/tool fetch url="http://{domain}/radius-integration/api/install/{server.install_token}/$ver" dst-path="algaswaa.rsc";
+:delay 5;
+/import file-name=algaswaa.rsc;
+]
+"""
+    response = HttpResponse(fetch_script, content_type="text/plain")
+    response["Content-Disposition"] = f'attachment; filename="AlGaswaa_Install_{server.id}.rsc"'
     return response
 
 
@@ -76,9 +49,11 @@ def server_add(request):
             server.save()
 
             # ADD CLIENT TO FREERADIUS
+            # Use constant secret
+            from radius_integration.services import RADIUS_SECRET
             add_radius_client(
                 ip=server.ip_address,
-                secret=server.api_password,
+                secret=RADIUS_SECRET,
                 shortname=server.name.replace(" ", "_")
             )
 

@@ -11,6 +11,14 @@ class Offer(models.Model):
         related_name="offers"
     )
 
+    distributer = models.ForeignKey(
+        "distributers.Distributer",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="offers"
+    )
+
     name = models.CharField(max_length=100, verbose_name="اسم العرض")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="السعر")
 

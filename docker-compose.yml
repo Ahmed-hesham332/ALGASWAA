@@ -3,14 +3,10 @@ version: '3.9'
 services:
   web:
     build: .
-    ports:
-      - "8000:8000"
+    network_mode: host
     volumes:
       - .:/app
-      - ./media:/app/media
-      - ./static:/app/static
+      - ./starlink_isp/media:/app/media
     environment:
       - DEBUG=1
-    command: gunicorn starlink_isp.wsgi:application --bind 0.0.0.0:8000 --reload
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    command: gunicorn starlink_isp.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120

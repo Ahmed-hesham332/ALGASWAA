@@ -1,0 +1,66 @@
+{% extends "dashboard/base.html" %}
+{% block title %}الموزعين — Dashboard{% endblock %}
+{% block page_title %}الموزعين{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <!-- HEADER + ADD BUTTON -->
+    <div class="mb-6 flex items-center justify-between">
+        <h2 class="text-2xl font-bold text-gray-900">الموزعين</h2>
+
+        <a href="{% url 'distributers:distributer_add' %}"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+            + إضافة موزع جديد
+        </a>
+    </div>
+
+    {% if distributers %}
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-right text-sm">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th class="px-4 py-3 font-semibold text-gray-700">#</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">الاسم</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">اسم المستخدم</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">الحالة</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for dist in distributers %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-3 text-gray-600">{{ forloop.counter }}</td>
+                        <td class="px-4 py-3 text-gray-900 font-medium">{{ dist.user.first_name }}</td>
+                        <td class="px-4 py-3 text-gray-600 font-mono">{{ dist.user.username }}</td>
+                        <td class="px-4 py-3">
+                            {% if dist.status %}
+                            <span class="inline-block px-2 py-1 bg-green-100 text-green-700 rounded text-xs">مفعل</span>
+                            {% else %}
+                            <span class="inline-block px-2 py-1 bg-red-100 text-red-700 rounded text-xs">معطل</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 flex gap-2">
+                            <a href="{% url 'distributers:distributer_edit' dist.pk %}"
+                                class="text-blue-600 hover:text-blue-800 text-xs font-semibold">تعديل</a>
+                            <a href="{% url 'distributers:distributer_delete' dist.pk %}"
+                                class="text-red-600 hover:text-red-800 text-xs font-semibold"
+                                onclick="return confirm('هل أنت متأكد من حذف هذا الموزع؟');">حذف</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-lg p-10 text-center border border-gray-100">
+        <p class="text-gray-500 text-lg mb-4">لا يوجد موزعين حالياً</p>
+        <a href="{% url 'distributers:distributer_add' %}"
+            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
+            + إضافة موزع جديد
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

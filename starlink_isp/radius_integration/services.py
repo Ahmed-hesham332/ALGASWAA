@@ -2,6 +2,8 @@ from django.db import connections
 from django.utils import timezone
 from vouchers.models import Voucher
 
+RADIUS_SECRET = "mikroConnectsecret"
+
 def radius_add_user(serial, offer, ip_address):
     cursor = connections["radius"].cursor()
 
@@ -86,45 +88,98 @@ def add_radius_expiration(username, expires_at):
     return True
 
 def generate_mikrotik_config(
-    shared_secret,
-    radius_ip,
-    mikrotik_wan_ip,
-    login_html=None,
-    status_html=None,
-    tech_support_name="Technical Support",
-    tech_support_phone="0000000000"
+    *,
+    shared_secret: str = RADIUS_SECRET,
+    radius_ip: str,
+    nas_identifier: str,
+    mikrotik_wan_ip: str | None = None,
+    routeros_version: int = 7,   # 6 or 7
+    login_html: str | None = None,
+    status_html: str | None = None,
+    tech_support_name: str = "Technical Support",
+    tech_support_phone: str = "0000000000",
 ):
-    config = f"""
-# ==========================================
-# RADIUS + HOTSPOT CONFIG (AUTO GENERATED)
-# ==========================================
+    """
+    Generates a MikroTik Hotspot + RADIUS configuration script.
 
-# 1️⃣ Radius Client
-/radius add address={radius_ip} secret={shared_secret} service=hotspot authentication-port=1812 accounting-port=1813 src-address={mikrotik_wan_ip}
-/radius incoming set accept=yes
+    - Supports RouterOS v6 and v7
+    - Uses NAS-Identifier (required for NAT / Starlink)
+    - Uses RADIUS for Hotspot authentication
+    """
 
-# 2️⃣ Hotspot Profile (Dedicated)
-/ip hotspot profile add name=radius_hotspot use-radius=yes login-by=http-chap,cookie,mac-cookie radius-interim-update=5m idle-timeout=5m
+    # ---------- RADIUS BASE ----------
+    radius_cmd = f"""
+/radius add address={radius_ip} secret={shared_secret} service=hotspot authentication-port=1812 accounting-port=1813 nas-identifier={nas_identifier}
+"""
+
+    # src-address exists only in v7+
+    if routeros_version >= 7 and mikrotik_wan_ip:
+        radius_cmd = radius_cmd.replace(
+            "nas-identifier",
+            f"src-address={mikrotik_wan_ip} \\\n nas-identifier"
+        )
+
+    # incoming exists only in v6
+    incoming_cmd = ""
+    if routeros_version == 6:
+        incoming_cmd = "/radius incoming set accept=yes\n"
+
+    # ---------- HOTSPOT PROFILE ----------
+    hotspot_cmd = """
+/ip hotspot profile add name=radius_hotspot use-radius=yes login-by=http-chap,cookie,mac-cookie radius-interim-update=5m
 /ip hotspot set [find] profile=radius_hotspot
+"""
 
-# 3️⃣ Time Sync (MANDATORY)
+    # ---------- TIME SYNC (CRITICAL) ----------
+    ntp_cmd = """
 /system ntp client set enabled=yes primary-ntp=162.159.200.1 secondary-ntp=162.159.200.123
-# if the preavoius one did not work use this:/system clock set time-zone-name=Africa/Khartoum
+"""
 
-# 4️⃣ Walled Garden (Allow your platform)
+    # ---------- WALLED GARDEN ----------
+    walled_garden_cmd = """
 /ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=80
 /ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=443
 """
 
-    def output_file_script(filename, content):
+    # ---------- HTML FILE HANDLER ----------
+    def output_file_script(filename: str, content: str | None):
         if not content:
             return ""
+
         content = content.replace("{{ tech_support_name }}", tech_support_name)
         content = content.replace("{{ tech_support_phone }}", tech_support_phone)
-        escaped = content.replace('"', '\\"').replace("\n", "\\n")
+
+        # Escape for MikroTik
+        escaped = (
+            content
+            .replace("\\", "\\\\")
+            .replace('"', '\\"')
+            .replace("\n", "\\n")
+        )
+
         return f"""
-# Update {filename}
 /file set [find name="hotspot/{filename}"] contents="{escaped}"
+"""
+
+    # ---------- FINAL CONFIG ----------
+    config = f"""
+# ==========================================
+# AUTO GENERATED MIKROTIK CONFIG
+# NAS-ID: {nas_identifier}
+# ==========================================
+
+# 1️⃣ RADIUS CONFIG
+{radius_cmd}
+{incoming_cmd}
+
+# 2️⃣ HOTSPOT PROFILE
+{hotspot_cmd}
+
+# 3️⃣ TIME SYNC (MANDATORY)
+{ntp_cmd}
+
+# 4️⃣ WALLED GARDEN
+{walled_garden_cmd}
 """
 
     if login_html:
@@ -135,12 +190,11 @@ def generate_mikrotik_config(
 
     config += """
 # ==========================================
-# CONFIG COMPLETE
+# CONFIG COMPLETE ✅
 # ==========================================
 """
+
     return config
-
-
 
 
 def add_radius_client(ip, secret, shortname):
@@ -192,8 +246,6 @@ def radius_delete_client(ip):
     cursor = connections['radius'].cursor()
     cursor.execute("DELETE FROM nas WHERE nasname = %s", [ip])
     cursor.close()
-
-    return remaining_seconds
 
 def voucher_radius_delete(username):
     cursor = connections['radius'].cursor()

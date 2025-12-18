@@ -4,7 +4,8 @@ djangorestframework
 djangorestframework-simplejwt
 pillow
 reportlab
-dateutil
+python-dateutil
 django-cors-headers
 mysqlclient
 gunicorn
+whitenoise

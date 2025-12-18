@@ -11,8 +11,26 @@ from .utils import generate_design_preview
 
 @login_required
 def design_list(request):
-    designs = Design.objects.filter(owner=request.user)
-    batches = VoucherBatch.objects.filter(reseller=request.user)
+    user = request.user
+    if user.is_distributer:
+        distributer = user.distributer_profile
+        if not distributer.can_view_designs:
+             messages.error(request, "ليس لديك الصلاحية للقيام بهذا الإجراء.")
+             return redirect("dashboard:home")
+             
+        # Show Distributer's designs AND Reseller's designs?
+        # "view designs then (delete/add)"
+        # If they can ADD, they have their own.
+        # But maybe they want to use Reseller's?
+        # Let's show both for viewing/using, but separate in template or just merge?
+        # For simplicity, let's show both.
+        from django.db.models import Q
+        reseller = distributer.reseller
+        designs = Design.objects.filter(Q(owner=user) | Q(owner=reseller))
+        batches = VoucherBatch.objects.filter(distributer=distributer)
+    else:
+        designs = Design.objects.filter(owner=user)
+        batches = VoucherBatch.objects.filter(reseller=user)
 
     return render(
         request,
@@ -26,11 +44,16 @@ def design_list(request):
 
 @login_required
 def design_add(request):
+    user = request.user
+    if user.is_distributer and not user.distributer_profile.can_add_design:
+        messages.error(request, "ليس لديك الصلاحية للقيام بهذا الإجراء.")
+        return redirect("design:list")
+
     if request.method == "POST":
         form = DesignForm(request.POST, request.FILES)
         if form.is_valid():
             design = form.save(commit=False)
-            design.owner = request.user
+            design.owner = request.user 
             design.save()
 
             design.preview_image.save(
@@ -48,6 +71,12 @@ def design_add(request):
 
 @login_required
 def design_delete(request, design_id):
+    user = request.user
+    if user.is_distributer and not user.distributer_profile.can_delete_design:
+        messages.error(request, "ليس لديك الصلاحية للقيام بهذا الإجراء.")
+        return redirect("design:list")
+        
+    # Can only delete OWN designs
     design = get_object_or_404(
         Design,
         id=design_id,

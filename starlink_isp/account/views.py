@@ -1,7 +1,8 @@
 # accounts/views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from .forms import LoginForm
 
 def login_view(request):
@@ -41,3 +42,6 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect("login")
+
+
+

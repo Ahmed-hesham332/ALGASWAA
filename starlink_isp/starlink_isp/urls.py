@@ -33,6 +33,7 @@ urlpatterns = [
     path("profile/", include("profiles.urls")),
     path("income/", include("income.urls")),
     path("radius-integration/", include("radius_integration.urls")),
+    path("distributers/", include("distributers.urls")),
 ]
 
 if settings.DEBUG:

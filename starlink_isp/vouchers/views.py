@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from .utils import update_voucher_status
 from django.utils import timezone
 from .models import Voucher, VoucherBatch
+from offers.models import Offer
 from radius_integration.services import radius_add_user
 from .forms import VoucherGenerationForm
 from django.contrib import messages
@@ -12,10 +13,26 @@ from servers.models import Server
 import string
 import random
 
+@login_required
 def voucher_list(request):
     user = request.user
-
-    vouchers = Voucher.objects.filter(batch__reseller=user)
+    
+    if user.is_distributer:
+        distributer = user.distributer_profile
+        if not distributer.can_view_vouchers:
+            messages.error(request, "ليس لديك الصلاحية للقيام بهذا الإجراء.")
+            return redirect("dashboard:home")
+        vouchers = Voucher.objects.filter(batch__distributer=distributer)
+        reseller = distributer.reseller
+        servers = distributer.servers.all() # Distributer has assigned servers
+        offers = Offer.objects.filter(distributer=distributer) # Distributer's own offers ONLY
+        groups = VoucherBatch.objects.filter(distributer=distributer) # His batches
+    else:
+        vouchers = Voucher.objects.filter(batch__reseller=user)
+        reseller = user
+        servers = user.servers.all()
+        offers = user.offers.all()
+        groups = VoucherBatch.objects.filter(reseller=user)
 
 
     update_voucher_status()
@@ -52,16 +69,14 @@ def voucher_list(request):
     elif selected_status == "active":
         vouchers = vouchers.filter(is_used="used", expires_at__gte=now)
 
-    # Server, offers, groups for dropdowns
-    servers = user.servers.all()
+    # Server, offers, groups for dropdowns - Need to set is_selected
+    # servers, offers, groups are already filtered above based on user/distributer
     for s in servers:
         s.is_selected = (str(s.id) == selected_server)
 
-    offers = user.offers.all()
     for o in offers:
         o.is_selected = (str(o.id) == selected_offer)
 
-    groups = VoucherBatch.objects.filter(reseller=user)
     for g in groups:
         g.is_selected = (str(g.id) == selected_group)
 
@@ -85,16 +100,26 @@ def voucher_list(request):
         "statuses": statuses,
     }
 
-    return render(request, "dashboard/vouchers/voucher_list.html", context)
+    return render(request, "dashboard/vouchers/voucher_list.html", context) 
 
     
 @login_required
 def voucher_generate(request):
-    reseller = request.user
+    user = request.user
+    reseller = user
+    distributer = None
+    
+    if user.is_distributer:
+        distributer = user.distributer_profile
+        if not distributer.can_add_voucher:
+             messages.error(request, "ليس لديك الصلاحية للقيام بهذا الإجراء.")
+             return redirect("vouchers:list")
+        reseller = distributer.reseller
 
     
     if reseller.plan:  
         plan_limit = reseller.plan.number_of_vouchers
+        # Count total vouchers for reseller (distributers count towards reseller quota)
         current_vouchers = Voucher.objects.filter(batch__reseller=reseller).count()
 
         if current_vouchers >= plan_limit:
@@ -107,6 +132,10 @@ def voucher_generate(request):
 
     if request.method == "POST":
         form = VoucherGenerationForm(request.POST, reseller=reseller)
+        if distributer:
+             form.fields['server'].queryset = distributer.servers.all()
+             form.fields['offer'].queryset = Offer.objects.filter(distributer=distributer)
+
         if form.is_valid():
 
             quantity = form.cleaned_data["quantity"]
@@ -123,9 +152,16 @@ def voucher_generate(request):
                     )
                     return render(request, "dashboard/vouchers/voucher_add.html", {"form": form})
 
+            # Check if Distributer has access to the server
+            server = form.cleaned_data["server"]
+            if distributer and server not in distributer.servers.all():
+                 messages.error(request, "ليس لديك الصلاحية للقيام بهذا الإجراء.")
+                 return render(request, "dashboard/vouchers/voucher_add.html", {"form": form})
+
             batch = VoucherBatch.objects.create(
                 reseller=reseller,
-                server=form.cleaned_data["server"],
+                distributer=distributer, # Link if exists
+                server=server,
                 offer=form.cleaned_data["offer"],
                 name=form.cleaned_data["name"],
                 quantity=form.cleaned_data["quantity"],
@@ -156,9 +192,11 @@ def voucher_generate(request):
 
             messages.success(request, f"تم إنشاء {len(vouchers)} كارت بنجاح!")
             return redirect("vouchers:list")
-
     else:
         form = VoucherGenerationForm(reseller=reseller)
+        if distributer:
+            form.fields['server'].queryset = distributer.servers.all()
+            form.fields['offer'].queryset = Offer.objects.filter(distributer=distributer)
 
     return render(request, "dashboard/vouchers/voucher_add.html", {"form": form})
 
@@ -166,12 +204,25 @@ def voucher_generate(request):
 def batch_list(request):
     user = request.user
     
-    batches = VoucherBatch.objects.filter(reseller=user).annotate(
-        total_cards=Count('vouchers'),
-        unused_cards=Count('vouchers', filter=Q(vouchers__is_used='unused')),
-        used_cards=Count('vouchers', filter=Q(vouchers__is_used='used')),
-        expired_cards=Count('vouchers', filter=Q(vouchers__is_used='expired'))
-    ).order_by('-created_at')
+    if user.is_distributer:
+        distributer = user.distributer_profile
+        if not distributer.can_view_vouchers:
+             messages.error(request, "ليس لديك الصلاحية للقيام بهذا الإجراء.")
+             return redirect("dashboard:home")
+             
+        batches = VoucherBatch.objects.filter(distributer=distributer).annotate(
+            total_cards=Count('vouchers'),
+            unused_cards=Count('vouchers', filter=Q(vouchers__is_used='unused')),
+            used_cards=Count('vouchers', filter=Q(vouchers__is_used='used')),
+            expired_cards=Count('vouchers', filter=Q(vouchers__is_used='expired'))
+        ).order_by('-created_at')
+    else:
+        batches = VoucherBatch.objects.filter(reseller=user).annotate(
+            total_cards=Count('vouchers'),
+            unused_cards=Count('vouchers', filter=Q(vouchers__is_used='unused')),
+            used_cards=Count('vouchers', filter=Q(vouchers__is_used='used')),
+            expired_cards=Count('vouchers', filter=Q(vouchers__is_used='expired'))
+        ).order_by('-created_at')
 
     # Pagination - 20 per page as requested
     paginator = Paginator(batches, 20)
