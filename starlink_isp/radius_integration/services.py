@@ -93,10 +93,6 @@ def generate_mikrotik_config(
     nas_identifier: str,
     mikrotik_wan_ip: str | None = None,
     routeros_version: int = 7,   # 6 or 7
-    login_html: str | None = None,
-    status_html: str | None = None,
-    tech_support_name: str = "Technical Support",
-    tech_support_phone: str = "0000000000",
 ):
     """
     Auto-generated MikroTik Hotspot + RADIUS configuration.
@@ -106,16 +102,17 @@ def generate_mikrotik_config(
     - Uses NAS-Identifier (important for NAT / Starlink)
     """
 
+    identity_cmd = f"""
+/system identity set name={nas_identifier}
+"""
+    
     # ---------- RADIUS ----------
     radius_cmd = f"""
-/radius add address={radius_ip} secret={shared_secret} service=hotspot authentication-port=1812 accounting-port=1813 nas-identifier={nas_identifier}
+/radius add address={radius_ip} secret={shared_secret} service=hotspot authentication-port=1812 accounting-port=1813
 """
 
     if routeros_version >= 7 and mikrotik_wan_ip:
-        radius_cmd = radius_cmd.replace(
-            "nas-identifier",
-            f"src-address={mikrotik_wan_ip} nas-identifier"
-        )
+        radius_cmd = radius_cmd.strip() + f" src-address={mikrotik_wan_ip}\n"
 
     incoming_cmd = ""
     if routeros_version == 6:
@@ -148,36 +145,43 @@ def generate_mikrotik_config(
 /ip hotspot add name=algaswaa_hotspot interface=algaswaa-bridge profile=algaswaa_hotspot address-pool=algaswaa_pool
 """
 
-    # ---------- TIME ----------
-    ntp_cmd = """
-/system ntp client set enabled=yes primary-ntp=162.159.200.1 secondary-ntp=162.159.200.123
-/system clock set time-zone-name=Africa/Khartoum
-"""
+    # ---------- TIME SYNC ----------
+    if routeros_version >= 7:
+        ntp_cmd = """
+    /system ntp client set enabled=yes
+    /system ntp client servers add address=162.159.200.1
+    /system ntp client servers add address=162.159.200.123
+    /system clock set time-zone-name=Africa/Khartoum
+    """
+    else:
+        ntp_cmd = """
+    /system ntp client set enabled=yes primary-ntp=162.159.200.1 secondary-ntp=162.159.200.123
+    /system clock set time-zone-name=Africa/Khartoum
+    """
 
     # ---------- WALLED GARDEN ----------
     walled_garden_cmd = """
 /ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=80
 /ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=443
+/ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=8000
 """
 
     # ---------- HTML ----------
-    def output_file_script(filename: str, content: str | None):
-        if not content:
-            return ""
+    # Dynamic fetch from API
+    files_cmd = f"""
+# 5️⃣ FILES SETUP
+/file remove [find name="hotspot/login.html"]
+/file remove [find name="hotspot/status.html"]
 
-        content = content.replace("{{ tech_support_name }}", tech_support_name)
-        content = content.replace("{{ tech_support_phone }}", tech_support_phone)
+:delay 2s
 
-        escaped = (
-            content
-            .replace("\\", "\\\\")
-            .replace('"', '\\"')
-            .replace("\n", "\\n")
-        )
-
-        return f"""
-/file set [find name="hotspot/{filename}"] contents="{escaped}"
+/tool fetch url="http://{radius_ip}/radius-integration/api/install/{nas_identifier}/login/" dst-path="hotspot/login.html" mode=http keep-result=yes
+/tool fetch url="http://{radius_ip}/radius-integration/api/install/{nas_identifier}/status/" dst-path="hotspot/status.html" mode=http keep-result=yes
 """
+
+    config += files_cmd
+
+
 
     # ---------- FINAL ----------
     config = f"""
@@ -187,6 +191,7 @@ def generate_mikrotik_config(
 # ==========================================
 
 # 1️⃣ RADIUS
+{identity_cmd}
 {radius_cmd}
 {incoming_cmd}
 
@@ -202,12 +207,6 @@ def generate_mikrotik_config(
 # 5️⃣ WALLED GARDEN
 {walled_garden_cmd}
 """
-
-    if login_html:
-        config += output_file_script("login.html", login_html)
-
-    if status_html:
-        config += output_file_script("status.html", status_html)
 
     config += """
 # ==========================================

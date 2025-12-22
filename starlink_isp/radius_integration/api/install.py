@@ -45,40 +45,53 @@ def mikrotik_install(request, token, version):
     except Exception:
         ver_int = 7
 
-    # Load MikroTik UI templates
-    login_html = None
-    status_html = None
-
-    login_html_path = os.path.join(settings.BASE_DIR, "mikrotikUI", "login.html")
-    status_html_path = os.path.join(settings.BASE_DIR, "mikrotikUI", "status.html")
-
-    if os.path.exists(login_html_path):
-        with open(login_html_path, "r", encoding="utf-8") as f:
-            login_html = f.read()
-
-    if os.path.exists(status_html_path):
-        with open(status_html_path, "r", encoding="utf-8") as f:
-            status_html = f.read()
-
-    # Tech Support Info
-    ts_name = "Support"
-    ts_phone = "0000000000"
-
-    if server.owner.tech_support_assigned:
-        ts_name = server.owner.tech_support_assigned.name
-        ts_phone = server.owner.tech_support_assigned.phone
-
-    # Generate MikroTik config
     config_text = generate_mikrotik_config(
         shared_secret=RADIUS_SECRET,
         radius_ip="72.62.26.238",
         nas_identifier=token,
         mikrotik_wan_ip=mikrotik_ip,
         routeros_version=ver_int,
-        login_html=login_html,
-        status_html=status_html,
-        tech_support_name=ts_name,
-        tech_support_phone=ts_phone
     )
 
     return HttpResponse(config_text, content_type="text/plain; charset=utf-8")
+
+def _get_server_and_support_info(token):
+    try:
+        owner_id, server_id = token.split('_')
+    except ValueError:
+        raise Http404("Invalid token format")
+
+    server = get_object_or_404(Server, id=server_id, owner_id=owner_id)
+    
+    ts_name = "Support"
+    ts_phone = "0000000000"
+
+    if server.owner.tech_support_assigned:
+        ts_name = server.owner.tech_support_assigned.name
+        ts_phone = server.owner.tech_support_assigned.phone
+        
+    return ts_name, ts_phone
+
+def serve_login_html(request, token):
+    ts_name, ts_phone = _get_server_and_support_info(token)
+    
+    login_html_path = os.path.join(settings.BASE_DIR, "mikrotikUI", "login.html")
+    content = ""
+    if os.path.exists(login_html_path):
+        with open(login_html_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+    content = content.replace("Tech Support", ts_name).replace("0120100102", ts_phone)
+    return HttpResponse(content, content_type="text/html; charset=utf-8")
+
+def serve_status_html(request, token):
+    ts_name, ts_phone = _get_server_and_support_info(token)
+    
+    status_html_path = os.path.join(settings.BASE_DIR, "mikrotikUI", "status.html")
+    content = ""
+    if os.path.exists(status_html_path):
+        with open(status_html_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+    content = content.replace("Tech Support", ts_name).replace("0120100102", ts_phone)
+    return HttpResponse(content, content_type="text/html; charset=utf-8")

@@ -23,7 +23,7 @@ def server_download(request, server_id):
     # Assuming token is available as property on server
     fetch_script = f"""
 [:local ver [:pick  [/system resource get version] 0 1];
-/tool fetch url="http://{domain}/radius-integration/api/install/{server.install_token}/$ver" dst-path="algaswaa.rsc";
+/tool fetch url="http://{domain}/radius-integration/api/install/{server.install_token}/$ver/" dst-path="algaswaa.rsc";
 :delay 5;
 /import file-name=algaswaa.rsc;
 ]
