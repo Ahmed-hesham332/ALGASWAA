@@ -88,7 +88,7 @@ def add_radius_expiration(username, expires_at):
 
 def generate_mikrotik_config(
     *,
-    shared_secret: str = RADIUS_SECRET,
+    shared_secret: str,
     radius_ip: str,
     nas_identifier: str,
     mikrotik_wan_ip: str | None = None,
@@ -99,37 +99,56 @@ def generate_mikrotik_config(
     tech_support_phone: str = "0000000000",
 ):
     """
-    Generates a MikroTik Hotspot + RADIUS configuration script.
+    Auto-generated MikroTik Hotspot + RADIUS configuration.
 
-    - Supports RouterOS v6 and v7
-    - Uses NAS-Identifier (required for NAT / Starlink)
-    - Uses RADIUS for Hotspot authentication
+    - RouterOS v6 / v7 supported
+    - Safe (no WAN/interface guessing)
+    - Uses NAS-Identifier (important for NAT / Starlink)
     """
 
-    # ---------- RADIUS BASE ----------
+    # ---------- RADIUS ----------
     radius_cmd = f"""
 /radius add address={radius_ip} secret={shared_secret} service=hotspot authentication-port=1812 accounting-port=1813 nas-identifier={nas_identifier}
 """
 
-    # src-address exists only in v7+
     if routeros_version >= 7 and mikrotik_wan_ip:
         radius_cmd = radius_cmd.replace(
             "nas-identifier",
             f"src-address={mikrotik_wan_ip} nas-identifier"
         )
 
-    # incoming exists only in v6
     incoming_cmd = ""
     if routeros_version == 6:
         incoming_cmd = "/radius incoming set accept=yes\n"
 
-    # ---------- HOTSPOT PROFILE ----------
-    hotspot_cmd = """
-/ip hotspot profile add name=radius_hotspot use-radius=yes login-by=http-chap,cookie,mac-cookie radius-interim-update=5m
-/ip hotspot set [find] profile=radius_hotspot
+    # ---------- LAN BRIDGE ----------
+    lan_cmd = """
+# Create dedicated LAN bridge
+/interface bridge add name=algaswaa-bridge 
+
+# Assign LAN IP
+/ip address add address=10.10.10.1/24 interface=algaswaa-bridge 
+
+# DHCP pool
+/ip pool add name=algaswaa_pool ranges=10.10.10.10-10.10.10.200
+
+# DHCP server
+/ip dhcp-server add name=algaswaa_dhcp interface=algaswaa-bridge address-pool=algaswaa_pool lease-time=1h disabled=no
+
+# DHCP network
+/ip dhcp-server network add address=10.10.10.0/24 gateway=10.10.10.1 dns-server=8.8.8.8,1.1.1.1
 """
 
-    # ---------- TIME SYNC (CRITICAL) ----------
+    # ---------- HOTSPOT ----------
+    hotspot_cmd = """
+# Hotspot profile
+/ip hotspot profile add name=algaswaa_hotspot use-radius=yes login-by=http-chap,cookie,mac-cookie radius-interim-update=5m
+
+# Hotspot server
+/ip hotspot add name=algaswaa_hotspot interface=algaswaa-bridge profile=algaswaa_hotspot address-pool=algaswaa_pool
+"""
+
+    # ---------- TIME ----------
     ntp_cmd = """
 /system ntp client set enabled=yes primary-ntp=162.159.200.1 secondary-ntp=162.159.200.123
 /system clock set time-zone-name=Africa/Khartoum
@@ -141,7 +160,7 @@ def generate_mikrotik_config(
 /ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=443
 """
 
-    # ---------- HTML FILE HANDLER ----------
+    # ---------- HTML ----------
     def output_file_script(filename: str, content: str | None):
         if not content:
             return ""
@@ -149,7 +168,6 @@ def generate_mikrotik_config(
         content = content.replace("{{ tech_support_name }}", tech_support_name)
         content = content.replace("{{ tech_support_phone }}", tech_support_phone)
 
-        # Escape for MikroTik
         escaped = (
             content
             .replace("\\", "\\\\")
@@ -161,24 +179,27 @@ def generate_mikrotik_config(
 /file set [find name="hotspot/{filename}"] contents="{escaped}"
 """
 
-    # ---------- FINAL CONFIG ----------
+    # ---------- FINAL ----------
     config = f"""
 # ==========================================
-# AUTO GENERATED MIKROTIK CONFIG
+# ALGASWAA AUTO INSTALL
 # NAS-ID: {nas_identifier}
 # ==========================================
 
-# 1️⃣ RADIUS CONFIG
+# 1️⃣ RADIUS
 {radius_cmd}
 {incoming_cmd}
 
-# 2️⃣ HOTSPOT PROFILE
+# 2️⃣ LAN + DHCP
+{lan_cmd}
+
+# 3️⃣ HOTSPOT
 {hotspot_cmd}
 
-# 3️⃣ TIME SYNC (MANDATORY)
+# 4️⃣ TIME SYNC
 {ntp_cmd}
 
-# 4️⃣ WALLED GARDEN
+# 5️⃣ WALLED GARDEN
 {walled_garden_cmd}
 """
 
@@ -190,7 +211,9 @@ def generate_mikrotik_config(
 
     config += """
 # ==========================================
-# CONFIG COMPLETE ✅
+# INSTALL COMPLETE ✅
+# Add ports or Wi-Fi to bridge:
+# /interface bridge port add bridge=algaswaa-bridge interface=etherX
 # ==========================================
 """
 
