@@ -34,8 +34,8 @@ def mikrotik_install(request, token, version):
 
     # Ensure NAS exists (NAS-ID = token)
     add_radius_client(
-        hostname=mikrotik_ip,      # nasname (IP)
-        shortname=token,           # NAS-Identifier (UNIQUE)
+        nasname=mikrotik_ip,
+        shortname=token,      
         secret=RADIUS_SECRET
     )
 
@@ -55,13 +55,21 @@ def mikrotik_install(request, token, version):
 
     return HttpResponse(config_text, content_type="text/plain; charset=utf-8")
 
-def _get_server_and_support_info(token):
+def _get_server_and_support_info(request, token):
     try:
         owner_id, server_id = token.split('_')
     except ValueError:
         raise Http404("Invalid token format")
 
     server = get_object_or_404(Server, id=server_id, owner_id=owner_id)
+
+    # ✅ CAPTURE ROUTER IP ON FETCH
+    mikrotik_ip = get_client_ip(request)
+    
+
+    if mikrotik_ip:
+        server.ip_address = mikrotik_ip
+        server.save(update_fields=["ip_address"])
     
     ts_name = "Support"
     ts_phone = "0000000000"
@@ -73,7 +81,7 @@ def _get_server_and_support_info(token):
     return ts_name, ts_phone
 
 def serve_login_html(request, token):
-    ts_name, ts_phone = _get_server_and_support_info(token)
+    ts_name, ts_phone = _get_server_and_support_info(request, token)
     
     login_html_path = os.path.join(settings.BASE_DIR, "mikrotikUI", "login.html")
     content = ""
@@ -85,7 +93,7 @@ def serve_login_html(request, token):
     return HttpResponse(content, content_type="text/html; charset=utf-8")
 
 def serve_status_html(request, token):
-    ts_name, ts_phone = _get_server_and_support_info(token)
+    ts_name, ts_phone = _get_server_and_support_info(request, token)
     
     status_html_path = os.path.join(settings.BASE_DIR, "mikrotikUI", "status.html")
     content = ""

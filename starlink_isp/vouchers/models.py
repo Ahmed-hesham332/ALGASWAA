@@ -54,13 +54,3 @@ class Voucher(models.Model):
     def __str__(self):
         return self.serial
 
-# Signal to delete from RADIUS when Voucher is deleted
-from django.db.models.signals import post_delete
-from django.dispatch import receiver
-from radius_integration.services import voucher_radius_delete
-
-@receiver(post_delete, sender=Voucher)
-def delete_voucher_from_radius(sender, instance, **kwargs):
-    if instance.serial:
-        voucher_radius_delete(instance.serial)
-

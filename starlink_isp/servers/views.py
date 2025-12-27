@@ -6,6 +6,7 @@ from .models import Server
 from .forms import ServerForm
 from radius_integration.services import generate_mikrotik_config, add_radius_client, radius_delete_client, voucher_radius_delete
 from django.http import HttpResponse
+from django.db import connections
 
 @login_required
 def server_list(request):
@@ -46,14 +47,6 @@ def server_add(request):
             server = form.save(commit=False)
             server.owner = user
             server.save()
-
-            # Add to RADIUS using NAS-Identifier (token)
-            from radius_integration.services import RADIUS_SECRET
-            add_radius_client(
-                hostname=server.install_token,
-                shortname=server.name,
-                secret=RADIUS_SECRET
-            )
             
             messages.success(request, "تم إضافة السيرفر")
 

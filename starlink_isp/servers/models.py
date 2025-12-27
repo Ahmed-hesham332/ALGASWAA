@@ -16,11 +16,12 @@ class Server(models.Model):
     hostname = models.CharField(max_length=64, unique=True, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if not self.id:
-            super().save(*args, **kwargs)
+        # Always save first
+        super().save(*args, **kwargs)
         
         if not self.hostname:
             self.hostname = f"{self.owner.id}_{self.id}"
+            # Update hostname without triggering recursion issues if we use update_fields
             super().save(update_fields=['hostname'])
 
 

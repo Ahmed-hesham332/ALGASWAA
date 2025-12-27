@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>تسجيل الدخول</title>
-
     <style>
         * {
             box-sizing: border-box;
@@ -116,14 +115,12 @@
 </head>
 
 <body>
-
     $(if chap-id)
     <form name="sendin" action="$(link-login-only)" method="post" style="display:none">
         <input type="hidden" name="username">
         <input type="hidden" name="password">
         <input type="hidden" name="dst" value="$(link-orig)">
     </form>
-
     <script src="/md5.js"></script>
     <script>
         function doLogin() {
@@ -137,7 +134,6 @@
     $(endif)
 
     <div class="page">
-
         <!-- TOP BADGE -->
         <div class="top-badge">
             <svg viewBox="0 0 24 24">
@@ -146,18 +142,15 @@
             </svg>
             Tech Support
         </div>
-        <div class="phone">
-            0120100102
-        </div>
-        <!-- TITLE -->
+        <div class="phone">0120100102</div>
 
+        <!-- TITLE -->
         <div class="title">
             شبكة<br>القصواء
         </div>
 
         <!-- FORM -->
         <div class="form">
-
             $(if error)
             <div class="alert">$(error)</div>
             $(endif)
@@ -166,17 +159,11 @@
                 $(endif)>
                 <input type="hidden" name="dst" value="$(link-orig)">
                 <input type="hidden" name="popup" value="true">
-
                 <input class="input" type="text" name="voucher" placeholder="أدخل رقم الكرت" required autofocus>
-
-                <button class="button" type="submit">
-                    تسجيل الدخول
-                </button>
+                <button class="button" type="submit">تسجيل الدخول</button>
             </form>
         </div>
-
     </div>
-
 </body>
 
 </html>

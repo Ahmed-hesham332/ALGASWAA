@@ -91,7 +91,6 @@ def generate_mikrotik_config(
     shared_secret: str,
     radius_ip: str,
     nas_identifier: str,
-    mikrotik_wan_ip: str | None = None,
     routeros_version: int = 7,   # 6 or 7
 ):
     """
@@ -108,20 +107,15 @@ def generate_mikrotik_config(
     
     # ---------- RADIUS ----------
     radius_cmd = f"""
-/radius add address={radius_ip} secret={shared_secret} service=hotspot authentication-port=1812 accounting-port=1813
+/radius add address={radius_ip} secret={shared_secret} service=hotspot authentication-port=1812 accounting-port=1813 
+/radius incoming set accept=yes
 """
-
-    if routeros_version >= 7 and mikrotik_wan_ip:
-        radius_cmd = radius_cmd.strip() + f" src-address={mikrotik_wan_ip}\n"
-
-    incoming_cmd = ""
-    if routeros_version == 6:
-        incoming_cmd = "/radius incoming set accept=yes\n"
 
     # ---------- LAN BRIDGE ----------
     lan_cmd = """
 # Create dedicated LAN bridge
 /interface bridge add name=algaswaa-bridge 
+/interface bridge port add bridge=algaswaa-bridge interface=ether2
 
 # Assign LAN IP
 /ip address add address=10.10.10.1/24 interface=algaswaa-bridge 
@@ -134,6 +128,8 @@ def generate_mikrotik_config(
 
 # DHCP network
 /ip dhcp-server network add address=10.10.10.0/24 gateway=10.10.10.1 dns-server=8.8.8.8,1.1.1.1
+
+/ip dns set allow-remote-requests=yes servers=8.8.8.8,1.1.1.1
 """
 
     # ---------- HOTSPOT ----------
@@ -143,27 +139,58 @@ def generate_mikrotik_config(
 
 # Hotspot server
 /ip hotspot add name=algaswaa_hotspot interface=algaswaa-bridge profile=algaswaa_hotspot address-pool=algaswaa_pool
+
+# Hotspot shared users
+/ip hotspot profile set algaswaa_hotspot shared-users=1
+
+# Hotspot enable
+/ip hotspot enable algaswaa_hotspot
 """
 
     # ---------- TIME SYNC ----------
     if routeros_version >= 7:
         ntp_cmd = """
-    /system ntp client set enabled=yes
-    /system ntp client servers add address=162.159.200.1
-    /system ntp client servers add address=162.159.200.123
-    /system clock set time-zone-name=Africa/Khartoum
+/system ntp client set enabled=yes
+/system ntp client servers add address=162.159.200.1
+/system ntp client servers add address=162.159.200.123
+/system clock set time-zone-name=Africa/Khartoum
     """
     else:
         ntp_cmd = """
-    /system ntp client set enabled=yes primary-ntp=162.159.200.1 secondary-ntp=162.159.200.123
-    /system clock set time-zone-name=Africa/Khartoum
+/system ntp client set enabled=yes primary-ntp=162.159.200.1 secondary-ntp=162.159.200.123
+/system clock set time-zone-name=Africa/Khartoum
     """
 
-    # ---------- WALLED GARDEN ----------
+    # ---------- WALLED GARDEN + NAT ----------
     walled_garden_cmd = """
 /ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=80
 /ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=443
 /ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=8000
+/ip firewall nat add chain=srcnat src-address=10.10.10.0/24 out-interface=ether1 action=masquerade
+"""
+
+    # ---------- FINAL ----------
+    config = f"""
+# ==========================================
+# ALGASWAA AUTO INSTALL
+# NAS-ID: {nas_identifier}
+# ==========================================
+
+# 1️⃣ RADIUS
+{identity_cmd}
+{radius_cmd}
+
+# 2️⃣ LAN + DHCP
+{lan_cmd}
+
+# 3️⃣ HOTSPOT
+{hotspot_cmd}
+
+# 4️⃣ TIME SYNC
+{ntp_cmd}
+
+# 5️⃣ WALLED GARDEN + NAT
+{walled_garden_cmd}
 """
 
     # ---------- HTML ----------
@@ -181,33 +208,6 @@ def generate_mikrotik_config(
 
     config += files_cmd
 
-
-
-    # ---------- FINAL ----------
-    config = f"""
-# ==========================================
-# ALGASWAA AUTO INSTALL
-# NAS-ID: {nas_identifier}
-# ==========================================
-
-# 1️⃣ RADIUS
-{identity_cmd}
-{radius_cmd}
-{incoming_cmd}
-
-# 2️⃣ LAN + DHCP
-{lan_cmd}
-
-# 3️⃣ HOTSPOT
-{hotspot_cmd}
-
-# 4️⃣ TIME SYNC
-{ntp_cmd}
-
-# 5️⃣ WALLED GARDEN
-{walled_garden_cmd}
-"""
-
     config += """
 # ==========================================
 # INSTALL COMPLETE ✅
@@ -219,7 +219,7 @@ def generate_mikrotik_config(
     return config
 
 
-def add_radius_client(hostname, shortname, secret):
+def add_radius_client(nasname, shortname, secret):
     conn = connections["radius"]
     cursor = conn.cursor()
 
@@ -227,7 +227,7 @@ def add_radius_client(hostname, shortname, secret):
         INSERT INTO nas (nasname, shortname, type, secret)
         VALUES (%s, %s, 'mikrotik', %s)
         ON DUPLICATE KEY UPDATE secret = VALUES(secret);
-    """, [hostname, shortname, secret])
+    """, [nasname, shortname, secret])
 
     conn.commit()
     cursor.close()
@@ -266,7 +266,7 @@ def radius_delete_client(token):
     Delete NAS client from FreeRADIUS by IP address.
     """
     cursor = connections['radius'].cursor()
-    cursor.execute("DELETE FROM nas WHERE nasname = %s", [token])
+    cursor.execute("DELETE FROM nas WHERE shortname = %s", [token])
     cursor.close()
 
 def voucher_radius_delete(username):
