@@ -94,129 +94,127 @@ def generate_mikrotik_config(
     routeros_version: int = 7,   # 6 or 7
 ):
     """
-    Auto-generated MikroTik Hotspot + RADIUS configuration.
+    Production-grade MikroTik HotSpot + RADIUS configuration.
 
-    - RouterOS v6 / v7 supported
-    - Safe (no WAN/interface guessing)
-    - Uses NAS-Identifier (important for NAT / Starlink)
+    ✔ RouterOS v6 / v7
+    ✔ VM + Real hardware
+    ✔ bridgeLocal aware
+    ✔ WiFi aware
+    ✔ Voucher-safe (PAP)
     """
 
-    identity_cmd = f"""
-/system identity set name={nas_identifier}
-"""
-    
-    # ---------- RADIUS ----------
-    radius_cmd = f"""
-/radius add address={radius_ip} secret={shared_secret} service=hotspot authentication-port=1812 accounting-port=1813 
-/radius incoming set accept=yes
-"""
-
-    # ---------- LAN BRIDGE ----------
-    lan_cmd = """
-# Create dedicated LAN bridge
-/interface bridge add name=algaswaa-bridge 
-/interface bridge port add bridge=algaswaa-bridge interface=ether2
-
-# Assign LAN IP
-/ip address add address=10.10.10.1/24 interface=algaswaa-bridge 
-
-# DHCP pool
-/ip pool add name=algaswaa_pool ranges=10.10.10.10-10.10.10.200
-
-# DHCP server
-/ip dhcp-server add name=algaswaa_dhcp interface=algaswaa-bridge address-pool=algaswaa_pool lease-time=1h disabled=no
-
-# DHCP network
-/ip dhcp-server network add address=10.10.10.0/24 gateway=10.10.10.1 dns-server=8.8.8.8,1.1.1.1
-
-/ip dns set allow-remote-requests=yes servers=8.8.8.8,1.1.1.1
-"""
-
-    # ---------- HOTSPOT ----------
-    hotspot_cmd = """
-# Hotspot profile
-/ip hotspot profile add name=algaswaa_hotspot use-radius=yes login-by=http-chap,cookie,mac-cookie radius-interim-update=5m
-
-# Hotspot server
-/ip hotspot add name=algaswaa_hotspot interface=algaswaa-bridge profile=algaswaa_hotspot address-pool=algaswaa_pool
-
-# Hotspot shared users
-/ip hotspot profile set algaswaa_hotspot shared-users=1
-
-# Hotspot enable
-/ip hotspot enable algaswaa_hotspot
-"""
-
-    # ---------- TIME SYNC ----------
+    # ---------- TIME SYNC (VERSION-AWARE) ----------
     if routeros_version >= 7:
         ntp_cmd = """
+# ---------- TIME (RouterOS v7) ----------
 /system ntp client set enabled=yes
+/system ntp client servers remove [find]
 /system ntp client servers add address=162.159.200.1
 /system ntp client servers add address=162.159.200.123
 /system clock set time-zone-name=Africa/Khartoum
-    """
+"""
     else:
         ntp_cmd = """
+# ---------- TIME (RouterOS v6) ----------
 /system ntp client set enabled=yes primary-ntp=162.159.200.1 secondary-ntp=162.159.200.123
 /system clock set time-zone-name=Africa/Khartoum
-    """
-
-    # ---------- WALLED GARDEN + NAT ----------
-    walled_garden_cmd = """
-/ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=80
-/ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=443
-/ip hotspot walled-garden ip add dst-address=72.62.26.238 protocol=tcp dst-port=8000
-/ip firewall nat add chain=srcnat src-address=10.10.10.0/24 out-interface=ether1 action=masquerade
 """
 
-    # ---------- FINAL ----------
     config = f"""
 # ==========================================
-# ALGASWAA AUTO INSTALL
+# ALGASWAA AUTO INSTALL (SMART)
 # NAS-ID: {nas_identifier}
 # ==========================================
 
-# 1️⃣ RADIUS
-{identity_cmd}
-{radius_cmd}
+# ---------- SYSTEM ID ----------
+/system identity set name={nas_identifier}
 
-# 2️⃣ LAN + DHCP
-{lan_cmd}
+# ---------- DETECT LAN BRIDGE ----------
+:global LANBRIDGE ""
 
-# 3️⃣ HOTSPOT
-{hotspot_cmd}
+:if ([/interface bridge find name="bridgeLocal"] != "") do={{
+    :set LANBRIDGE "bridgeLocal"
+}} else={{
+    :set LANBRIDGE "algaswaa-bridge"
+    :if ([/interface bridge find name=$LANBRIDGE] = "") do={{
+        /interface bridge add name=$LANBRIDGE
+        /interface bridge port add bridge=$LANBRIDGE interface=ether2
+    }}
+}}
 
-# 4️⃣ TIME SYNC
+# ---------- LAN IP ----------
+:if ([/ip address find interface=$LANBRIDGE] = "") do={{
+    /ip address add address=10.10.10.1/24 interface=$LANBRIDGE
+}}
+
+# ---------- DHCP ----------
+:if ([/ip pool find name="algaswaa_pool"] = "") do={{
+    /ip pool add name=algaswaa_pool ranges=10.10.10.10-10.10.10.200
+}}
+
+:if ([/ip dhcp-server find name="algaswaa_dhcp"] = "") do={{
+    /ip dhcp-server add name=algaswaa_dhcp interface=$LANBRIDGE address-pool=algaswaa_pool lease-time=1h disabled=no
+}}
+
+:if ([/ip dhcp-server network find address=10.10.10.0/24] = "") do={{
+    /ip dhcp-server network add address=10.10.10.0/24 gateway=10.10.10.1 dns-server=8.8.8.8,1.1.1.1
+}}
+
+# ---------- DNS ----------
+/ip dns set allow-remote-requests=yes servers=8.8.8.8,1.1.1.1
+
+# ---------- RADIUS ----------
+:if ([/radius find address={radius_ip} service=hotspot] = "") do={{
+    /radius add address={radius_ip} secret={shared_secret} service=hotspot authentication-port=1812 accounting-port=1813
+}}
+/radius incoming set accept=yes
+
+# ---------- HOTSPOT PROFILE ----------
+:if ([/ip hotspot profile find name="algaswaa_hotspot"] = "") do={{
+    /ip hotspot profile add name=algaswaa_hotspot use-radius=yes login-by=http-pap,http-chap,cookie,mac-cookie radius-interim-update=5m
+    /ip hotspot user profile set [find name="algaswaa_hotspot"] shared-users=1
+}}
+
+# ---------- HOTSPOT SERVER ----------
+:if ([/ip hotspot find name="algaswaa_hotspot"] = "") do={{
+    /ip hotspot add name=algaswaa_hotspot interface=$LANBRIDGE profile=algaswaa_hotspot address-pool=algaswaa_pool
+}}
+
+# ---------- HOTSPOT ENABLE ----------
+/ip hotspot enable algaswaa_hotspot
+
+# ---------- NAT ----------
+:if ([/ip firewall nat find chain=srcnat out-interface=ether1] = "") do={{
+    /ip firewall nat add chain=srcnat out-interface=ether1 action=masquerade
+}}
+
+# ---------- WALLED GARDEN ----------
+/ip hotspot walled-garden ip remove [find]
+/ip hotspot walled-garden ip add dst-address={radius_ip} protocol=tcp dst-port=80
+/ip hotspot walled-garden ip add dst-address={radius_ip} protocol=tcp dst-port=443
+/ip hotspot walled-garden ip add dst-address={radius_ip} protocol=tcp dst-port=8000
+
 {ntp_cmd}
 
-# 5️⃣ WALLED GARDEN + NAT
-{walled_garden_cmd}
-"""
-
-    # ---------- HTML ----------
-    # Dynamic fetch from API
-    files_cmd = f"""
-# 5️⃣ FILES SETUP
+# ---------- HOTSPOT FILES ----------
 /file remove [find name="hotspot/login.html"]
 /file remove [find name="hotspot/status.html"]
 
 :delay 2s
 
-/tool fetch url="http://{radius_ip}/radius-integration/api/install/{nas_identifier}/login/" dst-path="hotspot/login.html" mode=http keep-result=yes
-/tool fetch url="http://{radius_ip}/radius-integration/api/install/{nas_identifier}/status/" dst-path="hotspot/status.html" mode=http keep-result=yes
-"""
+/tool fetch url=("http://{radius_ip}/radius-integration/api/install/{nas_identifier}/login/") dst-path="hotspot/login.html" mode=http keep-result=yes
+/tool fetch url=("http://{radius_ip}/radius-integration/api/install/{nas_identifier}/status/") dst-path="hotspot/status.html" mode=http keep-result=yes
 
-    config += files_cmd
+# ---------- CLEAN STATE ----------
+/ip hotspot active remove [find]
+/ip hotspot cookie remove [find]
+/ip hotspot host remove [find]
 
-    config += """
-# ==========================================
-# INSTALL COMPLETE ✅
-# Add ports or Wi-Fi to bridge:
-# /interface bridge port add bridge=algaswaa-bridge interface=etherX
-# ==========================================
+:log info "ALGASWAA HOTSPOT INSTALL COMPLETE"
 """
 
     return config
+
 
 
 def add_radius_client(nasname, shortname, secret):

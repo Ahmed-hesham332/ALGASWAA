@@ -25,8 +25,6 @@ def mikrotik_install(request, token, version):
     # ✅ FIX: Get REAL MikroTik WAN IP
     mikrotik_ip = get_client_ip(request)
 
-    # if not mikrotik_ip or mikrotik_ip.startswith("127."):
-    #     raise Http404("Invalid MikroTik IP detected")
 
     # Update server WAN IP
     server.ip_address = mikrotik_ip
@@ -49,7 +47,6 @@ def mikrotik_install(request, token, version):
         shared_secret=RADIUS_SECRET,
         radius_ip="72.62.26.238",
         nas_identifier=token,
-        mikrotik_wan_ip=mikrotik_ip,
         routeros_version=ver_int,
     )
 
