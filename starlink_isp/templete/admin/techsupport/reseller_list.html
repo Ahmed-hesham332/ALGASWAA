@@ -78,8 +78,8 @@
         padding: 8px 14px;
         font-size: 14px;
         border-radius: 6px;
-        background: #dc2626;
-        color: #ffffff;
+        /* background: #dc2626;  <-- REMOVED TO ALLOW TAILWIND CLASSES */
+        /* color: #ffffff;       <-- REMOVED */
         text-decoration: none;
         cursor: pointer;
     }
@@ -486,7 +486,11 @@
                 </td>
 
                 <td data-label="الدفع" class="text-center">
-                    <a href="{% url 'adminpanel:reseller_toggle_paied' r.id %}" class="switch-link">
+                    <a href="{% url 'adminpanel:reseller_toggle_paied' r.id %}" class="switch-link" data-confirm {% if
+                        r.has_paied %} data-msg="هل أنت متأكد من إلغاء الدفع لهذا المشترك؟" data-btn-text="إلغاء الدفع"
+                        data-btn-class="bg-yellow-600 hover:bg-yellow-700 text-white" {% else %}
+                        data-msg="هل أنت متأكد من تفعيل الدفع لهذا المشترك؟" data-btn-text="تفعيل الدفع"
+                        data-btn-class="bg-green-600 hover:bg-green-700 text-white" {% endif %}>
                         <span class="switch {% if r.has_paied %}active{% endif %}"></span>
                     </a>
                 </td>
@@ -522,10 +526,26 @@
         const cancel = document.getElementById("cmCancel");
 
         let targetHref = null;
+        // Store default class to restore it if needed, though we will overwrite mostly
+        const defaultBtnClass = "px-3 py-2 text-sm rounded-md bg-red-600 hover:bg-red-700 text-white";
 
-        function openModal(message, href) {
+        function openModal(message, href, btnText, btnClass) {
             text.textContent = message || "هل أنت متأكد؟";
             targetHref = href;
+
+            // Set Button Text
+            okBtn.textContent = btnText || "حذف";
+
+            // Set Button Class
+            if (btnClass) {
+                // Keep base layout classes, replace color classes
+                // Simpler: Just overwrite className if we provide full tailwind classes
+                // We'll assume btnClass contains all necessary styling
+                okBtn.className = "px-3 py-2 text-sm rounded-md " + btnClass;
+            } else {
+                okBtn.className = defaultBtnClass;
+            }
+
             modal.style.display = "block";
         }
 
@@ -534,21 +554,23 @@
             targetHref = null;
         }
 
-        // Attach to ALL delete links
+        // Attach to ALL delete links (and now toggle links)
         document.querySelectorAll("a[data-confirm]").forEach(link => {
             link.addEventListener("click", function (e) {
-                e.preventDefault(); // ⛔ stop delete
+                e.preventDefault(); // ⛔ stop navigation
                 openModal(
                     link.dataset.msg,
-                    link.getAttribute("href")
+                    link.getAttribute("href"),
+                    link.dataset.btnText,
+                    link.dataset.btnClass
                 );
             });
         });
 
-        // Confirm delete
+        // Confirm action
         okBtn.addEventListener("click", function () {
             if (targetHref) {
-                window.location.href = targetHref; // ✅ NOW delete
+                window.location.href = targetHref;
             }
         });
 

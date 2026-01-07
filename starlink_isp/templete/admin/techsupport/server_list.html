@@ -88,6 +88,66 @@
 </style>
 
 
+<style>
+    /* ... (EXISTING MODAL STYLES) ... */
+
+    /* ADDING RESPONSIVE STYLES SIMILAR TO RESELLER LIST */
+    @media (max-width: 640px) {
+
+        .admin-table,
+        .admin-table thead,
+        .admin-table tbody,
+        .admin-table th,
+        .admin-table td,
+        .admin-table tr {
+            display: block;
+            width: 100%;
+        }
+
+        .admin-table thead {
+            display: none;
+        }
+
+        .admin-table tr {
+            background: #fff;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .admin-table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            text-align: right;
+            direction: rtl;
+            font-size: 14px;
+        }
+
+        .admin-table td:last-child {
+            border-bottom: none;
+        }
+
+        .admin-table td::before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: #555;
+            white-space: nowrap;
+            margin-left: 10px;
+            /* Space between label and content */
+        }
+
+        /* Adjust actions column */
+        .admin-table td:last-child {
+            justify-content: center;
+            gap: 10px;
+        }
+    }
+</style>
+
 <div style="margin-bottom: 2rem;">
     <h2 style="margin-bottom: 1.5rem;">الخوادم</h2>
 
@@ -109,22 +169,22 @@
         <tbody>
             {% for server in servers %}
             <tr>
-                <td>
-                    {{ server.name }}
+                <td data-label="اسم الخادم">
                     {% if server.is_online %}
                     <span
-                        style="display:inline-block; width:10px; height:10px; background-color:#22c55e; border-radius:50%; margin-right:5px;"
+                        style="display:inline-block; width:10px; height:10px; background-color:#22c55e; border-radius:50%; margin-left:5px;"
                         title="Online"></span>
                     {% else %}
                     <span
-                        style="display:inline-block; width:10px; height:10px; background-color:#9ca3af; border-radius:50%; margin-right:5px;"
+                        style="display:inline-block; width:10px; height:10px; background-color:#9ca3af; border-radius:50%; margin-left:5px;"
                         title="Offline"></span>
                     {% endif %}
+                    {{ server.name }}
                 </td>
-                <td>{{ server.owner.username }}</td>
-                <td>{{ server.ip_address }}</td>
-                <td>{{ server.created_at|date:"Y-m-d H:i" }}</td>
-                <td>
+                <td data-label="المشترك">{{ server.owner.username }}</td>
+                <td data-label="عنوان IP">{{ server.ip_address }}</td>
+                <td data-label="تاريخ الإنشاء">{{ server.created_at|date:"Y-m-d H:i" }}</td>
+                <td data-label="الإجراءات">
                     <a href="{% url 'adminpanel:server_delete' server.id %}" data-confirm
                         data-msg="هل أنت متأكد من حذف هذا الخادم؟" class="btn btn-danger">
                         حذف
