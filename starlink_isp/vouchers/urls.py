@@ -7,4 +7,5 @@ urlpatterns = [
     path("", views.voucher_list, name="list"),
     path("add/", views.voucher_generate, name="voucher_generate"),
     path("batches/", views.batch_list, name="batch_list"),
+    path("reconnect/<int:voucher_id>/", views.reconnect_voucher, name="reconnect"),
 ]

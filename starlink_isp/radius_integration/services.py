@@ -7,7 +7,9 @@ def radius_add_user(serial, offer, token):
     cursor = connections["radius"].cursor()
 
     # 1️⃣ Calculate Session Timeout 
-    if offer.duration_type == "hours":
+    if offer.duration_type == "minutes":
+        duration_seconds = offer.duration_value * 60
+    elif offer.duration_type == "hours":
         duration_seconds = offer.duration_value * 3600
     elif offer.duration_type == "days":
         duration_seconds = offer.duration_value * 86400
@@ -15,7 +17,6 @@ def radius_add_user(serial, offer, token):
         duration_seconds = offer.duration_value * 30 * 86400
     else:
         duration_seconds = 0    
-
 
     # Insert NAS IP Address 
     cursor.execute("""
@@ -42,8 +43,12 @@ def radius_add_user(serial, offer, token):
 
     # Insert quota
     if offer.quota_type != "none":
-       
-        quota_bytes = offer.quota_amount * 1024 * 1024 * 1024 
+        if offer.quota_type == "MB":
+            quota_bytes = offer.quota_amount * 1024 * 1024
+        else:
+            # Default to GB ("fixed")
+            quota_bytes = offer.quota_amount * 1024 * 1024 * 1024 
+        
         cursor.execute("""
             INSERT INTO radreply (username, attribute, op, value)
             VALUES (%s, 'Mikrotik-Total-Limit', ':=', %s)
@@ -171,7 +176,7 @@ def generate_mikrotik_config(
 
 # ---------- HOTSPOT PROFILE ----------
 :if ([/ip hotspot profile find name="algaswaa_hotspot"] = "") do={{
-    /ip hotspot profile add name=algaswaa_hotspot use-radius=yes login-by=http-pap,http-chap,cookie,mac-cookie radius-interim-update=5m
+    /ip hotspot profile add name=algaswaa_hotspot use-radius=yes login-by=http-pap,http-chap,cookie,mac-cookie radius-interim-update=1m
     /ip hotspot user profile set [find name="algaswaa_hotspot"] shared-users=1
 }}
 
@@ -204,6 +209,10 @@ def generate_mikrotik_config(
 
 /tool fetch url=("http://{radius_ip}/radius-integration/api/install/{nas_identifier}/login/") dst-path="hotspot/login.html" mode=http keep-result=yes
 /tool fetch url=("http://{radius_ip}/radius-integration/api/install/{nas_identifier}/status/") dst-path="hotspot/status.html" mode=http keep-result=yes
+
+# ---------- HEARTBEAT SCHEDULER ----------
+/system scheduler remove [find name="algaswaa-heartbeat"]
+/system scheduler add name=algaswaa-heartbeat interval=1m on-event="/tool fetch url=("http://{radius_ip}/radius-integration/api/heartbeat/{nas_identifier}/") keep-result=no"
 
 # ---------- CLEAN STATE ----------
 /ip hotspot active remove [find]
@@ -260,12 +269,13 @@ def get_voucher_status(username):
     cursor.close()
 
 def radius_delete_client(token):
-    """
-    Delete NAS client from FreeRADIUS by IP address.
-    """
-    cursor = connections['radius'].cursor()
-    cursor.execute("DELETE FROM nas WHERE shortname = %s", [token])
-    cursor.close()
+    # """
+    # Delete NAS client from FreeRADIUS by IP address.
+    # """
+    # cursor = connections['radius'].cursor()
+    # cursor.execute("DELETE FROM nas WHERE shortname = %s", [token])
+    # cursor.close()
+    pass
 
 def voucher_radius_delete(username):
     cursor = connections['radius'].cursor()

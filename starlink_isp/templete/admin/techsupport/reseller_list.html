@@ -392,6 +392,20 @@
         </div>
     </div>
 
+    <!-- BULK ACTIONS -->
+    <div style="margin-bottom: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+        <a href="{% url 'adminpanel:reseller_bulk_payment' 'pay' %}"
+            onclick="return confirm('هل أنت متأكد من تفعيل الدفع لجميع المشتركين في القائمة؟')" class="btn"
+            style="background-color: #059669; color: white; padding: 6px 12px; font-size: 13px; border-radius: 6px; text-decoration: none;">
+            تفعيل الدفع للجميع
+        </a>
+        <a href="{% url 'adminpanel:reseller_bulk_payment' 'unpay' %}"
+            onclick="return confirm('هل أنت متأكد من إلغاء الدفع لجميع المشتركين في القائمة؟')" class="btn"
+            style="background-color: #d97706; color: white; padding: 6px 12px; font-size: 13px; border-radius: 6px; text-decoration: none;">
+            إلغاء الدفع للجميع
+        </a>
+    </div>
+
     <!-- ====== FILTER BAR ====== -->
     <form method="get" class="filter-bar">
         <div class="filter-grid">

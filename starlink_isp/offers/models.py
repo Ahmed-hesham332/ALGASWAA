@@ -29,6 +29,7 @@ class Offer(models.Model):
     speed_formula = models.BooleanField(default=False, verbose_name="تفعيل معادلة السرعة")
 
     DURATION_CHOICES = [
+        ("minutes", "دقائق"),
         ("hours", "ساعات"),
         ("days", "أيام"),
         ("months", "شهور"),
@@ -39,6 +40,7 @@ class Offer(models.Model):
 
     QUOTA_CHOICES = [
         ("none", "غير محدود"),
+        ("MB", "ميجابايت"),
         ("fixed", "محددة (جيجا)"),
     ]
 

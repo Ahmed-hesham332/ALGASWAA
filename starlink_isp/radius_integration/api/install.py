@@ -70,15 +70,20 @@ def _get_server_and_support_info(request, token):
     
     ts_name = "Support"
     ts_phone = "0000000000"
+    network_name = "شبكة القصواء" # Default fallback
 
     if server.owner.tech_support_assigned:
         ts_name = server.owner.tech_support_assigned.name
         ts_phone = server.owner.tech_support_assigned.phone
-        
-    return ts_name, ts_phone
+    
+    # Get Network Name from owner if set, distinct from default
+    if server.owner.Network_Name and server.owner.Network_Name.strip() != "":
+         network_name = server.owner.Network_Name
+
+    return ts_name, ts_phone, network_name
 
 def serve_login_html(request, token):
-    ts_name, ts_phone = _get_server_and_support_info(request, token)
+    ts_name, ts_phone, network_name = _get_server_and_support_info(request, token)
     
     login_html_path = os.path.join(settings.BASE_DIR, "mikrotikUI", "login.html")
     content = ""
@@ -90,7 +95,7 @@ def serve_login_html(request, token):
     return HttpResponse(content, content_type="text/html; charset=utf-8")
 
 def serve_status_html(request, token):
-    ts_name, ts_phone = _get_server_and_support_info(request, token)
+    ts_name, ts_phone, network_name = _get_server_and_support_info(request, token)
     
     status_html_path = os.path.join(settings.BASE_DIR, "mikrotikUI", "status.html")
     content = ""

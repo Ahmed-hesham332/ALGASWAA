@@ -109,7 +109,18 @@
         <tbody>
             {% for server in servers %}
             <tr>
-                <td>{{ server.name }}</td>
+                <td>
+                    {{ server.name }}
+                    {% if server.is_online %}
+                    <span
+                        style="display:inline-block; width:10px; height:10px; background-color:#22c55e; border-radius:50%; margin-right:5px;"
+                        title="Online"></span>
+                    {% else %}
+                    <span
+                        style="display:inline-block; width:10px; height:10px; background-color:#9ca3af; border-radius:50%; margin-right:5px;"
+                        title="Offline"></span>
+                    {% endif %}
+                </td>
                 <td>{{ server.owner.username }}</td>
                 <td>{{ server.ip_address }}</td>
                 <td>{{ server.created_at|date:"Y-m-d H:i" }}</td>

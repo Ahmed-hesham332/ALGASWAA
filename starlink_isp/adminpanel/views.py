@@ -50,6 +50,21 @@ def reseller_toggle_paied(request, reseller_id):
     reseller.has_paied = not reseller.has_paied
     reseller.save()
 
+
+    return redirect("adminpanel:reseller_list")
+
+
+@user_passes_test(tech_support_only)
+def reseller_bulk_payment(request, action):
+    resellers = CustomUser.objects.filter(tech_support_assigned__user=request.user)
+
+    if action == "pay":
+        resellers.update(has_paied=True)
+        messages.success(request, "تم تفعيل الدفع لجميع المشتركين.")
+    elif action == "unpay":
+        resellers.update(has_paied=False)
+        messages.success(request, "تم إلغاء الدفع لجميع المشتركين.")
+    
     return redirect("adminpanel:reseller_list")
 
 

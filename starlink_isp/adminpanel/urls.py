@@ -26,6 +26,11 @@ urlpatterns = [
         views.reseller_toggle_paied,
         name="reseller_toggle_paied"
     ),
+    path(
+        "reseller/bulk-pay/<str:action>/",
+        views.reseller_bulk_payment,
+        name="reseller_bulk_payment"
+    ),
     # SuperAdmin: Tech Support Management
     path("tech-supports/", views.tech_support_list, name="tech_support_list"),
     path("tech-supports/add/", views.tech_support_add, name="tech_support_add"),

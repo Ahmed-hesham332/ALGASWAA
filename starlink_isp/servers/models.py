@@ -1,6 +1,8 @@
 # servers/models.py
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 
 class Server(models.Model):
     owner = models.ForeignKey(
@@ -14,6 +16,7 @@ class Server(models.Model):
     id = models.AutoField(primary_key=True) 
     created_at = models.DateTimeField(auto_now_add=True)
     hostname = models.CharField(max_length=64, unique=True, blank=True, null=True)
+    last_heartbeat = models.DateTimeField(null=True, blank=True, default='1970-01-01 00:00:00')
 
     def save(self, *args, **kwargs):
         # Always save first
@@ -28,6 +31,12 @@ class Server(models.Model):
     @property
     def install_token(self):
         return f"{self.owner.id}_{self.id}"
+
+    @property
+    def is_online(self):
+        if not self.last_heartbeat:
+            return False
+        return timezone.now() - self.last_heartbeat < timedelta(minutes=2)
 
     def __str__(self):
         return self.name

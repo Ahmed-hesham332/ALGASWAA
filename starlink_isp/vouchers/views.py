@@ -4,7 +4,8 @@ from .utils import update_voucher_status
 from django.utils import timezone
 from .models import Voucher, VoucherBatch
 from offers.models import Offer
-from radius_integration.services import radius_add_user
+from offers.models import Offer
+from radius_integration.services import radius_add_user, voucher_radius_delete
 from .forms import VoucherGenerationForm
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -244,4 +245,38 @@ def generate_serial(length, type, prefix=""):
         chars = string.ascii_uppercase + string.digits
         body = ''.join(random.choices(chars, k=length))
 
+
     return prefix + body
+
+
+@login_required
+def reconnect_voucher(request, voucher_id):
+    voucher = get_object_or_404(Voucher, id=voucher_id)
+
+    # Security check: Ensure user owns this voucher (either as reseller or distributer)
+    user = request.user
+    if user.is_distributer:
+        if voucher.batch.distributer != user.distributer_profile:
+             messages.error(request, "ليس لديك صلاحية على هذا الكارت")
+             return redirect("vouchers:list")
+    else:
+        if voucher.batch.reseller != user:
+             messages.error(request, "ليس لديك صلاحية على هذا الكارت")
+             return redirect("vouchers:list")
+
+    if voucher.is_used != "unused":
+        messages.error(request, "يمكن فقط إعادة توصيل الكروت غير المستخدمة.")
+        return redirect("vouchers:list")
+
+    try:
+        # 1. Delete from Radius
+        voucher_radius_delete(voucher.serial)
+        
+        # 2. Add back to Radius
+        radius_add_user(voucher.serial, voucher.offer, voucher.token)
+        
+        messages.success(request, f"تم إعادة توصيل الكارت {voucher.serial} بنجاح.")
+    except Exception as e:
+        messages.error(request, f"حدث خطأ أثناء إعادة التوصيل: {e}")
+
+    return redirect("vouchers:list")

@@ -112,13 +112,12 @@
                         <th class="px-4 py-3 font-semibold text-gray-700">الحالة</th>
                         <th class="px-4 py-3 font-semibold text-gray-700">السعر</th>
                         <th class="px-4 py-3 font-semibold text-gray-700">السيرفر</th>
+                        <th class="px-4 py-3 font-semibold text-gray-700">إجراءات</th>
                     </tr>
                 </thead>
 
                 <tbody class="divide-y divide-gray-200">
                     {% for v in vouchers %}
-                    {%for o in offers %}
-                    {% if v.offer.id == o.id %}
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-4 py-3 text-gray-600">{{ forloop.counter }}</td>
                         <td class="px-4 py-3 text-gray-900 font-mono text-xs">{{ v.serial }}</td>
@@ -126,8 +125,8 @@
                         <td class="px-4 py-3 text-gray-600 text-xs">{{ v.created_at }}</td>
                         <td class="px-4 py-3 text-gray-600 text-xs">{{ v.activated_at|default:"—"}}</td>
                         <td class="px-4 py-3 text-gray-600 text-xs">{{ v.expires_at|default:"—" }}</td>
-                        {% if o.quota_type != "none" %}
-                        <td class="px-4 py-3 text-gray-600">{{ o.quota_amount}}GB</td>
+                        {% if v.offer.quota_type != "none" %}
+                        <td class="px-4 py-3 text-gray-600">{{ v.offer.quota_amount}}GB</td>
                         {% else %}
                         <td class="px-4 py-3 text-gray-600">غير محدود</td>
                         {% endif %}
@@ -138,9 +137,18 @@
                         </td>
                         <td class="px-4 py-3 text-gray-600 font-medium">{{ v.batch.offer.price }}</td>
                         <td class="px-4 py-3 text-gray-600">{{ v.batch.server.name }}</td>
+                        <td class="px-4 py-3 text-gray-600">
+                            {% if v.is_used == "unused" %}
+                            <a href="{% url 'vouchers:reconnect' v.id %}"
+                                onclick="return confirm('هل أنت متأكد من رغبتك في إعادة توصيل هذا الكارت؟ سيتم حذفه وإعادة إضافته للراديوس.')"
+                                class="text-blue-600 hover:text-blue-800 text-xs bg-blue-50 px-2 py-1 rounded border border-blue-200">
+                                إعادة توصيل
+                            </a>
+                            {% else %}
+                            <span class="text-gray-400 text-xs">-</span>
+                            {% endif %}
+                        </td>
                     </tr>
-                    {% endif %}
-                    {% endfor %}
                     {% endfor %}
                 </tbody>
             </table>
