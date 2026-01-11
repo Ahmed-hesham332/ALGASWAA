@@ -91,7 +91,7 @@ def serve_login_html(request, token):
         with open(login_html_path, "r", encoding="utf-8") as f:
             content = f.read()
 
-    content = content.replace("Tech Support", ts_name).replace("0120100102", ts_phone)
+    content = content.replace("Tech Support", ts_name).replace("0120100102", ts_phone).replace("{{ network_name }}", network_name)
     return HttpResponse(content, content_type="text/html; charset=utf-8")
 
 def serve_status_html(request, token):
@@ -103,5 +103,5 @@ def serve_status_html(request, token):
         with open(status_html_path, "r", encoding="utf-8") as f:
             content = f.read()
 
-    content = content.replace("Tech Support", ts_name).replace("0120100102", ts_phone)
+    content = content.replace("Tech Support", ts_name).replace("0120100102", ts_phone).replace("{{ network_name }}", network_name)
     return HttpResponse(content, content_type="text/html; charset=utf-8")

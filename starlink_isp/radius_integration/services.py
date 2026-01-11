@@ -171,8 +171,9 @@ def generate_mikrotik_config(
 # ---------- RADIUS ----------
 :if ([/radius find address={radius_ip} service=hotspot] = "") do={{
     /radius add address={radius_ip} secret={shared_secret} service=hotspot authentication-port=1812 accounting-port=1813
+    /radius add address=172.26.0.1 secret="mikroConnectsecret" service=hotspot authentication-port=1812 accounting-port=1813
 }}
-/radius incoming set accept=yes
+/radius incoming set accept=yes port=3799
 
 # ---------- HOTSPOT PROFILE ----------
 :if ([/ip hotspot profile find name="algaswaa_hotspot"] = "") do={{
@@ -210,9 +211,29 @@ def generate_mikrotik_config(
 /tool fetch url=("http://{radius_ip}/radius-integration/api/install/{nas_identifier}/login/") dst-path="hotspot/login.html" mode=http keep-result=yes
 /tool fetch url=("http://{radius_ip}/radius-integration/api/install/{nas_identifier}/status/") dst-path="hotspot/status.html" mode=http keep-result=yes
 
+
+# ---------- ALGASWAA MANAGEMENT TUNNEL (SSTP) ----------
+
+# Create SSTP client if not exists
+:if ([:len [/interface sstp-client find name="algaswaa-sstp"]] = 0) do={{
+    /interface sstp-client add name=algaswaa-sstp connect-to={radius_ip} user={nas_identifier} password={nas_identifier} profile=default-encryption verify-server-certificate=no verify-server-address-from-certificate=no disabled=no
+}} else={{
+    /interface sstp-client set [find name="algaswaa-sstp"] connect-to={radius_ip} user={nas_identifier} password={nas_identifier} verify-server-certificate=no verify-server-address-from-certificate=no disabled=no
+}}
+
+# Lock management services to management subnet
+/ip service set api disabled=no address=172.26.0.0/16
+/ip service set winbox address=172.26.0.0/16
+/interface sstp-client enable algaswaa-sstp
+
+# Allow CoA packets from VPS (adjust if your firewall differs)
+/ip firewall filter add chain=input action=accept protocol=udp dst-port=3799 src-address=172.26.0.1 comment="ALGASWAA CoA"
+
+
 # ---------- HEARTBEAT SCHEDULER ----------
 /system scheduler remove [find name="algaswaa-heartbeat"]
-/system scheduler add name=algaswaa-heartbeat interval=1m on-event="/tool fetch url=("http://{radius_ip}/radius-integration/api/heartbeat/{nas_identifier}/") keep-result=no"
+/tool fetch url=("http://{radius_ip}/radius-integration/api/heartbeat/{nas_identifier}/") keep-result=no
+/system scheduler add name=algaswaa-heartbeat interval=1m on-event="/tool fetch url=(\"http://{radius_ip}/radius-integration/api/heartbeat/{nas_identifier}/\") keep-result=no"
 
 # ---------- CLEAN STATE ----------
 /ip hotspot active remove [find]

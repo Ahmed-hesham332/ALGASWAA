@@ -62,7 +62,12 @@ def update_voucher_status():
                     offer = voucher.offer
 
                     # ---- calculate expires_at ----
-                    if offer.duration_type == "hours":
+                    if offer.duration_type == "minutes":
+                        expires_at = activated_at_aware + relativedelta(
+                            minutes=offer.duration_value
+                        )
+
+                    elif offer.duration_type == "hours":
                         expires_at = activated_at_aware + relativedelta(
                             hours=offer.duration_value
                         )

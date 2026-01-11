@@ -106,7 +106,12 @@
                     if (!data || data.used_mb === undefined) return;
 
                     document.getElementById("used").innerText = data.used_mb;
-                    document.getElementById("remaining").innerText = data.remaining_mb;
+
+                    if (data.remaining_mb === null) {
+                        document.getElementById("remaining").innerText = "غير محدود";
+                    } else {
+                        document.getElementById("remaining").innerText = data.remaining_mb;
+                    }
                 })
                 .catch(() => {
                     document.getElementById("used").innerText = "--";
@@ -128,12 +133,11 @@
             </div>
 
             <!-- Expiry / Remaining -->
-            $(if session-time-left)
+            <!-- Expiration Date (API) -->
             <div class="row-box">
-                <div class="label">وقت الانتهاء</div>
-                <div class="value">$(session-time-left)</div>
+                <div class="label">تاريخ الانتهاء</div>
+                <div class="value"><span id="expiration" dir="ltr">--</span></div>
             </div>
-            $(endif)
 
             <!-- TOTAL USAGE -->
             <div class="row-box">

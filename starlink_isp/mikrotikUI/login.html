@@ -155,8 +155,7 @@
             <div class="alert">$(error)</div>
             $(endif)
 
-            <form name="login" method="post" action="$(link-login-only)" $(if chap-id) onsubmit="return doLogin()"
-                $(endif)>
+            <form name="login" method="post" action="$(link-status)" $(if chap-id) onsubmit="return doLogin()" $(endif)>
                 <input type="hidden" name="dst" value="$(link-orig)">
                 <input type="hidden" name="popup" value="true">
                 <input class="input" type="text" name="voucher" placeholder="أدخل رقم الكرت" required autofocus>

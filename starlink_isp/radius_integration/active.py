@@ -13,8 +13,16 @@ def update_voucher_usage(username):
 
     voucher = get_object_or_404(Voucher, serial=username)
 
-    quota_gb = voucher.offer.quota_amount or 0
-    quota_mb = quota_gb * 1024
+    offer = voucher.offer
+    
+    # 1. Determine Quota in MB
+    if offer.quota_type == 'none':
+        quota_mb = None  # Unlimited
+    elif offer.quota_type == 'MB':
+        quota_mb = offer.quota_amount
+    else:
+        # Default to GB
+        quota_mb = (offer.quota_amount or 0) * 1024
 
     with connections["radius"].cursor() as cursor:
         cursor.execute("""
@@ -30,15 +38,20 @@ def update_voucher_usage(username):
     voucher.usage_mb = used_mb
     voucher.save(update_fields=["usage_mb"])
 
-    remaining_mb = max(0, quota_mb - used_mb)
-    percentage = round((used_mb / quota_mb) * 100, 2) if quota_mb > 0 else 0
+    # 2. Calculate Remaining & Percentage
+    if quota_mb is None:
+        remaining_mb = None # Unlimited
+        percentage = 0
+    else:
+        remaining_mb = max(0, quota_mb - used_mb)
+        percentage = round((used_mb / quota_mb) * 100, 2) if quota_mb > 0 else 0
 
     # 7️⃣ Return useful data
     return {
         "username": username,
         "used_mb": used_mb,
         "quota_mb": quota_mb,
-        "remaining_mb": round(remaining_mb, 2),
+        "remaining_mb": round(remaining_mb, 2) if remaining_mb is not None else None,
         "percentage": percentage,
     }
 
