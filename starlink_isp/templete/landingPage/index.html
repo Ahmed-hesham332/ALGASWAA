@@ -1,143 +1,605 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>القصواء - خدمات ISP الحديثة</title>
-    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/landing_new.css' %}">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: ["class"],
+            theme: {
+                container: {
+                    center: true,
+                    padding: "2rem",
+                    screens: {
+                        "2xl": "1400px",
+                    },
+                },
+                extend: {
+                    colors: {
+                        border: "hsl(var(--border))",
+                        input: "hsl(var(--input))",
+                        ring: "hsl(var(--ring))",
+                        background: "hsl(var(--background))",
+                        foreground: "hsl(var(--foreground))",
+                        primary: {
+                            DEFAULT: "hsl(var(--primary))",
+                            foreground: "hsl(var(--primary-foreground))",
+                        },
+                        secondary: {
+                            DEFAULT: "hsl(var(--secondary))",
+                            foreground: "hsl(var(--secondary-foreground))",
+                        },
+                        destructive: {
+                            DEFAULT: "hsl(var(--destructive))",
+                            foreground: "hsl(var(--destructive-foreground))",
+                        },
+                        muted: {
+                            DEFAULT: "hsl(var(--muted))",
+                            foreground: "hsl(var(--muted-foreground))",
+                        },
+                        accent: {
+                            DEFAULT: "hsl(var(--accent))",
+                            foreground: "hsl(var(--accent-foreground))",
+                        },
+                        popover: {
+                            DEFAULT: "hsl(var(--popover))",
+                            foreground: "hsl(var(--popover-foreground))",
+                        },
+                        card: {
+                            DEFAULT: "hsl(var(--card))",
+                            foreground: "hsl(var(--card-foreground))",
+                        },
+                    },
+                    borderRadius: {
+                        lg: "var(--radius)",
+                        md: "calc(var(--radius) - 2px)",
+                        sm: "calc(var(--radius) - 4px)",
+                    },
+                },
+            },
+        }
+    </script>
 </head>
 
-<body>
+<body class="bg-background text-foreground font-cairo antialiased selection:bg-primary/20">
 
-    <!-- NAVBAR -->
-    <nav>
-        <div class="logo">
-            <img src="/media/logos/algaswaa3.png" alt="القصواء">
-        </div>
-
-        <ul>
-            <li><a href="#features">المزايا</a></li>
-            <li><a href="#pricing">الباقات</a></li>
-        </ul>
-
-        <a href="{% url 'login' %}" class="btn-login">دخول</a>
-    </nav>
-
-
-    <!-- HERO SECTION -->
-    <section class="hero">
-
-        <!-- TEXT -->
-        <div class="hero-content">
-            <h1>منصة القصواء</h1>
-            <p>
-                أسرع وأسهل طريقة لإدارة الخوادم والكروت والعملاء — كل ذلك
-                في لوحة معلومات واحدة
-            </p>
-
-            <div class="hero-buttons">
-                <a href="#pricing"><button class="btn-primary">اختر خطتك</button></a>
-            </div>
-        </div>
-
-        <!-- IMAGES -->
-        <div class="hero-images">
-            <img class="img-main" src="/media/dashboard/dash1.png" alt="">
-            <img class="img-second" src="/media/dashboard/dash2.png" alt="">
-        </div>
-
-    </section>
-
-
-    <section class="features" id="features">
-        <h2>مميزات خدمتنا</h2>
-        <p class="section-subtitle">نوفر لك أفضل حلول الإنترنت مع سرعة عالية وأداء مستقر ومتطلبات أكثر</p>
-
-        <div class="feature-grid">
-
-            <div class="feature-card">
-                <div class="feature-icon">🛡️</div>
-                <h3>أمان متقدم</h3>
-                <p>حماية كاملة ضد التهديدات مع تشفير متطور</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>إدارة قوية</h3>
-                <p>لوحة تحكم شاملة لإدارة السيرفرات والكروت</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🎯</div>
-                <h3>تصاميم متعددة</h3>
-                <p>خطط وبوابات مرنة مع إمكانية التخصيص الكامل</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">24/7</div>
-                <h3>دعم مستمر</h3>
-                <p>فريق دعم متخصص يعمل على مدار الساعة</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">💰</div>
-                <h3>أسعار منافسة</h3>
-                <p>خطط مناسبة تلبي احتياجاتك وميزانيتك</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🎟️</div>
-                <h3>نظام فواتير</h3>
-                <p>إدارة فواتير احترافية وسهلة</p>
-            </div>
-
-        </div>
-    </section>
-
-
-
-
-    <!-- PRICING SECTION -->
-    <section id="pricing" class="pricing">
-
-        <h2>اختر خطتك</h2>
-        <p class="section-subtitle">نقدم لك خطط متنوعة تناسب جميع احتياجاتك وميزانيتك</p>
-        <div id="pricing" class="pricing-grid">
-
-            {% for plan in plans %}
-            <div class="plan-card {% if forloop.counter == 2 %}featured{% endif %}">
-
-                <h3 class="plan-title">{{ plan.name }}</h3>
-
-                <p>{{ plan.description }}</p>
-
-                <div class="plan-price">{{ plan.price_display }}</div>
-
-                <div class="plan-divider"></div>
-
-                <ul class="plan-features">
-                    <li>عدد السيرفرات: {{ plan.number_of_servers }}</li>
-                    <li>عدد الكروت: {{ plan.number_of_vouchers }}</li>
-                </ul>
-
-                <a href="https://wa.me/966501234567" class="btn-subscribe">
-                    تواصل معنا للاشتراك
+    <!-- HEADER -->
+    <header id="main-header" class="fixed top-0 right-0 left-0 z-50 transition-all duration-500 bg-transparent">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-3 group">
+                    <div
+                        class="relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                        <img src="/media/logos/algaswaa5.png" alt="logo" class="w-full h-full object-contain">
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-2xl font-black text-foreground tracking-tight">القصواء</span>
+                        <span class="text-xs text-muted-foreground -mt-1">ALGASWAA</span>
+                    </div>
                 </a>
 
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="#features"
+                        class="px-5 py-2.5 text-muted-foreground hover:text-foreground transition-colors font-medium rounded-lg hover:bg-muted/50">
+                        المزايا
+                    </a>
+                    <a href="#pricing"
+                        class="px-5 py-2.5 text-muted-foreground hover:text-foreground transition-colors font-medium rounded-lg hover:bg-muted/50">
+                        الباقات
+                    </a>
+                </div>
+
+                <!-- CTA Button -->
+                <div class="hidden md:block">
+                    <a href="{% url 'login' %}"
+                        class="btn-gradient text-primary-foreground px-7 py-3 text-base font-bold rounded-xl inline-block hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                        دخول
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn"
+                    class="md:hidden text-foreground p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6" id="menu-icon"></i>
+                </button>
             </div>
-            {% endfor %}
-        </div>
-    </section>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 border-t border-border/50 animate-fade-up">
+                <div class="flex flex-col gap-2 pt-4">
+                    <a href="#features"
+                        class="mobile-link px-4 py-3 text-muted-foreground hover:text-foreground transition-colors font-medium rounded-lg hover:bg-muted/50">
+                        المزايا
+                    </a>
+                    <a href="#pricing"
+                        class="mobile-link px-4 py-3 text-muted-foreground hover:text-foreground transition-colors font-medium rounded-lg hover:bg-muted/50">
+                        الباقات
+                    </a>
+                    <a href="{% url 'login' %}"
+                        class="btn-gradient text-primary-foreground w-full py-4 text-base font-bold rounded-xl mt-2 text-center">
+                        دخول
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- HERO SECTION -->
+        <section class="relative min-h-screen bg-gradient-hero cyber-grid overflow-hidden pt-28 pb-20">
+            <!-- Animated background orbs -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <div
+                    class="absolute top-20 right-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] animate-pulse">
+                </div>
+                <div class="absolute bottom-20 left-1/4 w-[400px] h-[400px] bg-accent/15 rounded-full blur-[100px] animate-pulse"
+                    style="animation-delay: 1s;"></div>
+                <div
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]">
+                </div>
+            </div>
+
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="grid lg:grid-cols-2 gap-16 items-center">
+                    <!-- Text Content -->
+                    <div class="text-right order-1 lg:order-2">
+                        <!-- Badge -->
+                        <div class="inline-flex items-center gap-2 mb-8 animate-fade-up">
+                            <span
+                                class="px-4 py-2 glass-card rounded-full text-sm font-semibold text-accent flex items-center gap-2">
+                                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                                منصة إدارة مزودي الإنترنت
+                            </span>
+                        </div>
+
+                        <!-- Headline -->
+                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-black text-foreground mb-6 leading-[1.1] animate-fade-up"
+                            style="animation-delay: 0.1s;">
+                            إدارة شبكتك <br>
+                            <span class="gradient-text">بذكاء فائق</span>
+                        </h1>
+
+                        <!-- Description -->
+                        <p class="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed max-w-xl mr-auto animate-fade-up"
+                            style="animation-delay: 0.2s;">
+                            منصة <span class="text-foreground font-semibold">القصواء</span> — الحل الأمثل لإدارة الخوادم
+                            والكروت والعملاء في لوحة تحكم واحدة متكاملة
+                        </p>
+
+                        <!-- Feature pills -->
+                        <div class="flex flex-wrap gap-3 justify-end mb-10 animate-fade-up"
+                            style="animation-delay: 0.25s;">
+                            <span
+                                class="flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm">
+                                <i data-lucide="shield" class="w-4 h-4 text-primary"></i>
+                                حماية متقدمة
+                            </span>
+                            <span
+                                class="flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground text-sm">
+                                <i data-lucide="zap" class="w-4 h-4 text-accent"></i>
+                                سرعة فائقة
+                            </span>
+                        </div>
+
+                        <!-- CTAs -->
+                        <div class="flex flex-wrap gap-4 justify-end animate-fade-up" style="animation-delay: 0.3s;">
+                            <a href="#pricing"
+                                class="btn-gradient text-primary-foreground px-8 py-4 text-lg font-bold rounded-xl flex items-center hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                                اختر خطتك
+                                <i data-lucide="arrow-down" class="mr-2 h-5 w-5"></i>
+                            </a>
+                            <a href="#features"
+                                class="border-2 border-muted bg-transparent text-foreground hover:bg-muted hover:border-muted-foreground/20 px-8 py-4 text-lg font-bold rounded-xl flex items-center transition-all">
+                                اكتشف المزيد
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Images -->
+                    <div class="relative order-2 lg:order-1">
+                        <div class="relative">
+                            <!-- Main dashboard image -->
+                            <div class="relative z-20 rounded-2xl overflow-hidden glow-border animate-float">
+                                <div class="glass-card p-1">
+                                    <img src="/media/dashboard/dash1.png" alt="لوحة تحكم القصواء"
+                                        class="w-full h-auto rounded-xl">
+                                </div>
+                            </div>
+
+                            <!-- Secondary dashboard image -->
+                            <div
+                                class="absolute -bottom-10 -left-10 w-3/4 z-30 rounded-2xl overflow-hidden animate-float-delayed">
+                                <div class="glass-card p-1 neon-glow-accent">
+                                    <img src="/media/dashboard/dash2.png" alt="إدارة الكروت والعملاء"
+                                        class="w-full h-auto rounded-xl">
+                                </div>
+                            </div>
+
+                            <!-- Decorative elements -->
+                            <div class="absolute -top-6 -right-6 w-32 h-32 border border-primary/20 rounded-2xl -z-10">
+                            </div>
+                            <div class="absolute -bottom-16 left-20 w-24 h-24 border border-accent/20 rounded-xl -z-10">
+                            </div>
+
+                            <!-- Stats card -->
+                            <div class="absolute top-4 -right-4 z-40 glass-card rounded-xl p-4 animate-slide-in"
+                                style="animation-delay: 0.5s;">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                                        <i data-lucide="zap" class="w-5 h-5 text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-2xl font-black text-foreground">+500</p>
+                                        <p class="text-xs text-muted-foreground">مزود خدمة</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scroll indicator -->
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+                <span class="text-xs text-muted-foreground">اكتشف المزيد</span>
+                <i data-lucide="arrow-down" class="w-5 h-5 text-muted-foreground"></i>
+            </div>
+        </section>
 
 
+        <!-- FEATURES SECTION -->
+        <section id="features" class="py-32 bg-background relative overflow-hidden">
+            <!-- Background effects -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                <div class="absolute top-1/3 -right-40 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]">
+                </div>
+                <div class="absolute bottom-1/3 -left-40 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]">
+                </div>
+            </div>
+
+            <div class="container mx-auto px-6 relative z-10">
+                <!-- Section Header -->
+                <div class="text-center mb-20">
+                    <span
+                        class="inline-flex items-center gap-2 px-5 py-2.5 glass-card rounded-full text-sm font-semibold text-accent mb-6">
+                        <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                        لماذا تختارنا؟
+                    </span>
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-6">
+                        مميزات <span class="gradient-text-static">استثنائية</span>
+                    </h2>
+                    <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+                        نوفر لك أفضل حلول الإنترنت مع سرعة عالية وأداء مستقر ومتطلبات أكثر
+                    </p>
+                </div>
+
+                <!-- Features Grid -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Feature 1 -->
+                    <div
+                        class="group relative p-8 glass-card rounded-2xl hover:bg-card/60 transition-all duration-500 hover:-translate-y-2">
+                        <div
+                            class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-primary/5">
+                        </div>
+                        <div
+                            class="relative w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 bg-primary/10 group-hover:bg-primary/20">
+                            <i data-lucide="shield" class="w-8 h-8 text-primary"></i>
+                        </div>
+                        <h3 class="relative text-xl font-bold text-foreground mb-3">أمان متقدم</h3>
+                        <p class="relative text-muted-foreground leading-relaxed">حماية كاملة ضد التهديدات مع تشفير
+                            متطور وأنظمة مراقبة على مدار الساعة</p>
+                        <div
+                            class="absolute bottom-8 left-8 w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0 bg-primary/10">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-primary"></i>
+                        </div>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="group relative p-8 glass-card rounded-2xl hover:bg-card/60 transition-all duration-500 hover:-translate-y-2"
+                        style="animation-delay: 0.1s;">
+                        <div
+                            class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-accent/5">
+                        </div>
+                        <div
+                            class="relative w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 bg-accent/10 group-hover:bg-accent/20">
+                            <i data-lucide="bar-chart-3" class="w-8 h-8 text-accent"></i>
+                        </div>
+                        <h3 class="relative text-xl font-bold text-foreground mb-3">إدارة قوية</h3>
+                        <p class="relative text-muted-foreground leading-relaxed">لوحة تحكم شاملة لإدارة السيرفرات
+                            والكروت مع تقارير تفصيلية</p>
+                        <div
+                            class="absolute bottom-8 left-8 w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0 bg-accent/10">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-accent"></i>
+                        </div>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="group relative p-8 glass-card rounded-2xl hover:bg-card/60 transition-all duration-500 hover:-translate-y-2"
+                        style="animation-delay: 0.2s;">
+                        <div
+                            class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-primary/5">
+                        </div>
+                        <div
+                            class="relative w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 bg-primary/10 group-hover:bg-primary/20">
+                            <i data-lucide="palette" class="w-8 h-8 text-primary"></i>
+                        </div>
+                        <h3 class="relative text-xl font-bold text-foreground mb-3">تصاميم متعددة</h3>
+                        <p class="relative text-muted-foreground leading-relaxed">خطط وبوابات مرنة مع إمكانية التخصيص
+                            الكامل حسب هويتك</p>
+                        <div
+                            class="absolute bottom-8 left-8 w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0 bg-primary/10">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-primary"></i>
+                        </div>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div class="group relative p-8 glass-card rounded-2xl hover:bg-card/60 transition-all duration-500 hover:-translate-y-2"
+                        style="animation-delay: 0.3s;">
+                        <div
+                            class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-accent/5">
+                        </div>
+                        <div
+                            class="relative w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 bg-accent/10 group-hover:bg-accent/20">
+                            <i data-lucide="headphones" class="w-8 h-8 text-accent"></i>
+                        </div>
+                        <h3 class="relative text-xl font-bold text-foreground mb-3">دعم مستمر</h3>
+                        <p class="relative text-muted-foreground leading-relaxed">فريق دعم متخصص يعمل على مدار الساعة
+                            لمساعدتك في أي وقت</p>
+                        <div
+                            class="absolute bottom-8 left-8 w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0 bg-accent/10">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-accent"></i>
+                        </div>
+                    </div>
+
+                    <!-- Feature 5 -->
+                    <div class="group relative p-8 glass-card rounded-2xl hover:bg-card/60 transition-all duration-500 hover:-translate-y-2"
+                        style="animation-delay: 0.4s;">
+                        <div
+                            class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-primary/5">
+                        </div>
+                        <div
+                            class="relative w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 bg-primary/10 group-hover:bg-primary/20">
+                            <i data-lucide="coins" class="w-8 h-8 text-primary"></i>
+                        </div>
+                        <h3 class="relative text-xl font-bold text-foreground mb-3">أسعار منافسة</h3>
+                        <p class="relative text-muted-foreground leading-relaxed">خطط مناسبة تلبي احتياجاتك وميزانيتك
+                            بأفضل قيمة</p>
+                        <div
+                            class="absolute bottom-8 left-8 w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0 bg-primary/10">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-primary"></i>
+                        </div>
+                    </div>
+
+                    <!-- Feature 6 -->
+                    <div class="group relative p-8 glass-card rounded-2xl hover:bg-card/60 transition-all duration-500 hover:-translate-y-2"
+                        style="animation-delay: 0.5s;">
+                        <div
+                            class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-accent/5">
+                        </div>
+                        <div
+                            class="relative w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 bg-accent/10 group-hover:bg-accent/20">
+                            <i data-lucide="receipt" class="w-8 h-8 text-accent"></i>
+                        </div>
+                        <h3 class="relative text-xl font-bold text-foreground mb-3">نظام فواتير</h3>
+                        <p class="relative text-muted-foreground leading-relaxed">إدارة فواتير احترافية وسهلة مع تقارير
+                            مالية متكاملة</p>
+                        <div
+                            class="absolute bottom-8 left-8 w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0 bg-accent/10">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-accent"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- PRICING SECTION -->
+        <section id="pricing" class="py-32 bg-secondary/30 relative overflow-hidden">
+            <!-- Background effects -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none cyber-grid opacity-50">
+                <div class="absolute top-0 left-1/3 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]"></div>
+                <div class="absolute bottom-0 right-1/3 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px]">
+                </div>
+            </div>
+
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center mb-20">
+                    <span
+                        class="inline-flex items-center gap-2 px-5 py-2.5 glass-card rounded-full text-sm font-semibold text-primary mb-6">
+                        <i data-lucide="crown" class="w-4 h-4"></i>
+                        باقات متنوعة
+                    </span>
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-6">
+                        اختر <span class="gradient-text-static">خطتك</span>
+                    </h2>
+                    <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+                        نقدم لك خطط متنوعة تناسب جميع احتياجاتك وميزانيتك
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    {% for plan in plans %}
+                    <div
+                        class="relative rounded-3xl p-8 transition-all duration-500 hover:-translate-y-3 glass-card {% if forloop.counter == 2 %}glow-border{% endif %}">
+                        {% if forloop.counter == 2 %}
+                        <div
+                            class="absolute -top-4 right-8 px-5 py-1.5 bg-gradient-to-r from-primary to-accent rounded-full text-sm font-bold text-primary-foreground flex items-center gap-2 shadow-lg">
+                            <i data-lucide="crown" class="w-4 h-4"></i>
+                            الأكثر شعبية
+                        </div>
+                        {% endif %}
+
+                        <!-- Plan icon -->
+                        <div
+                            class="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 {% if forloop.counter == 2 %}bg-gradient-to-br from-primary to-accent{% else %}bg-muted{% endif %}">
+                            {% if forloop.counter == 1 %}
+                            <i data-lucide="zap" class="w-7 h-7 text-muted-foreground"></i>
+                            {% elif forloop.counter == 2 %}
+                            <i data-lucide="crown" class="w-7 h-7 text-primary-foreground"></i>
+                            {% else %}
+                            <i data-lucide="building-2" class="w-7 h-7 text-muted-foreground"></i>
+                            {% endif %}
+                        </div>
+
+                        <h3 class="text-2xl font-bold text-foreground mb-2">{{ plan.name }}</h3>
+                        <p class="text-muted-foreground text-sm mb-8">{{ plan.description }}</p>
+
+                        <div class="mb-8">
+                            <span
+                                class="text-4xl font-black {% if forloop.counter == 2 %}gradient-text-static{% else %}text-foreground{% endif %}">
+                                {{ plan.price_display }}</span>
+                            <div class="text-muted-foreground text-lg mr-2"></div>
+                        </div>
+                        <!-- Note: plan.price_display replaced plan.price from mockup, I assume it includes currency if strict text. The mock had explicit currency text, but django template had variable. I'll stick to django variable but style it. -->
+
+                        <div class="h-px bg-border mb-8"></div>
+
+                        <ul class="space-y-4 mb-10">
+                            <li class="flex items-center gap-3">
+                                <div
+                                    class="w-6 h-6 rounded-full flex items-center justify-center {% if forloop.counter == 2 %}bg-primary/20{% else %}bg-accent/20{% endif %}">
+                                    <i data-lucide="check"
+                                        class="w-4 h-4 {% if forloop.counter == 2 %}text-primary{% else %}text-accent{% endif %}"></i>
+                                </div>
+                                <span class="text-foreground">عدد السيرفرات: <span class="font-bold">
+                                        {{ plan.number_of_servers }}</span></span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <div
+                                    class="w-6 h-6 rounded-full flex items-center justify-center {% if forloop.counter == 2 %}bg-primary/20{% else %}bg-accent/20{% endif %}">
+                                    <i data-lucide="check"
+                                        class="w-4 h-4 {% if forloop.counter == 2 %}text-primary{% else %}text-accent{% endif %}"></i>
+                                </div>
+                                <span class="text-foreground">عدد الكروت: <span class="font-bold">
+                                        {{ plan.number_of_vouchers }}</span></span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <div
+                                    class="w-6 h-6 rounded-full flex items-center justify-center {% if forloop.counter == 2 %}bg-primary/20{% else %}bg-accent/20{% endif %}">
+                                    <i data-lucide="check"
+                                        class="w-4 h-4 {% if forloop.counter == 2 %}text-primary{% else %}text-accent{% endif %}"></i>
+                                </div>
+                                <span class="text-foreground">دعم فني على مدار الساعة</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <div
+                                    class="w-6 h-6 rounded-full flex items-center justify-center {% if forloop.counter == 2 %}bg-primary/20{% else %}bg-accent/20{% endif %}">
+                                    <i data-lucide="check"
+                                        class="w-4 h-4 {% if forloop.counter == 2 %}text-primary{% else %}text-accent{% endif %}"></i>
+                                </div>
+                                <span class="text-foreground">نظام فواتير متكامل</span>
+                            </li>
+                        </ul>
+
+                        <a href="https://wa.me/966501234567" target="_blank" rel="noopener noreferrer"
+                            class="w-full py-4 text-lg font-bold rounded-xl transition-all flex items-center justify-center {% if forloop.counter == 2 %}btn-gradient text-primary-foreground{% else %}btn-accent{% endif %}">
+                            <i data-lucide="message-circle" class="ml-2 w-5 h-5"></i>
+                            تواصل معنا للاشتراك
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
 
     <!-- FOOTER -->
-    <footer>
-        <p>© 2025 القصواء — جميع الحقوق محفوظة</p>
+    <footer class="bg-secondary/50 border-t border-border py-12">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+                <!-- Logo -->
+                <div class="flex items-center gap-3 h-10">
+                    <img src="/media/logos/algaswaaDashboard.png" alt="القصواء"
+                        class="h-full w-auto object-contain grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all">
+                </div>
+
+                <!-- Copyright -->
+                <p class="text-muted-foreground text-sm flex items-center gap-2">
+                    © 2025 القصواء — جميع الحقوق محفوظة
+                    <i data-lucide="heart" class="w-4 h-4 text-primary fill-current"></i>
+                </p>
+
+                <!-- Links -->
+                <div class="flex items-center gap-8">
+                    <a href="#features"
+                        class="text-muted-foreground hover:text-foreground text-sm transition-colors">المزايا</a>
+                    <a href="#pricing"
+                        class="text-muted-foreground hover:text-foreground text-sm transition-colors">الباقات</a>
+                </div>
+            </div>
+        </div>
     </footer>
 
+    <!-- Initialize Lucide Icons & Logic -->
+    <script>
+        // Icons
+        lucide.createIcons();
+
+        // Mobile Menu Logic
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const header = document.getElementById('main-header');
+
+        // Helper to update background based on state
+        function updateHeaderBackground() {
+            const isScrolled = window.scrollY > 20;
+            const isOpen = !mobileMenu.classList.contains('hidden');
+
+            if (isScrolled || isOpen) {
+                header.classList.add('glass-card', 'shadow-2xl', 'shadow-primary/5');
+                header.classList.remove('bg-transparent');
+            } else {
+                header.classList.remove('glass-card', 'shadow-2xl', 'shadow-primary/5');
+                header.classList.add('bg-transparent');
+            }
+        }
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+
+            // Toggle Icon: Remove existing SVG and create new appropriate icon element
+            const isOpen = !mobileMenu.classList.contains('hidden');
+            const iconName = isOpen ? 'x' : 'menu';
+
+            // Clear current content of button
+            mobileMenuBtn.innerHTML = `<i data-lucide="${iconName}" class="w-6 h-6"></i>`;
+
+            // Re-initialize icons for the new element
+            lucide.createIcons();
+
+            // Update background
+            updateHeaderBackground();
+        });
+
+        // Close mobile menu on link click
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                mobileMenuBtn.innerHTML = `<i data-lucide="menu" class="w-6 h-6"></i>`;
+                lucide.createIcons();
+                updateHeaderBackground();
+            });
+        });
+
+        // Scroll Logic for Header
+        window.addEventListener('scroll', () => {
+            updateHeaderBackground();
+        });
+    </script>
 </body>
 
 </html>
