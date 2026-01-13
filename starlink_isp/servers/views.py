@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Server
 from .forms import ServerForm
-from radius_integration.services import generate_mikrotik_config, add_radius_client, radius_delete_client, voucher_radius_delete
+from radius_integration.services import generate_mikrotik_config, add_radius_client, radius_delete_client, voucher_radius_delete, add_tunnel_client
 from django.http import HttpResponse
+from .utils import allocate_tunnel_ip
 from django.db import connections
 
 @login_required
@@ -20,8 +21,7 @@ def server_download(request, server_id):
 
     # Bootstrap Script
     domain = "72.62.26.238"
-    # routeros fetch command
-    # Assuming token is available as property on server
+    
     fetch_script = f"""
 [:local ver [:pick  [/system resource get version] 0 1];
 /tool fetch url="http://{domain}/radius-integration/api/install/{server.install_token}/$ver/" dst-path="algaswaa.rsc";
@@ -47,9 +47,20 @@ def server_add(request):
             server = form.save(commit=False)
             server.owner = user
             server.save()
-            
-            messages.success(request, "تم إضافة السيرفر")
 
+            # set hostname if you didn't already
+            if not server.hostname:
+                server.hostname = f"{server.owner.id}_{server.id}"
+            if not server.tunnel_password:
+                server.tunnel_password = server.hostname
+
+            if not server.tunnel_ip:
+                server.tunnel_ip = allocate_tunnel_ip()
+
+            add_tunnel_client(server.hostname, server.tunnel_ip)
+            server.save(update_fields=["hostname", "tunnel_password", "tunnel_ip"])
+
+            messages.success(request, "تم إضافة السيرفر")
             return redirect("servers:list")
     else:
         form = ServerForm()

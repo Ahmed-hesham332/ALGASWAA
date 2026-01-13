@@ -61,9 +61,9 @@ def radius_add_user(serial, offer, token):
     """, [serial, duration_seconds])
 
     cursor.execute("""
-        INSERT INTO vouchers (voucher_number, duration_seconds, status)
-        VALUES (%s, %s, %s)
-    """, [serial, duration_seconds, 0])
+        INSERT INTO vouchers (voucher_number, duration_seconds, status, nas_identifier)
+        VALUES (%s, %s, %s, %s)
+    """, [serial, duration_seconds, 0, token])
         
     cursor.close()
     
@@ -216,10 +216,11 @@ def generate_mikrotik_config(
 
 # Create SSTP client if not exists
 :if ([:len [/interface sstp-client find name="algaswaa-sstp"]] = 0) do={{
-    /interface sstp-client add name=algaswaa-sstp connect-to={radius_ip} user={nas_identifier} password={nas_identifier} profile=default-encryption verify-server-certificate=no verify-server-address-from-certificate=no disabled=no
+    /interface sstp-client add name=algaswaa-sstp connect-to={radius_ip} port=443 user={nas_identifier} password={nas_identifier} profile=default-encryption authentication=pap,chap verify-server-certificate=no add-default-route=no disabled=no
 }} else={{
-    /interface sstp-client set [find name="algaswaa-sstp"] connect-to={radius_ip} user={nas_identifier} password={nas_identifier} verify-server-certificate=no verify-server-address-from-certificate=no disabled=no
+    /interface sstp-client set [find name="algaswaa-sstp"] connect-to={radius_ip} port=443 user={nas_identifier} password={nas_identifier} profile=default-encryption authentication=pap,chap verify-server-certificate=no add-default-route=no disabled=no
 }}
+
 
 # Lock management services to management subnet
 /ip service set api disabled=no address=172.26.0.0/16
@@ -233,7 +234,7 @@ def generate_mikrotik_config(
 # ---------- HEARTBEAT SCHEDULER ----------
 /system scheduler remove [find name="algaswaa-heartbeat"]
 /tool fetch url=("http://{radius_ip}/radius-integration/api/heartbeat/{nas_identifier}/") keep-result=no
-/system scheduler add name=algaswaa-heartbeat interval=1m on-event="/tool fetch url=(\"http://{radius_ip}/radius-integration/api/heartbeat/{nas_identifier}/\") keep-result=no"
+/system scheduler add name=algaswaa-heartbeat interval=1m on-event="/tool fetch url=http://{radius_ip}/radius-integration/api/heartbeat/{nas_identifier}/ keep-result=no"
 
 # ---------- CLEAN STATE ----------
 /ip hotspot active remove [find]
@@ -246,6 +247,17 @@ def generate_mikrotik_config(
     return config
 
 
+def add_tunnel_client(hostname, tunnel_ip):
+    conn = connections["radius"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO nas_tunnel_map (nas_identifier, tunnel_ip)
+        VALUES (%s, %s)
+    """, [hostname, tunnel_ip])
+
+    conn.commit()
+    cursor.close()
 
 def add_radius_client(nasname, shortname, secret):
     conn = connections["radius"]

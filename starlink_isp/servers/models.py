@@ -16,6 +16,8 @@ class Server(models.Model):
     id = models.AutoField(primary_key=True) 
     created_at = models.DateTimeField(auto_now_add=True)
     hostname = models.CharField(max_length=64, unique=True, blank=True, null=True)
+    tunnel_ip = models.GenericIPAddressField(unique=True, null=True, blank=True)
+    tunnel_password = models.CharField(max_length=64, blank=True)
     last_heartbeat = models.DateTimeField(null=True, blank=True, default='1970-01-01 00:00:00')
 
     def save(self, *args, **kwargs):
@@ -24,8 +26,8 @@ class Server(models.Model):
         
         if not self.hostname:
             self.hostname = f"{self.owner.id}_{self.id}"
-            # Update hostname without triggering recursion issues if we use update_fields
-            super().save(update_fields=['hostname'])
+            self.tunnel_password = self.hostname  # simplest for now
+            super().save(update_fields=["hostname", "tunnel_password"])
 
 
     @property
