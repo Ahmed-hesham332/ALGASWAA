@@ -486,11 +486,10 @@
                 </td>
 
                 <td data-label="الدفع" class="text-center">
-                    <a href="{% url 'adminpanel:reseller_toggle_paied' r.id %}" class="switch-link" data-confirm {% if
-                        r.has_paied %} data-msg="هل أنت متأكد من إلغاء الدفع لهذا المشترك؟" data-btn-text="إلغاء الدفع"
-                        data-btn-class="bg-yellow-600 hover:bg-yellow-700 text-white" {% else %}
-                        data-msg="هل أنت متأكد من تفعيل الدفع لهذا المشترك؟" data-btn-text="تفعيل الدفع"
-                        data-btn-class="bg-green-600 hover:bg-green-700 text-white" {% endif %}>
+                    <a href="{% url 'adminpanel:reseller_toggle_paied' r.id %}" class="switch-link" data-confirm
+                        data-msg="{% if r.has_paied %}هل أنت متأكد من إلغاء الدفع لهذا المشترك؟{% else %}هل أنت متأكد من تفعيل الدفع لهذا المشترك؟{% endif %}"
+                        data-btn-text="{% if r.has_paied %}إلغاء الدفع{% else %}تفعيل الدفع{% endif %}"
+                        data-btn-class="{% if r.has_paied %}bg-yellow-600 hover:bg-yellow-700 text-white{% else %}bg-green-600 hover:bg-green-700 text-white{% endif %}">
                         <span class="switch {% if r.has_paied %}active{% endif %}"></span>
                     </a>
                 </td>

@@ -10,6 +10,7 @@
     <!-- Tailwind CSS -->
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
 </head>
 
@@ -76,38 +77,101 @@
     {% endif %}
 
     <div class="sidebar" id="sidebar">
-        <h2 class="logo">
-            <img src="/media/logos/algaswaaDashboard.png" alt="">
-        </h2>
+        <div class="logo px-6 py-8 border-b border-white/10">
+            <a href="/dashboard/" class="flex items-center gap-3 group text-white hover:no-underline">
+                <div
+                    class="relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-white/5 p-1.5">
+                    <img src="/media/logos/wifi.png" alt="logo" class="w-full h-full object-contain !m-0 !p-0">
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-xl font-bold tracking-tight">القصواء</span>
+                    <span class="text-[10px] text-gray-400 -mt-1 tracking-wider uppercase">ALGASWAA</span>
+                </div>
+            </a>
+        </div>
 
-        <ul class="menu">
-            <li><a href="/dashboard/">الرئيسية</a></li>
+        <ul class="menu px-4 py-6 space-y-2">
+            <li>
+                <a href="/dashboard/"
+                    class="{% if request.path == '/dashboard/' %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span>الرئيسية</span>
+                </a>
+            </li>
             {% if not user.is_distributer %}
-            <li><a href="/servers/">الخوادم</a></li>
+            <li>
+                <a href="/servers/"
+                    class="{% if '/servers/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    <i data-lucide="server" class="w-5 h-5"></i>
+                    <span>الخوادم</span>
+                </a>
+            </li>
             {% endif %}
             {% if not user.is_distributer %}
-            <li><a href="/distributers/">الموزعين</a></li>
+            <li>
+                <a href="/distributers/"
+                    class="{% if '/distributers/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <span>الموزعين</span>
+                </a>
+            </li>
             {% endif %}
 
             {% if not user.is_distributer or user.distributer_profile.can_view_offers %}
-            <li><a href="/offers/">العروض</a></li>
+            <li>
+                <a href="/offers/"
+                    class="{% if '/offers/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    <i data-lucide="tag" class="w-5 h-5"></i>
+                    <span>العروض</span>
+                </a>
+            </li>
             {% endif %}
 
             {% if not user.is_distributer or user.distributer_profile.can_view_vouchers %}
-            <li><a href="/vouchers/">الكروت</a></li>
-            <li><a href="/online/">الكروت المتصلة</a></li>
+            <li>
+                <a href="/vouchers/"
+                    class="{% if '/vouchers/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    <i data-lucide="credit-card" class="w-5 h-5"></i>
+                    <span>الكروت</span>
+                </a>
+            </li>
+            <li>
+                <a href="/online/"
+                    class="{% if '/online/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    <i data-lucide="wifi" class="w-5 h-5"></i>
+                    <span>الكروت المتصلة</span>
+                </a>
+            </li>
             {% endif %}
 
             {% if not user.is_distributer %}
-            <li><a href="/income/">المبيعات</a></li>
+            <li>
+                <a href="/income/"
+                    class="{% if '/income/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                    <span>المبيعات</span>
+                </a>
+            </li>
             {% endif %}
 
             {% if not user.is_distributer or user.distributer_profile.can_view_designs %}
-            <li><a href="/design/">التصاميم</a></li>
+            <li>
+                <a href="/design/"
+                    class="{% if '/design/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    <i data-lucide="palette" class="w-5 h-5"></i>
+                    <span>التصاميم</span>
+                </a>
+            </li>
             {% endif %}
 
             {% if not user.is_distributer %}
-            <li><a href="/profile/">الملف الشخصي</a></li>
+            <li>
+                <a href="/profile/"
+                    class="{% if '/profile/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                    <span>الملف الشخصي</span>
+                </a>
+            </li>
             {% endif %}
         </ul>
 
@@ -443,6 +507,9 @@
                 menuOverlay.classList.remove('active');
             });
         });
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
     </script>
 </body>
 
