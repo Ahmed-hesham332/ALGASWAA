@@ -5,514 +5,885 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم</title>
+    <title>{% block title %}لوحة التحكم{% endblock %} — القصواء</title>
 
-    <!-- Local Fonts -->
-    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+    <!-- Google Fonts - Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <!-- Tailwind CSS -->
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: {
+                            50: '#f7f7f8',
+                            100: '#ebebef',
+                            200: '#d2d3db',
+                            300: '#adafbc',
+                            400: '#808398',
+                            500: '#65687c',
+                            600: '#505265',
+                            700: '#424453',
+                            800: '#393a47',
+                            900: '#17181c',
+                            950: '#0c0d10',
+                        },
+                        accent: {
+                            DEFAULT: '#14b8a6',
+                            50: '#effefb',
+                            100: '#c8fff4',
+                            200: '#92ffe9',
+                            300: '#53f5da',
+                            400: '#20e3c6',
+                            500: '#14b8a6',
+                            600: '#0a9488',
+                            700: '#0d756f',
+                            800: '#105d59',
+                            900: '#124d4a',
+                        },
+                        danger: {
+                            DEFAULT: '#ef4444',
+                            light: '#fecaca',
+                            dark: '#b91c1c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c0d10 0%, #17181c 50%, #0c0d10 100%);
+            min-height: 100vh;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(20, 184, 166, 0.3);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(20, 184, 166, 0.5);
+        }
+
+        /* Glass Card Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card-hover:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(20, 184, 166, 0.3);
+        }
+
+        /* Glow Effects */
+        .glow-border {
+            box-shadow: 0 0 20px rgba(20, 184, 166, 0.15);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 20px rgba(20, 184, 166, 0.5);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, rgba(20, 184, 166, 0.08) 0%, rgba(0, 0, 0, 0.4) 100%);
+            backdrop-filter: blur(30px);
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                right: -280px;
+                width: 280px;
+                height: 100vh;
+                z-index: 200 !important;
+            }
+
+            .sidebar.active {
+                right: 0;
+            }
+        }
+
+        /* Menu Link */
+        .menu-link {
+            transition: all 0.2s ease;
+        }
+
+        .menu-link:hover {
+            background: rgba(20, 184, 166, 0.15);
+            color: #14b8a6;
+        }
+
+        .menu-link.active {
+            background: linear-gradient(135deg, rgba(20, 184, 166, 0.25) 0%, rgba(20, 184, 166, 0.1) 100%);
+            color: #14b8a6;
+            border-right: 3px solid #14b8a6;
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid rgba(255, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #14b8a6, #ef4444);
+        }
+
+        /* Table Styles */
+        .cyber-table {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .cyber-table thead {
+            background: rgba(20, 184, 166, 0.1);
+            border-bottom: 1px solid rgba(20, 184, 166, 0.3);
+        }
+
+        .cyber-table th {
+            color: #14b8a6;
+            font-weight: 600;
+        }
+
+        .cyber-table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .cyber-table tbody tr:hover {
+            background: rgba(20, 184, 166, 0.08);
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #14b8a6 0%, #0a9488 100%);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 25px rgba(20, 184, 166, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #d2d3db;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(20, 184, 166, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Form Inputs */
+        .cyber-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .cyber-input:focus {
+            outline: none;
+            border-color: #14b8a6;
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.2);
+        }
+
+        .cyber-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Select styling */
+        select.cyber-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2314b8a6' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: left 12px center;
+            padding-left: 40px;
+        }
+
+        /* Badge Styles */
+        .badge-success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(234, 179, 8, 0.2);
+            color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge-info {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        /* Online Indicator */
+        .online-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Toast Styles */
+        .toast-success {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.95) 0%, rgba(22, 163, 74, 0.95) 100%);
+            border-right: 4px solid #22c55e;
+        }
+
+        .toast-error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%);
+            border-right: 4px solid #ef4444;
+        }
+
+        .toast-info {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(37, 99, 235, 0.95) 100%);
+            border-right: 4px solid #3b82f6;
+        }
+
+        /* Overlay */
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Header */
+        .header-glass {
+            background: rgba(12, 13, 16, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* User Avatar */
+        .user-avatar {
+            background: linear-gradient(135deg, #14b8a6 0%, #0a9488 100%);
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.3);
+        }
+
+        /* Form Django Widget Overrides */
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="number"],
+        input[type="url"],
+        textarea,
+        select {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            border-radius: 0.75rem !important;
+            padding: 0.75rem 1rem !important;
+            width: 100% !important;
+            transition: all 0.3s ease !important;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none !important;
+            border-color: #14b8a6 !important;
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.2) !important;
+        }
+
+        /* Loading Animation */
+        .loading-dots span {
+            animation: loadingDots 1.4s infinite both;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes loadingDots {
+
+            0%,
+            80%,
+            100% {
+                opacity: 0;
+            }
+
+            40% {
+                opacity: 1;
+            }
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #14b8a6 0%, #22c55e 50%, #14b8a6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
 </head>
 
-<body>
+<body class="font-cairo text-white">
 
-    <!-- Hamburger button and overlay for mobile menu -->
+    <!-- Mobile Menu Overlay -->
     <div class="menu-overlay" id="menuOverlay"></div>
 
-    <!-- notifications -->
+    <!-- Toast Notifications -->
     {% if messages %}
-    <div
-        class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md space-y-2 px-4 pointer-events-none">
-
+    <div class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md space-y-3 px-4">
         {% for message in messages %}
-        <div class="toast-message pointer-events-auto flex items-center w-full p-4 mb-4 text-gray-500 bg-white 
-                    rounded-lg shadow-lg border-r-4
-                    {% if 'error' in message.tags %}border-red-500
-                    {% elif 'success' in message.tags %}border-green-500
-                    {% else %}border-blue-500{% endif %}" role="alert">
+        <div class="toast-message flex items-center w-full p-4 rounded-xl shadow-2xl backdrop-blur-xl
+                    {% if 'error' in message.tags %}toast-error
+                    {% elif 'success' in message.tags %}toast-success
+                    {% else %}toast-info{% endif %}" role="alert">
 
-            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg
-                        {% if 'error' in message.tags %}text-red-500 bg-red-100
-                        {% elif 'success' in message.tags %}text-green-500 bg-green-100
-                        {% else %}text-blue-500 bg-blue-100{% endif %}">
-
-                <!-- Icons -->
+            <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-white/20">
                 {% if 'error' in message.tags %}
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                         d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                        clip-rule="evenodd"></path>
+                        clip-rule="evenodd" />
                 </svg>
                 {% elif 'success' in message.tags %}
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clip-rule="evenodd"></path>
+                        clip-rule="evenodd" />
                 </svg>
                 {% else %}
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                         d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                        clip-rule="evenodd"></path>
+                        clip-rule="evenodd" />
                 </svg>
                 {% endif %}
             </div>
 
-            <div class="mr-3 text-sm font-medium text-gray-800">{{ message }}</div>
+            <div class="mr-3 text-sm font-medium">{{ message }}</div>
 
-            <button type="button"
-                class="mr-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8"
+            <button type="button" class="mr-auto bg-white/10 hover:bg-white/20 rounded-lg p-1.5 transition-colors"
                 aria-label="Close" onclick="this.parentElement.remove()">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                         d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                        clip-rule="evenodd"></path>
+                        clip-rule="evenodd" />
                 </svg>
             </button>
         </div>
         {% endfor %}
     </div>
-
-    <!-- notifications -->
     {% endif %}
 
-    <div class="sidebar" id="sidebar">
-        <div class="logo px-6 py-8 border-b border-white/10">
-            <a href="/dashboard/" class="flex items-center gap-3 group text-white hover:no-underline">
-                <div
-                    class="relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 bg-white/5 p-1.5">
-                    <img src="/media/logos/wifi.png" alt="logo" class="w-full h-full object-contain !m-0 !p-0">
-                </div>
-                <div class="flex flex-col">
-                    <span class="text-xl font-bold tracking-tight">القصواء</span>
-                    <span class="text-[10px] text-gray-400 -mt-1 tracking-wider uppercase">ALGASWAA</span>
-                </div>
-            </a>
-        </div>
+    <div class="flex min-h-screen">
 
-        <ul class="menu px-4 py-6 space-y-2">
-            <li>
+        <!-- Sidebar -->
+        <aside class="sidebar w-72 flex flex-col fixed md:sticky top-0 h-screen" id="sidebar">
+
+            <!-- Logo -->
+            <div class="px-6 py-6 border-b border-white/10">
+                <a href="/dashboard/" class="flex items-center gap-3 group">
+                    <div
+                        class="relative w-12 h-12 rounded-xl bg-gradient-to-br from-accent-500 to-accent-700 flex items-center justify-center shadow-lg glow-border transition-transform group-hover:scale-105">
+                        <img src="/media/logos/wifi.png" alt="logo" class="w-8 h-8 object-contain">
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xl font-bold gradient-text">القصواء</span>
+                        <span class="text-[10px] text-dark-400 tracking-widest uppercase">ALGASWAA</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
                 <a href="/dashboard/"
-                    class="{% if request.path == '/dashboard/' %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl {% if request.path == '/dashboard/' %}active{% endif %}">
                     <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
                     <span>الرئيسية</span>
                 </a>
-            </li>
-            {% if not user.is_distributer %}
-            <li>
+
+                {% if not user.is_distributer %}
                 <a href="/servers/"
-                    class="{% if '/servers/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl {% if '/servers/' in request.path %}active{% endif %}">
                     <i data-lucide="server" class="w-5 h-5"></i>
                     <span>الخوادم</span>
                 </a>
-            </li>
-            {% endif %}
-            {% if not user.is_distributer %}
-            <li>
+                {% endif %}
+
+                {% if not user.is_distributer %}
                 <a href="/distributers/"
-                    class="{% if '/distributers/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl {% if '/distributers/' in request.path %}active{% endif %}">
                     <i data-lucide="users" class="w-5 h-5"></i>
                     <span>الموزعين</span>
                 </a>
-            </li>
-            {% endif %}
+                {% endif %}
 
-            {% if not user.is_distributer or user.distributer_profile.can_view_offers %}
-            <li>
+                {% if not user.is_distributer or user.distributer_profile.can_view_offers %}
                 <a href="/offers/"
-                    class="{% if '/offers/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl {% if '/offers/' in request.path %}active{% endif %}">
                     <i data-lucide="tag" class="w-5 h-5"></i>
                     <span>العروض</span>
                 </a>
-            </li>
-            {% endif %}
+                {% endif %}
 
-            {% if not user.is_distributer or user.distributer_profile.can_view_vouchers %}
-            <li>
+                {% if not user.is_distributer or user.distributer_profile.can_view_vouchers %}
                 <a href="/vouchers/"
-                    class="{% if '/vouchers/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl {% if '/vouchers/' in request.path %}active{% endif %}">
                     <i data-lucide="credit-card" class="w-5 h-5"></i>
                     <span>الكروت</span>
                 </a>
-            </li>
-            <li>
+
                 <a href="/online/"
-                    class="{% if '/online/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl {% if '/online/' in request.path %}active{% endif %}">
                     <i data-lucide="wifi" class="w-5 h-5"></i>
                     <span>الكروت المتصلة</span>
                 </a>
-            </li>
-            {% endif %}
+                {% endif %}
 
-            {% if not user.is_distributer %}
-            <li>
+                {% if not user.is_distributer %}
                 <a href="/income/"
-                    class="{% if '/income/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl {% if '/income/' in request.path %}active{% endif %}">
                     <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
                     <span>المبيعات</span>
                 </a>
-            </li>
-            {% endif %}
+                {% endif %}
 
-            {% if not user.is_distributer or user.distributer_profile.can_view_designs %}
-            <li>
+                {% if not user.is_distributer or user.distributer_profile.can_view_designs %}
                 <a href="/design/"
-                    class="{% if '/design/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl {% if '/design/' in request.path %}active{% endif %}">
                     <i data-lucide="palette" class="w-5 h-5"></i>
                     <span>التصاميم</span>
                 </a>
-            </li>
-            {% endif %}
+                {% endif %}
 
-            {% if not user.is_distributer %}
-            <li>
+                {% if not user.is_distributer %}
                 <a href="/profile/"
-                    class="{% if '/profile/' in request.path %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/10">
+                    class="menu-link flex items-center gap-3 px-4 py-3 rounded-xl {% if '/profile/' in request.path %}active{% endif %}">
                     <i data-lucide="user" class="w-5 h-5"></i>
                     <span>الملف الشخصي</span>
                 </a>
-            </li>
-            {% endif %}
-        </ul>
+                {% endif %}
+            </nav>
 
-        <div class="sidebar-footer">
-            <a href="{% url 'logout' %}" class="logout-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                تسجيل الخروج
-            </a>
-        </div>
-    </div>
-
-    <div class="main-container">
-        <header class="header">
-            <div class="header-content">
-                <button class="hamburger-btn md:hidden" id="hamburgerBtn">☰</button>
-                <div>
-                    <h1>مرحبا، {{ user.username }}</h1>
-                </div>
-                <div class="header-info relative">
-                    <button class="user-info focus:outline-none" id="userMenuBtn">
-                        <div class="user-avatar">{{ user.username | first | upper }}</div>
-                        <span class="user-name" style="font-weight: 600; color: var(--dark);">{{ user.username}}</span>
-                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                            </path>
-                        </svg>
-                    </button>
-                    <!-- Dropdown Menu -->
-                    <div id="userMenuDropdown"
-                        class="hidden absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
-                        <a href="/profile/"
-                            class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                            </svg>
-                            الملف الشخصي
-                        </a>
-                        <div class="h-px bg-gray-100 my-1"></div>
-                        <a href="{% url 'logout' %}"
-                            class="flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                                </path>
-                            </svg>
-                            تسجيل الخروج
-                        </a>
-                    </div>
-                </div>
+            <!-- Logout Button -->
+            <div class="p-4 border-t border-white/10">
+                <a href="{% url 'logout' %}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl text-danger hover:bg-danger/10 transition-colors">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <span>تسجيل الخروج</span>
+                </a>
             </div>
-        </header>
+        </aside>
 
-        <main class="content">
-            <div class="content-wrapper">
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col md:mr-0">
+
+            <!-- Header -->
+            <header class="header-glass sticky top-0 z-40 px-6 py-4">
+                <div class="flex items-center justify-between">
+
+                    <!-- Mobile Menu Button -->
+                    <button class="md:hidden p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                        id="hamburgerBtn">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+
+                    <!-- Mobile Title -->
+                    <div class="md:hidden">
+                        <h1 class="text-lg font-bold">القصواء</h1>
+                    </div>
+
+                    <!-- Welcome Message -->
+                    <div class="hidden md:block">
+                        <h1 class="text-xl font-bold">مرحباً، <span class="gradient-text">{{ user.username }}</span>
+                        </h1>
+                        <p class="text-sm text-dark-400">{% block page_subtitle %}لوحة التحكم{% endblock %}</p>
+                    </div>
+
+                    <!-- User Menu -->
+                    <div class="relative">
+                        <button class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-colors"
+                            id="userMenuBtn">
+                            <div
+                                class="user-avatar w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold">
+                                {{ user.username|first|upper }}
+                            </div>
+                            <span class="hidden sm:block font-medium">{{ user.username }}</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-dark-400"></i>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div id="userMenuDropdown"
+                            class="hidden absolute top-full left-0 mt-2 w-56 bg-dark-900/90 backdrop-blur-4xl rounded-xl shadow-2xl overflow-hidden z-50 ring-1 ring-white/10">
+                            <div class="p-3 border-b border-white/10">
+                                <p class="text-sm font-medium">{{ user.username }}</p>
+                                <p class="text-xs text-dark-400">{{ user.email }}</p>
+                            </div>
+                            <div class="p-2">
+                                <a href="/profile/"
+                                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors">
+                                    <i data-lucide="user" class="w-4 h-4 text-accent"></i>
+                                    <span class="text-sm">الملف الشخصي</span>
+                                </a>
+                                <a href="{% url 'logout' %}"
+                                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-danger/10 text-danger transition-colors">
+                                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                                    <span class="text-sm">تسجيل الخروج</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 p-6">
+
                 {% if plan %}
-                <div class="plan-hero">
-                    <h2>{{ plan.name }}</h2>
-                    <p>{{ plan.description }}</p>
-                    <!-- Warning Notification for Unpaid Users -->
+                <!-- Plan Hero Section -->
+                <div class="glass-card rounded-2xl p-6 mb-6 glow-border">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div
+                            class="w-14 h-14 rounded-xl bg-gradient-to-br from-accent-500 to-accent-700 flex items-center justify-center">
+                            <i data-lucide="crown" class="w-7 h-7"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold gradient-text">{{ plan.name }}</h2>
+                            <p class="text-dark-400">{{ plan.description }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Payment Warning -->
                     {% if not user.is_distributer and not user.has_paied %}
-                    <div class="mt-4 p-4 bg-red-50 border-r-4 border-red-500 rounded-lg">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path fill-rule="evenodd"
-                                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                        clip-rule="evenodd" />
-                                </svg>
+                    <div class="mt-4 p-4 rounded-xl bg-danger/10 border border-danger/30">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-danger/20 flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="alert-triangle" class="w-5 h-5 text-danger"></i>
                             </div>
-                            <div class="mr-3">
-                                <h3 class="text-sm font-medium text-red-800">تنبيه هام</h3>
-                                <div class="mt-2 text-sm text-red-700">
-                                    <p>
-                                        يجب عليك دفع الاشتراك المستحق للاستمرار في استخدام الخدمة.
-                                    </p>
-                                    <p class="mt-1">
-                                        إذا قمت بالدفع وما زالت هذه الرسالة تظهر، يرجى التواصل مع الدعم الفني:
-                                        <span class="font-bold">{{ tech_support.name }}</span>
-                                    </p>
-                                </div>
+                            <div>
+                                <h3 class="font-bold text-danger">تنبيه هام</h3>
+                                <p class="text-sm text-dark-300 mt-1">
+                                    يجب عليك دفع الاشتراك المستحق للاستمرار في استخدام الخدمة.
+                                </p>
+                                <p class="text-sm text-dark-400 mt-1">
+                                    إذا قمت بالدفع وما زالت هذه الرسالة تظهر، يرجى التواصل مع الدعم الفني:
+                                    <span class="font-bold text-accent">{{ tech_support.name }}</span>
+                                </p>
                             </div>
                         </div>
                     </div>
                     {% endif %}
+
+                    <!-- Info Cards Grid -->
                     {% if not user.is_distributer %}
-                    <div class="mt-6 rounded-2xl bg-gradient-to-br from-white to-gray-50 border shadow-sm p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
 
-                            <!-- SUPPORT CARD -->
-                            <div class="rounded-xl bg-white border p-5 hover:shadow transition">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <div
-                                        class="w-9 h-9 flex items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                                        📞
-                                    </div>
-                                    <h3 class="font-bold text-gray-800">الدعم الفني</h3>
+                        <!-- Support Card -->
+                        <div class="glass-card glass-card-hover rounded-xl p-5 transition-all">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
+                                    <i data-lucide="headphones" class="w-5 h-5 text-accent"></i>
                                 </div>
-
-                                <div class="space-y-3 text-sm">
-                                    <div>
-                                        <div class="text-gray-500">الاسم</div>
-                                        <div class="font-semibold text-gray-900">
-                                            {{ tech_support.name }}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div class="text-gray-500">رقم التواصل</div>
-
-                                        <div
-                                            class="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 mt-1">
-                                            <span class="font-mono">{{ tech_support.phone }}</span>
-
-                                            <div class="flex items-center gap-2">
-                                                <!-- COPY -->
-                                                <button onclick="copyText('{{ tech_support.phone }}')"
-                                                    class="text-xs text-blue-600 hover:underline">
-                                                    نسخ
-                                                </button>
-
-                                                <!-- WHATSAPP -->
-                                                <a href="https://wa.me/{{ tech_support.phone }}" target="_blank"
-                                                    class="flex items-center gap-1 text-green-600 hover:text-green-700 text-xs font-semibold">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
-                                                        viewBox="0 0 24 24" fill="currentColor">
-                                                        <path
-                                                            d="M12.04 2.01C6.58 2.01 2.15 6.44 2.15 11.9c0 1.93.5 3.82 1.45 5.5L2 22l4.7-1.53c1.6.87 3.4 1.32 5.34 1.32h.01c5.46 0 9.89-4.43 9.89-9.89S17.5 2.01 12.04 2.01zm5.73 14.2c-.24.68-1.42 1.3-1.96 1.38-.5.08-1.12.12-1.8-.12-.42-.14-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.4-.15-.2-1.19-1.58-1.19-3.02 0-1.44.75-2.15 1.02-2.45.27-.3.6-.38.8-.38.2 0 .4 0 .57.01.18.01.42-.07.66.5.24.58.82 2 .89 2.15.07.15.12.33.02.53-.1.2-.15.33-.3.5-.15.18-.31.4-.44.54-.15.15-.31.32-.13.63.18.3.8 1.33 1.72 2.15 1.18 1.05 2.17 1.38 2.48 1.53.31.15.5.13.68-.08.18-.2.78-.9.99-1.2.2-.3.4-.25.68-.15.27.1 1.7.8 2 .95.3.15.5.22.57.35.07.12.07.7-.17 1.38z" />
-                                                    </svg>
-                                                    واتساب
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                </div>
+                                <h3 class="font-bold">الدعم الفني</h3>
                             </div>
-
-                            <!-- BANK CARD -->
-                            <div class="rounded-xl bg-white border p-5 hover:shadow transition">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <div
-                                        class="w-9 h-9 flex items-center justify-center rounded-full bg-green-100 text-green-600">
-                                        🏦
-                                    </div>
-                                    <h3 class="font-bold text-gray-800">بيانات التحويل البنكي</h3>
+                            <div class="space-y-3 text-sm">
+                                <div>
+                                    <span class="text-dark-400">الاسم</span>
+                                    <p class="font-medium">{{ tech_support.name }}</p>
                                 </div>
-
-                                <div class="space-y-3 text-sm">
-                                    <div>
-                                        <div class="text-gray-500">اسم البنك</div>
-                                        <div class="font-semibold text-gray-900">
-                                            {{ tech_support.bank_name }}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div class="text-gray-500">اسم صاحب الحساب</div>
-                                        <div
-                                            class="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 mt-1">
-                                            <span class="font-mono">{{ tech_support.bank_account_holder }}</span>
-                                            <button onclick="copyText('{{ tech_support.bank_account_holder }}')"
-                                                class="text-xs text-blue-600 hover:underline">
-                                                نسخ
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div class="text-gray-500">رقم الحساب</div>
-                                        <div
-                                            class="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 mt-1">
-                                            <span class="font-mono">{{ tech_support.bank_account_number }}</span>
-                                            <button onclick="copyText('{{ tech_support.bank_account_number }}')"
-                                                class="text-xs text-blue-600 hover:underline">
-                                                نسخ
-                                            </button>
-                                        </div>
+                                <div>
+                                    <span class="text-dark-400">رقم التواصل</span>
+                                    <div class="flex items-center gap-2 mt-1 p-2 rounded-lg bg-white/5">
+                                        <span class="font-mono text-xs flex-1 text-right" dir="ltr">
+                                            {{ tech_support.phone }}</span>
+                                        <button onclick="copyText('{{ tech_support.phone }}')"
+                                            class="text-xs text-accent hover:underline">نسخ</button>
+                                        <a href="https://wa.me/{{ tech_support.phone }}" target="_blank"
+                                            class="text-xs text-green-500 hover:underline">واتساب</a>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- ACCOUNT CARD -->
-                            <div class="rounded-xl bg-white border p-5 hover:shadow transition">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <div
-                                        class="w-9 h-9 flex items-center justify-center rounded-full bg-purple-100 text-purple-600">
-                                        👤
-                                    </div>
-                                    <h3 class="font-bold text-gray-800">معلومات الحساب</h3>
+                        <!-- Bank Card -->
+                        <div class="glass-card glass-card-hover rounded-xl p-5 transition-all">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                                    <i data-lucide="landmark" class="w-5 h-5 text-green-500"></i>
                                 </div>
-
-                                <div class="space-y-3 text-sm">
-                                    <div>
-                                        <div class="text-gray-500">رقم حسابك</div>
-                                        <div
-                                            class="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 mt-1">
-                                            <span>{{ user.id }}</span>
-                                            <button onclick="copyText('{{ user.id }}')"
-                                                class="text-xs text-blue-600 hover:underline">
-                                                نسخ
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div class="text-gray-500 mb-1">تاريخ الدفع التالي</div>
-                                        <div class="font-semibold text-gray-900">
-                                            {{ next_payment_date }}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div class="text-gray-500 mb-1">المبلغ المستحق</div>
-                                        <div class="font-semibold text-red-600">
-                                            {% if user.has_paied %}
-                                            0
-                                            {% else %}
-                                            {{ user.plan.price_display }}
-                                            {% endif %}
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-4 text-xs text-gray-500 bg-gray-50 rounded-lg p-3">
-                                        ⚠️ يرجى إرسال التحويل مع رقم الحساب لتسريع التفعيل
+                                <h3 class="font-bold">بيانات التحويل</h3>
+                            </div>
+                            <div class="space-y-3 text-sm">
+                                <div>
+                                    <span class="text-dark-400">اسم البنك</span>
+                                    <p class="font-medium">{{ tech_support.bank_name }}</p>
+                                </div>
+                                <div>
+                                    <span class="text-dark-400">اسم صاحب الحساب</span>
+                                    <p class="font-medium">{{ tech_support.bank_account_holder }}</p>
+                                </div>
+                                <div>
+                                    <span class="text-dark-400">رقم الحساب</span>
+                                    <div class="flex items-center gap-2 mt-1 p-2 rounded-lg bg-white/5">
+                                        <span class="font-mono text-xs flex-1 text-right" dir="ltr">
+                                            {{ tech_support.bank_account_number }}</span>
+                                        <button onclick="copyText('{{ tech_support.bank_account_number }}')"
+                                            class="text-xs text-accent hover:underline">نسخ</button>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
+                        <!-- Account Card -->
+                        <div class="glass-card glass-card-hover rounded-xl p-5 transition-all">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                                    <i data-lucide="user-circle" class="w-5 h-5 text-purple-500"></i>
+                                </div>
+                                <h3 class="font-bold">معلومات الحساب</h3>
+                            </div>
+                            <div class="space-y-3 text-sm">
+                                <div>
+                                    <span class="text-dark-400">رقم حسابك</span>
+                                    <div class="flex items-center gap-2 mt-1 p-2 rounded-lg bg-white/5">
+                                        <span class="font-mono flex-1">{{ user.id }}</span>
+                                        <button onclick="copyText('{{ user.id }}')"
+                                            class="text-xs text-accent hover:underline">نسخ</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>
+                                        <span class="text-dark-400">الدفع التالي</span>
+                                        <p class="font-medium">{{ next_payment_date }}</p>
+                                    </div>
+                                    <div class="text-right mt-2">
+                                        <span class="text-dark-400">المبلغ المستحق</span>
+                                        <p
+                                            class="font-bold {% if user.has_paied %}text-red-500{% else %}text-danger{% endif %}">
+                                            {% if user.has_paied %}0{% else %}{{ user.plan.price_display }}{% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     {% endif %}
 
-                    <div class="mt-6">
-
-                    </div>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-label">عدد الخوادم</div>
-                            <div class="stat-value">{{ total_servers }}</div>
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                        <div class="stat-card rounded-xl p-5">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-dark-400 text-sm">عدد الخوادم</p>
+                                    <p class="text-3xl font-bold mt-1 gradient-text">{{ total_servers }}</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
+                                    <i data-lucide="server" class="w-6 h-6 text-accent"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-label">المتصلون الآن</div>
-                            <div class="stat-value">{{ online_vouchers }}</div>
+
+                        <div class="stat-card rounded-xl p-5">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-dark-400 text-sm">المتصلون الآن</p>
+                                    <p class="text-3xl font-bold mt-1 gradient-text">{{ online_vouchers }}</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center">
+                                    <i data-lucide="wifi" class="w-6 h-6 text-green-500"></i>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="stat-card">
-                            <div class="stat-label">إجمالي الكروت المُنشأة</div>
-                            <div class="stat-value">{{ total_vouchers_created }}</div>
+                        <div class="stat-card rounded-xl p-5">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-dark-400 text-sm">إجمالي الكروت</p>
+                                    <p class="text-3xl font-bold mt-1 gradient-text">{{ total_vouchers_created }}</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                                    <i data-lucide="credit-card" class="w-6 h-6 text-purple-500"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 {% endif %}
-                {% block content %}
-                {% endblock %}
-            </div>
-        </main>
+
+                <!-- Page Content -->
+                {% block content %}{% endblock %}
+            </main>
+        </div>
     </div>
 
-    <!-- JavaScript for mobile menu toggle functionality -->
+    <!-- Scripts -->
     <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Mobile Menu Toggle
         const hamburgerBtn = document.getElementById('hamburgerBtn');
         const sidebar = document.getElementById('sidebar');
         const menuOverlay = document.getElementById('menuOverlay');
-        function copyText(text) {
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text).then(() => showToast("تم النسخ ✔"), () => fallbackCopyTextToClipboard(text));
-            } else {
-                fallbackCopyTextToClipboard(text);
-            }
-        }
-        function fallbackCopyTextToClipboard(text) {
-            var textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed";  // Avoid scrolling to bottom
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                var successful = document.execCommand('copy');
-                if (successful) showToast("تم النسخ ✔");
-                else showToast("فشل النسخ ❌");
-            } catch (err) {
-                showToast("فشل النسخ ❌");
-            }
-            document.body.removeChild(textArea);
-        }
-        function showToast(msg) {
-            const toast = document.createElement("div");
-            toast.innerText = msg;
-            toast.className = "fixed bottom-6 left-1/2 -translate-x-1/2 bg-black text-white text-sm px-4 py-2 rounded-lg shadow z-[60]";
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 1500);
-        }
 
-        // Dropdown toggle
-        const userMenuBtn = document.getElementById('userMenuBtn');
-        const userMenuDropdown = document.getElementById('userMenuDropdown');
-
-        if (userMenuBtn && userMenuDropdown) {
-            userMenuBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                userMenuDropdown.classList.toggle('hidden');
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!userMenuDropdown.contains(e.target) && !userMenuBtn.contains(e.target)) {
-                    userMenuDropdown.classList.add('hidden');
-                }
-            });
-        }
-
-        hamburgerBtn.addEventListener('click', () => {
+        hamburgerBtn?.addEventListener('click', () => {
             sidebar.classList.toggle('active');
             menuOverlay.classList.toggle('active');
         });
 
-        menuOverlay.addEventListener('click', () => {
+        menuOverlay?.addEventListener('click', () => {
             sidebar.classList.remove('active');
             menuOverlay.classList.remove('active');
         });
 
-        document.querySelectorAll('.menu a').forEach(link => {
+        // Close menu on link click (mobile)
+        document.querySelectorAll('.menu-link').forEach(link => {
             link.addEventListener('click', () => {
                 sidebar.classList.remove('active');
                 menuOverlay.classList.remove('active');
             });
         });
 
-        // Initialize Lucide Icons
-        lucide.createIcons();
+        // User Menu Dropdown
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userMenuDropdown = document.getElementById('userMenuDropdown');
+
+        userMenuBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userMenuDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!userMenuDropdown?.contains(e.target) && !userMenuBtn?.contains(e.target)) {
+                userMenuDropdown?.classList.add('hidden');
+            }
+        });
+
+        // Copy to Clipboard
+        function copyText(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => showToast("تم النسخ ✔", "success"));
+            } else {
+                fallbackCopyTextToClipboard(text);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            textarea.style.position = "fixed";
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast("تم النسخ ✔", "success");
+            } catch (err) {
+                showToast("فشل النسخ ❌", "error");
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function showToast(msg, type = "info") {
+            const toast = document.createElement("div");
+            toast.innerText = msg;
+            toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-2xl z-[60] text-white font-medium
+                ${type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-accent-600'}`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // Auto-hide toast messages
+        document.querySelectorAll('.toast-message').forEach(toast => {
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => toast.remove(), 500);
+            }, 5000);
+        });
     </script>
 </body>
 

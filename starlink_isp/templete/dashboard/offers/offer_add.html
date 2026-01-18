@@ -8,112 +8,113 @@
         <p class="text-gray-600 text-sm mt-2">أضف معلومات العرض والخصائص المتعلقة به</p>
     </div>
 
-    <div class="max-w-2xl mx-auto">
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+    <div class="max-w-3xl mx-auto">
+        <div class="glass-card rounded-2xl p-8 border border-white/10">
             <form method="post" class="space-y-6">
                 {% csrf_token %}
 
                 <!-- BASIC INFO -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                        <label class="block text-sm font-medium text-right mb-2">اسم العرض</label>
+                        <label class="block text-sm font-medium text-dark-300 mb-2">اسم العرض</label>
                         {{ form.name }}
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-right mb-2">السعر</label>
+                        <label class="block text-sm font-medium text-dark-300 mb-2">السعر</label>
                         {{ form.price }}
                     </div>
                 </div>
 
                 <!-- SPEED SECTION -->
-                <div class="border-t pt-6">
-                    <h3 class="text-right font-semibold text-gray-800 mb-5">سرعة الاتصال</h3>
+                <!-- SPEED SECTION -->
+                <div class="border-t border-white/10 pt-6">
+                    <h3 class="text-lg font-bold text-white mb-5 flex items-center gap-2">
+                        <i data-lucide="zap" class="w-5 h-5 text-accent"></i>
+                        سرعة الاتصال
+                    </h3>
 
-                    <div class="flex items-center gap-3 mb-5">
+                    <div class="flex items-center gap-3 mb-6 p-4 rounded-xl bg-white/5 border border-white/5">
                         {{ form.unlimited_speed }}
-                        <label class="text-sm font-medium text-gray-700">سرعة مفتوحة</label>
+                        <label class="text-sm font-medium text-dark-200 cursor-pointer"
+                            for="{{ form.unlimited_speed.id_for_label }}">
+                            سرعة مفتوحة (غير محدودة)
+                        </label>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
-                            <label class="block text-sm font-medium text-right mb-2">سرعة الرفع (MB)</label>
+                            <label class="block text-sm font-medium text-dark-300 mb-2">سرعة الرفع (MB)</label>
                             {{ form.upload_speed }}
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-right mb-2">سرعة التحميل (MB)</label>
+                            <label class="block text-sm font-medium text-dark-300 mb-2">سرعة التحميل (MB)</label>
                             {{ form.download_speed }}
                         </div>
                     </div>
-
-                    <!-- <div class="flex items-center gap-3 mt-5">
-                        {{ form.speed_formula }}
-                        <label class="text-sm font-medium text-gray-700">تفعيل معادلة السرعة</label>
-                    </div> -->
                 </div>
 
                 <!-- DURATION & QUOTA -->
-                <div class="border-t pt-6">
-                    <h3 class="text-right font-semibold text-gray-800 mb-5">المدة والحد</h3>
+                <!-- DURATION & QUOTA -->
+                <div class="border-t border-white/10 pt-6">
+                    <h3 class="text-lg font-bold text-white mb-5 flex items-center gap-2">
+                        <i data-lucide="clock" class="w-5 h-5 text-accent"></i>
+                        المدة والحد
+                    </h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
-                            <label class="block text-sm font-medium text-right mb-2">المدة</label>
+                            <label class="block text-sm font-medium text-dark-300 mb-2">المدة</label>
                             {{ form.duration_value }}
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-right mb-2">نوع المدة</label>
+                            <label class="block text-sm font-medium text-dark-300 mb-2">نوع المدة</label>
                             {{ form.duration_type }}
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
                         <div>
-                            <label class="block text-sm font-medium text-right mb-2">كمية الكوتا (GB)</label>
+                            <label class="block text-sm font-medium text-dark-300 mb-2">كمية الكوتا (GB)</label>
                             {{ form.quota_amount }}
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-right mb-2">نوع الكوتا</label>
+                            <label class="block text-sm font-medium text-dark-300 mb-2">نوع الكوتا</label>
                             {{ form.quota_type }}
                         </div>
                     </div>
                 </div>
 
                 <!-- OPTIONS -->
-                <div class="border-t pt-6">
-                    <h3 class="text-right font-semibold text-gray-800 mb-5">خيارات إضافية</h3>
+                <!-- OPTIONS -->
+                <div class="border-t border-white/10 pt-6">
+                    <h3 class="text-lg font-bold text-white mb-5 flex items-center gap-2">
+                        <i data-lucide="settings-2" class="w-5 h-5 text-accent"></i>
+                        خيارات إضافية
+                    </h3>
 
                     <div class="space-y-4">
-
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition">
                             {{ form.block_porn_sites }}
-                            <label class="text-sm font-medium text-gray-700">حجب المواقع الإباحية</label>
+                            <label class="text-sm font-medium text-dark-200 cursor-pointer"
+                                for="{{ form.block_porn_sites.id_for_label }}">
+                                حجب المواقع الإباحية
+                            </label>
                         </div>
-
-                        <!-- <div class="flex items-center gap-3">
-                            {{ form.peak_time }}
-                            <label class="text-sm font-medium text-gray-700">وقت الذروة</label>
-                        </div>
-
-                        <div class="flex items-center gap-3">
-                            {{ form.is_available }}
-                            <label class="text-sm font-medium text-gray-700">متاح</label>
-                        </div> -->
-
                     </div>
                 </div>
 
                 <!-- ACTION BUTTONS -->
-                <div class="flex gap-3 pt-6 border-t justify-end">
-                    <a href="{% url 'offers:offer_list' %}"
-                        class="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+                <!-- ACTION BUTTONS -->
+                <div class="flex gap-3 pt-6 border-t border-white/10 justify-end">
+                    <a href="{% url 'offers:offer_list' %}" class="btn-secondary px-6 py-2.5 rounded-xl font-medium">
                         إلغاء
                     </a>
                     <button type="submit"
-                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        class="btn-primary px-6 py-2.5 rounded-xl font-medium shadow-lg shadow-accent/20">
                         إضافة العرض
                     </button>
                 </div>
@@ -122,4 +123,21 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        lucide.createIcons();
+
+        // Add cyber-input class to all inputs
+        const inputs = document.querySelectorAll('input[type="text"], input[type="number"], select');
+        inputs.forEach(input => {
+            input.classList.add('cyber-input', 'w-full', 'rounded-xl', 'px-4', 'py-3', 'text-sm');
+        });
+
+        // Style checkboxes
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(box => {
+            box.classList.add('w-5', 'h-5', 'rounded', 'border-white/20', 'bg-white/5', 'text-accent', 'focus:ring-accent');
+        });
+    });
+</script>
 {% endblock %}

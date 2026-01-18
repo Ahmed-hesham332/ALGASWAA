@@ -5,47 +5,58 @@
 {% block content %}
 <div class="p-6">
     <!-- HEADER + ADD BUTTON -->
-    <div class="mb-6 flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-gray-900">الموزعين</h2>
+    <!-- HEADER + ADD BUTTON -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+            <h2 class="text-2xl font-bold">الموزعين</h2>
+            <p class="text-dark-400 text-sm mt-1">إدارة حسابات الموزعين والصلاحيات</p>
+        </div>
 
         <a href="{% url 'distributers:distributer_add' %}"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-            + إضافة موزع جديد
+            class="btn-primary inline-flex items-center gap-2 px-5 py-3 rounded-xl font-medium">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+            إضافة موزع
         </a>
     </div>
 
     {% if distributers %}
-    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+    <div class="cyber-table rounded-2xl overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-right text-sm">
-                <thead class="bg-gray-50 border-b border-gray-200">
+                <thead>
                     <tr>
-                        <th class="px-4 py-3 font-semibold text-gray-700">#</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">الاسم</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">اسم المستخدم</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">الحالة</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">الإجراءات</th>
+                        <th class="px-6 py-4 font-semibold">#</th>
+                        <th class="px-6 py-4 font-semibold">الاسم</th>
+                        <th class="px-6 py-4 font-semibold">اسم المستخدم</th>
+                        <th class="px-6 py-4 font-semibold">الحالة</th>
+                        <th class="px-6 py-4 font-semibold">الإجراءات</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200">
+                <tbody>
                     {% for dist in distributers %}
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-4 py-3 text-gray-600">{{ forloop.counter }}</td>
-                        <td class="px-4 py-3 text-gray-900 font-medium">{{ dist.user.first_name }}</td>
-                        <td class="px-4 py-3 text-gray-600 font-mono">{{ dist.user.username }}</td>
-                        <td class="px-4 py-3">
+                    <tr>
+                        <td class="px-6 py-4 text-dark-400">{{ forloop.counter }}</td>
+                        <td class="px-6 py-4 font-medium">{{ dist.user.first_name }}</td>
+                        <td class="px-6 py-4 text-dark-300 font-mono">{{ dist.user.username }}</td>
+                        <td class="px-6 py-4">
                             {% if dist.status %}
-                            <span class="inline-block px-2 py-1 bg-green-100 text-green-700 rounded text-xs">مفعل</span>
+                            <span class="badge-success px-2.5 py-1 rounded-lg text-xs">مفعل</span>
                             {% else %}
-                            <span class="inline-block px-2 py-1 bg-red-100 text-red-700 rounded text-xs">معطل</span>
+                            <span class="badge-danger px-2.5 py-1 rounded-lg text-xs">معطل</span>
                             {% endif %}
                         </td>
-                        <td class="px-4 py-3 flex gap-2">
+                        <td class="px-6 py-4 flex gap-2">
                             <a href="{% url 'distributers:distributer_edit' dist.pk %}"
-                                class="text-blue-600 hover:text-blue-800 text-xs font-semibold">تعديل</a>
+                                class="btn-secondary px-3 py-2 rounded-lg text-xs inline-flex items-center gap-1.5 hover:text-accent">
+                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                                تعديل
+                            </a>
                             <a href="{% url 'distributers:distributer_delete' dist.pk %}"
-                                class="text-red-600 hover:text-red-800 text-xs font-semibold"
-                                onclick="return confirm('هل أنت متأكد من حذف هذا الموزع؟');">حذف</a>
+                                class="px-3 py-2 rounded-lg text-xs inline-flex items-center gap-1.5 bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
+                                onclick="return confirm('هل أنت متأكد من حذف هذا الموزع؟');">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                حذف
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -54,11 +65,16 @@
         </div>
     </div>
     {% else %}
-    <div class="bg-white rounded-lg p-10 text-center border border-gray-100">
-        <p class="text-gray-500 text-lg mb-4">لا يوجد موزعين حالياً</p>
+    <div class="glass-card rounded-2xl p-12 text-center">
+        <div class="w-20 h-20 mx-auto rounded-2xl bg-accent/10 flex items-center justify-center mb-6">
+            <i data-lucide="users" class="w-10 h-10 text-accent"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-2">لا يوجد موزعين</h3>
+        <p class="text-dark-400 mb-6">قم بإضافة أول موزع لبدء البيع</p>
         <a href="{% url 'distributers:distributer_add' %}"
-            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
-            + إضافة موزع جديد
+            class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+            إضافة موزع جديد
         </a>
     </div>
     {% endif %}

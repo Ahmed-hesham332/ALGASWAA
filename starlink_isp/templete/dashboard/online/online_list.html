@@ -5,22 +5,22 @@
 {% block content %}
 <div class="p-6">
 
-    <div class="mb-6 flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-gray-900">المتصلون الآن</h2>
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold">المتصلون الآن</h2>
+        <p class="text-dark-400 text-sm mt-1">مراقبة الجلسات النشطة واستهلاك البيانات</p>
     </div>
 
     <!-- FILTER BAR -->
-    <div class="flex flex-col md:flex-row items-center justify-between bg-white p-4 mb-4 rounded-lg shadow-sm border">
+    <div class="glass-card rounded-2xl p-5 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
 
         <!-- SERVER FILTER -->
-        <form method="GET" class="flex items-center gap-3 mb-4 md:mb-0">
+        <form method="GET" class="flex-1 w-full md:w-auto">
             <select name="server" onchange="this.form.submit()"
-                class="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
-
+                class="cyber-input w-full md:w-64 rounded-xl px-4 py-2.5 text-sm">
                 <option value="all" {% if is_all_servers %}selected{% endif %}>
                     جميع السيرفرات
                 </option>
-
                 {% for s in servers %}
                 <option value="{{ s.id }}" {% if s.is_selected %}selected{% endif %}>
                     {{ s.name }}
@@ -30,15 +30,18 @@
         </form>
 
         <!-- SEARCH BAR -->
-        <form method="GET" class="flex items-center gap-2">
+        <form method="GET" class="flex items-center gap-3 w-full md:w-auto">
             {% if selected_server %}
             <input type="hidden" name="server" value="{{ selected_server }}">
             {% endif %}
 
-            <input type="text" name="search" value="{{ search_query }}" placeholder="بحث عن MAC أو رقم كارت..."
-                class="px-4 py-2 border border-gray-300 rounded-lg w-64">
+            <div class="relative flex-1">
+                <input type="text" name="search" value="{{ search_query }}" placeholder="بحث عن MAC أو رقم كارت..."
+                    class="cyber-input w-full md:w-72 rounded-xl px-4 py-2.5 pl-10 text-sm">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400"></i>
+            </div>
 
-            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button class="btn-primary px-5 py-2.5 rounded-xl font-medium text-sm">
                 بحث
             </button>
         </form>
@@ -47,42 +50,35 @@
 
     <!-- ACTIVE SESSIONS TABLE -->
     {% if sessions %}
-    <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+    <div class="cyber-table rounded-2xl overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-right text-sm">
-                <thead class="bg-gray-50 border-b">
+                <thead>
                     <tr>
-                        <th class="px-6 py-3">#</th>
-                        <th class="px-6 py-3">رقم الكارت</th>
-                        <th class="px-6 py-3">الماك</th>
-                        <th class="px-6 py-3">IP</th>
-                        <th class="px-6 py-3">الاستهلاك</th>
-                        <th class="px-6 py-3">المدة</th>
-                        <th class="px-6 py-3">السيرفر</th>
+                        <th class="px-6 py-4 font-semibold">#</th>
+                        <th class="px-6 py-4 font-semibold">رقم الكارت</th>
+                        <th class="px-6 py-4 font-semibold">الماك</th>
+                        <th class="px-6 py-4 font-semibold">IP</th>
+                        <th class="px-6 py-4 font-semibold">الاستهلاك</th>
+                        <th class="px-6 py-4 font-semibold">المدة</th>
+                        <th class="px-6 py-4 font-semibold">السيرفر</th>
                     </tr>
                 </thead>
 
-                <tbody class="divide-y">
+                <tbody>
                     {% for s in sessions %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4">{{ forloop.counter }}</td>
-                        <td class="px-6 py-4 font-mono">{{ s.serial }}</td>
-                        <td class="px-6 py-4 font-mono">{{ s.mac }}</td>
-                        <td class="px-6 py-4">{{ s.ip }}</td>
+                    <tr>
+                        <td class="px-6 py-4 text-dark-400">{{ forloop.counter }}</td>
+                        <td class="px-6 py-4 font-mono text-accent">{{ s.serial }}</td>
+                        <td class="px-6 py-4 font-mono text-dark-300">{{ s.mac }}</td>
+                        <td class="px-6 py-4 text-dark-300">{{ s.ip }}</td>
                         <td class="px-6 py-4">
-                            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                            <span class="badge-info px-2 py-1 rounded-lg text-xs font-mono">
                                 {{ s.usage_mb }}MB
                             </span>
                         </td>
-                        <!-- <td class="px-6 py-4">
-                            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                                {{ s.upload }}↓ / {{ s.download }}↑ MB
-                            </span>
-                        </td> -->
-
-                        <td class="px-6 py-4">{{ s.duration|default:"—" }}</td>
-
-                        <td class="px-6 py-4">{{ s.server_name }}</td>
+                        <td class="px-6 py-4 text-dark-300">{{ s.duration|default:"—" }}</td>
+                        <td class="px-6 py-4 text-dark-300">{{ s.server_name }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -93,8 +89,12 @@
 
     {% else %}
     <!-- EMPTY STATE -->
-    <div class="bg-white rounded-lg p-8 text-center border">
-        <p class="text-gray-500 mb-2">لا يوجد متصلون الآن</p>
+    <!-- EMPTY STATE -->
+    <div class="glass-card rounded-2xl p-12 text-center">
+        <div class="w-16 h-16 mx-auto rounded-xl bg-accent/10 flex items-center justify-center mb-4">
+            <i data-lucide="wifi-off" class="w-8 h-8 text-accent"></i>
+        </div>
+        <p class="text-dark-400">لا يوجد متصلون الآن</p>
     </div>
     {% endif %}
 

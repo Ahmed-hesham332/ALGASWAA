@@ -1,205 +1,180 @@
 {% extends "dashboard/base.html" %}
-{% block title %}السيرفرات — Dashboard{% endblock %}
+{% block title %}السيرفرات{% endblock %}
+{% block page_subtitle %}إدارة الخوادم{% endblock %}
+
 {% block content %}
-<div class="p-6">
+<div class="space-y-6">
 
-    <div class="mb-6 flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-gray-900">السيرفرات</h2>
-
-        <a href="{% url 'servers:add' %}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            + إضافة سيرفر
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold">السيرفرات</h2>
+            <p class="text-dark-400 text-sm mt-1">إدارة وتتبع جميع الخوادم المتصلة</p>
+        </div>
+        <a href="{% url 'servers:add' %}"
+            class="btn-primary inline-flex items-center gap-2 px-5 py-3 rounded-xl font-medium">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+            إضافة سيرفر
         </a>
     </div>
 
     {% if servers %}
+    <!-- Servers Table -->
+    <div class="cyber-table rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-right text-sm">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">الاسم</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">IP / المضيف</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">معرف السيرفر</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in servers %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center gap-3 justify-start">
+                                {% if s.is_online %}
+                                <span class="relative flex h-3 w-3">
+                                    <span
+                                        class="online-pulse absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                </span>
+                                {% else %}
+                                <span class="h-3 w-3 rounded-full bg-dark-500"></span>
+                                {% endif %}
+                                <span class="font-medium">{{ s.name }}</span>
+                            </div>
+                        </td>
 
-    <!-- ✅ WRAPPER NOW SCROLLS ON MOBILE -->
-    <div class="bg-white shadow-sm border border-gray-100 rounded-lg overflow-x-auto">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="font-mono text-dark-300" dir="ltr">{{ s.ip_address }}</span>
+                        </td>
 
-        <!-- IMPORTANT: table must not be 100% width → use max-content -->
-        <table class="text-right text-sm min-w-max w-full">
-            <thead class="bg-gray-50 border-b">
-                <tr>
-                    <th class="px-6 py-3 whitespace-nowrap">الاسم</th>
-                    <th class="px-6 py-3 whitespace-nowrap">IP / المضيف</th>
-                    <th class="px-6 py-3 whitespace-nowrap">الايدي</th>
-                    <th class="px-6 py-3 whitespace-nowrap">الإجراءات</th>
-                </tr>
-            </thead>
-
-            <tbody class="divide-y">
-                {% for s in servers %}
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center gap-2 justify-end">
-                            {% if s.is_online %}
-                            <!-- Online Icon (Green Pulse) -->
-                            <span class="relative flex h-3 w-3">
-                                <span
-                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="badge-success px-3 py-1.5 rounded-lg text-xs font-mono" dir="ltr">
+                                {{ s.hostname }}
                             </span>
-                            {% else %}
-                            <!-- Offline Icon (Gray Dot) -->
-                            <span class="h-3 w-3 rounded-full bg-gray-300"></span>
-                            {% endif %}
-                            <span class="text-gray-900 font-medium">{{ s.name }}</span>
-                        </div>
-                    </td>
+                        </td>
 
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        {{ s.ip_address }}
-                        <!-- <div class="text-gray-500 text-xs">{{ s.hostname }}</div> -->
-                    </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center gap-2 justify-start">
+                                <button data-copy-url="{% url 'servers:download' s.id %}"
+                                    class="btn-secondary px-3 py-2 rounded-lg text-xs inline-flex items-center gap-1.5 hover:text-accent">
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                    نسخ الإعدادات
+                                </button>
 
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs"
-                            style="direction: ltr; display: inline-block;">
-                            {{ s.hostname }}
-                        </span>
-                    </td>
+                                <a href="{% url 'servers:edit' s.id %}"
+                                    class="btn-secondary px-3 py-2 rounded-lg text-xs inline-flex items-center gap-1.5 hover:text-accent">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                    تعديل
+                                </a>
 
-
-                    <td class="px-6 py-4 flex gap-3 whitespace-nowrap">
-
-                        <button data-copy-url="{% url 'servers:download' s.id %}"
-                            class="text-green-600 hover:text-green-800 font-semibold focus:outline-none">
-                            نسخ الاعدادات
-                        </button>
-
-                        <a href="{% url 'servers:edit' s.id %}" class="text-blue-600 hover:text-blue-800">
-                            تعديل
-                        </a>
-
-                        <a href="{% url 'servers:delete' s.id %}" class="text-red-600 hover:text-red-800 font-medium"
-                            data-confirm="1" data-msg="هل أنت متأكد من حذف هذا السيرفر؟">
-                            حذف
-                        </a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-
-        </table>
+                                <button data-delete-url="{% url 'servers:delete' s.id %}"
+                                    onclick="openConfirmModal('هل أنت متأكد من حذف هذا السيرفر؟', this.dataset.deleteUrl)"
+                                    class="px-3 py-2 rounded-lg text-xs inline-flex items-center gap-1.5 bg-danger/10 text-danger hover:bg-danger/20 transition-colors">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    حذف
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
     {% else %}
-
-    <div class="bg-white p-8 text-center border rounded-lg">
-        <p class="text-gray-500 mb-4">لا توجد سيرفرات حالياً</p>
-        <a href="{% url 'servers:add' %}" class="px-4 py-2 bg-blue-600 text-white rounded-lg">
-            + إضافة أول سيرفر
+    <!-- Empty State -->
+    <div class="glass-card rounded-2xl p-12 text-center">
+        <div class="w-20 h-20 mx-auto rounded-2xl bg-accent/10 flex items-center justify-center mb-6">
+            <i data-lucide="server" class="w-10 h-10 text-accent"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-2">لا توجد سيرفرات</h3>
+        <p class="text-dark-400 mb-6">ابدأ بإضافة أول سيرفر لإدارة شبكتك</p>
+        <a href="{% url 'servers:add' %}"
+            class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+            إضافة أول سيرفر
         </a>
     </div>
-
     {% endif %}
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // -------- Confirm modal logic --------
-        const modal = document.getElementById("confirmModal");
-        const back = document.getElementById("cmBack");
-        const txt = document.getElementById("cmText");
-        const ok = document.getElementById("cmOk");
-        const cancel = document.getElementById("cmCancel");
-
-        function openModal(message, href) {
-            txt.textContent = message || "هل أنت متأكد؟";
-            ok.setAttribute("href", href || "#");
-            modal.classList.remove("hidden");
-        }
-
-        function closeModal() {
-            modal.classList.add("hidden");
-            ok.setAttribute("href", "#");
-        }
-
-        document.querySelectorAll("a[data-confirm]").forEach(a => {
-            a.addEventListener("click", (e) => {
-                e.preventDefault();
-                openModal(a.dataset.msg, a.href);
-            });
-        });
-
-        back.addEventListener("click", closeModal);
-        cancel.addEventListener("click", closeModal);
-
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") closeModal();
-        });
-
-        // -------- Copy Script Logic (HTTP Safe) --------
-        async function copyToClipboard(text) {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                return navigator.clipboard.writeText(text);
-            } else {
-                return new Promise((resolve, reject) => {
-                    const textarea = document.createElement("textarea");
-                    textarea.value = text;
-                    textarea.style.position = "fixed";
-                    document.body.appendChild(textarea);
-                    textarea.focus();
-                    textarea.select();
-                    try {
-                        const successful = document.execCommand('copy');
-                        document.body.removeChild(textarea);
-                        if (successful) resolve();
-                        else reject(new Error("execCommand failed"));
-                    } catch (err) {
-                        document.body.removeChild(textarea);
-                        reject(err);
-                    }
-                });
-            }
-        }
-
-        document.querySelectorAll("button[data-copy-url]").forEach(btn => {
-            btn.addEventListener("click", async () => {
-                const url = btn.dataset.copyUrl;
-                const originalText = btn.textContent;
-
-                try {
-                    btn.textContent = "جاري النسخ...";
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error("Network error");
-                    const text = await response.text();
-
-                    await copyToClipboard(text);
-
-                    btn.textContent = "تم النسخ!";
-                    btn.classList.add("text-green-700", "font-bold");
-
-                    setTimeout(() => {
-                        btn.textContent = originalText;
-                        btn.classList.remove("text-green-700", "font-bold");
-                    }, 2000);
-                } catch (err) {
-                    console.error("Copy failed", err);
-                    btn.textContent = "فشل النسخ";
-                    setTimeout(() => btn.textContent = originalText, 2000);
-                }
-            });
-        });
-    });
-</script>
-
-
+<!-- Confirm Modal -->
 <div id="confirmModal" class="fixed inset-0 hidden z-50">
-    <div id="cmBack" class="absolute inset-0 bg-black/30"></div>
-
-    <div class="absolute left-1/2 top-1/2 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2
-              bg-white border rounded-lg shadow p-5">
-        <p id="cmText" class="text-sm text-gray-800"></p>
-
-        <div class="mt-4 flex justify-end gap-2">
-            <button id="cmCancel" class="px-3 py-2 text-sm rounded-md bg-gray-100 hover:bg-gray-200">
-                إلغاء
-            </button>
-            <a id="cmOk" class="px-3 py-2 text-sm rounded-md bg-red-600 hover:bg-red-700 text-white">
-                حذف
-            </a>
+    <div id="cmBack" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div
+        class="absolute left-1/2 top-1/2 w-[92%] max-w-md -translate-x-1/2 -translate-y-1/2 glass-card rounded-2xl p-6 glow-border">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-danger/20 flex items-center justify-center">
+                <i data-lucide="alert-triangle" class="w-6 h-6 text-danger"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-lg">تأكيد الحذف</h3>
+                <p id="cmText" class="text-sm text-dark-400"></p>
+            </div>
+        </div>
+        <div class="flex gap-3 mt-6">
+            <button id="cmCancel" class="btn-secondary flex-1 py-3 rounded-xl font-medium">إلغاء</button>
+            <a id="cmOk" class="btn-danger flex-1 py-3 rounded-xl font-medium text-center">حذف</a>
         </div>
     </div>
 </div>
+
+<script>
+    function openConfirmModal(message, href) {
+        const modal = document.getElementById("confirmModal");
+        const txt = document.getElementById("cmText");
+        const ok = document.getElementById("cmOk");
+        txt.textContent = message;
+        ok.setAttribute("href", href);
+        modal.classList.remove("hidden");
+    }
+
+    function closeConfirmModal() {
+        document.getElementById("confirmModal").classList.add("hidden");
+    }
+
+    document.getElementById("cmBack")?.addEventListener("click", closeConfirmModal);
+    document.getElementById("cmCancel")?.addEventListener("click", closeConfirmModal);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeConfirmModal(); });
+
+    // Copy Script
+    document.querySelectorAll("button[data-copy-url]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const url = btn.dataset.copyUrl;
+            const originalHTML = btn.innerHTML;
+            try {
+                btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> جاري النسخ...';
+                lucide.createIcons();
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Network error");
+                const text = await response.text();
+                await navigator.clipboard.writeText(text);
+                btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> تم النسخ!';
+                btn.classList.add("text-green-500");
+                lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove("text-green-500");
+                    lucide.createIcons();
+                }, 2000);
+            } catch (err) {
+                btn.innerHTML = '<i data-lucide="x" class="w-4 h-4"></i> فشل النسخ';
+                lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    lucide.createIcons();
+                }, 2000);
+            }
+        });
+    });
+
+    lucide.createIcons();
+</script>
 {% endblock %}

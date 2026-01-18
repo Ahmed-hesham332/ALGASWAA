@@ -1,77 +1,71 @@
 {% extends "dashboard/base.html" %}
-{% block title %}الكروت — Dashboard{% endblock %}
-{% block page_title %}الكروت{% endblock %}
+{% block title %}الكروت{% endblock %}
+{% block page_subtitle %}إدارة الكروت{% endblock %}
 
 {% block content %}
 {% if request.user.status %}
-<div class="p-6">
+<div class="space-y-6">
 
-    <!-- HEADER + GENERATE BUTTON -->
-    <div class="mb-6 flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-gray-900">جميع الكروت</h2>
-
-        <div class="flex gap-2">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold">جميع الكروت</h2>
+            <p class="text-dark-400 text-sm mt-1">عرض وإدارة جميع كروت الشحن</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
             <a href="{% url 'vouchers:batch_list' %}"
-                class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                class="btn-secondary inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium">
+                <i data-lucide="layers" class="w-4 h-4"></i>
                 عرض المجموعات
             </a>
             <a href="{% url 'vouchers:voucher_generate' %}"
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                + إنشاء مجموعة كروت
+                class="btn-primary inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                إنشاء مجموعة كروت
             </a>
         </div>
     </div>
 
-    <!-- ====== FILTER BAR ====== -->
-    <form method="GET" class="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-
+    <!-- Filter Bar -->
+    <form method="GET" class="glass-card rounded-2xl p-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Server Filter -->
             <div>
-                <label class="text-sm text-gray-600">السيرفر</label>
-                <select name="server" class="w-full mt-1 border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                <label class="block text-sm text-dark-400 mb-2">السيرفر</label>
+                <select name="server" class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
                     <option value="">كل السيرفرات</option>
-
                     {% for s in servers %}
-                    <option value="{{ s.id }}" {% if s.is_selected %}selected{% endif %}>
-                        {{ s.name }}
-                    </option>
+                    <option value="{{ s.id }}" {% if s.is_selected %}selected{% endif %}>{{ s.name }}</option>
                     {% endfor %}
                 </select>
             </div>
 
             <!-- Offer Filter -->
             <div>
-                <label class="text-sm text-gray-600">العرض</label>
-                <select name="offer" class="w-full mt-1 border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                <label class="block text-sm text-dark-400 mb-2">العرض</label>
+                <select name="offer" class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
                     <option value="">كل العروض</option>
-
                     {% for o in offers %}
-                    <option value="{{ o.id }}" {% if o.is_selected %}selected{% endif %}>
-                        {{ o.name }}
-                    </option>
+                    <option value="{{ o.id }}" {% if o.is_selected %}selected{% endif %}>{{ o.name }}</option>
                     {% endfor %}
                 </select>
             </div>
 
             <!-- Group Filter -->
             <div>
-                <label class="text-sm text-gray-600">المجموعة</label>
-                <select name="group" class="w-full mt-1 border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                <label class="block text-sm text-dark-400 mb-2">المجموعة</label>
+                <select name="group" class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
                     <option value="">كل المجموعات</option>
-
                     {% for g in groups %}
-                    <option value="{{ g.id }}" {% if g.is_selected %}selected{% endif %}>
-                        {{ g.name }}
-                    </option>
+                    <option value="{{ g.id }}" {% if g.is_selected %}selected{% endif %}>{{ g.name }}</option>
                     {% endfor %}
                 </select>
             </div>
 
             <!-- Status Filter -->
             <div>
-                <label class="text-sm text-gray-600">الحالة</label>
-                <select name="status" class="w-full mt-1 border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                <label class="block text-sm text-dark-400 mb-2">الحالة</label>
+                <select name="status" class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
                     <option value="">الكل</option>
                     <option value="used" {% if statuses.used %}selected{% endif %}>مستخدم</option>
                     <option value="unused" {% if statuses.unused %}selected{% endif %}>غير مستخدم</option>
@@ -80,120 +74,124 @@
             </div>
         </div>
 
-        <div class="flex justify-end mt-4">
-            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                تطبيق الفلترة
-            </button>
-
+        <div class="flex justify-end gap-3 mt-5 pt-5 border-t border-white/10">
             <a href="{% url 'vouchers:list' %}"
-                class="px-4 py-2 mr-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+                class="btn-secondary px-5 py-2.5 rounded-xl font-medium inline-flex items-center gap-2">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                 إعادة التعيين
             </a>
+            <button type="submit" class="btn-primary px-5 py-2.5 rounded-xl font-medium inline-flex items-center gap-2">
+                <i data-lucide="filter" class="w-4 h-4"></i>
+                تطبيق الفلترة
+            </button>
         </div>
     </form>
-    <!-- ====== END FILTER BAR ====== -->
-
-
 
     {% if vouchers %}
-    <!-- VOUCHERS TABLE -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+    <!-- Vouchers Table -->
+    <div class="cyber-table rounded-2xl overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-right text-sm">
-                <thead class="bg-gray-50 border-b border-gray-200">
+                <thead>
                     <tr>
-                        <th class="px-4 py-3 font-semibold text-gray-700">#</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">رقم الكارت</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">العرض</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">تاريخ الانشاء</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">تاريخ الشحن</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">تاريخ الانتهاء</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">الكوتا</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">الحالة</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">السعر</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">السيرفر</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">إجراءات</th>
+                        <th class="px-4 py-4 font-semibold">#</th>
+                        <th class="px-4 py-4 font-semibold">رقم الكارت</th>
+                        <th class="px-4 py-4 font-semibold">العرض</th>
+                        <th class="px-4 py-4 font-semibold">تاريخ الإنشاء</th>
+                        <th class="px-4 py-4 font-semibold">تاريخ الشحن</th>
+                        <th class="px-4 py-4 font-semibold">تاريخ الانتهاء</th>
+                        <th class="px-4 py-4 font-semibold">الكوتا</th>
+                        <th class="px-4 py-4 font-semibold">الحالة</th>
+                        <th class="px-4 py-4 font-semibold">السعر</th>
+                        <th class="px-4 py-4 font-semibold">السيرفر</th>
+                        <th class="px-4 py-4 font-semibold">إجراءات</th>
                     </tr>
                 </thead>
-
-                <tbody class="divide-y divide-gray-200">
+                <tbody>
                     {% for v in vouchers %}
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-4 py-3 text-gray-600">{{ forloop.counter }}</td>
-                        <td class="px-4 py-3 text-gray-900 font-mono text-xs">{{ v.serial }}</td>
-                        <td class="px-4 py-3 text-gray-600">{{ v.offer.name }}</td>
-                        <td class="px-4 py-3 text-gray-600 text-xs">{{ v.created_at }}</td>
-                        <td class="px-4 py-3 text-gray-600 text-xs">{{ v.activated_at|default:"—"}}</td>
-                        <td class="px-4 py-3 text-gray-600 text-xs">{{ v.expires_at|default:"—" }}</td>
-                        {% if v.offer.quota_type != "none" %}
-                        <td class="px-4 py-3 text-gray-600">{{ v.offer.quota_amount}}GB</td>
-                        {% else %}
-                        <td class="px-4 py-3 text-gray-600">غير محدود</td>
-                        {% endif %}
+                    <tr>
+                        <td class="px-4 py-3 text-dark-400">{{ forloop.counter }}</td>
                         <td class="px-4 py-3">
-                            <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                                {{ v.get_is_used_display }}
-                            </span>
+                            <span class="font-mono text-xs bg-white/5 px-2 py-1 rounded">{{ v.serial }}</span>
                         </td>
-                        <td class="px-4 py-3 text-gray-600 font-medium">{{ v.batch.offer.price }}</td>
-                        <td class="px-4 py-3 text-gray-600">{{ v.batch.server.name }}</td>
-                        <td class="px-4 py-3 text-gray-600">
+                        <td class="px-4 py-3 text-dark-300">{{ v.offer.name }}</td>
+                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr">{{ v.created_at }}</td>
+                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr">{{ v.activated_at|default:"—" }}</td>
+                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr">{{ v.expires_at|default:"—" }}</td>
+                        <td class="px-4 py-3 text-dark-300">
+                            {% if v.offer.quota_type != "none" %}
+                            {{ v.offer.quota_amount }}GB
+                            {% else %}
+                            <span class="text-accent">∞</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if v.is_used == "unused" %}
+                            <span class="badge-success px-2.5 py-1 rounded-lg text-xs">غير مستخدم</span>
+                            {% elif v.is_used == "used" %}
+                            <span class="badge-info px-2.5 py-1 rounded-lg text-xs">مستخدم</span>
+                            {% else %}
+                            <span class="badge-danger px-2.5 py-1 rounded-lg text-xs">منتهي</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 font-medium text-accent">{{ v.batch.offer.price }}</td>
+                        <td class="px-4 py-3 text-dark-300">{{ v.batch.server.name }}</td>
+                        <td class="px-4 py-3">
                             {% if v.is_used == "unused" %}
                             <a href="{% url 'vouchers:reconnect' v.id %}"
-                                onclick="return confirm('هل أنت متأكد من رغبتك في إعادة توصيل هذا الكارت؟ سيتم حذفه وإعادة إضافته للراديوس.')"
-                                class="text-blue-600 hover:text-blue-800 text-xs bg-blue-50 px-2 py-1 rounded border border-blue-200">
+                                onclick="return confirm('هل أنت متأكد من رغبتك في إعادة توصيل هذا الكارت؟')"
+                                class="btn-secondary px-3 py-1.5 rounded-lg text-xs inline-flex items-center gap-1.5">
+                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                                 إعادة توصيل
                             </a>
                             {% else %}
-                            <span class="text-gray-400 text-xs">-</span>
+                            <span class="text-dark-500 text-xs">—</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            {% if page_obj.has_other_pages %}
-            <div class="flex justify-center mt-6">
-                <nav class="inline-flex space-x-1">
-
-                    {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}"
-                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
-                        السابق
-                    </a>
-                    {% endif %}
-
-                    {% for num in page_obj.paginator.page_range %}
-                    {% if page_obj.number == num %}
-                    <span class="px-3 py-1 bg-blue-600 text-white rounded">{{ num }}</span>
-                    {% else %}
-                    <a href="?page={{ num }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
-                        {{ num }}
-                    </a>
-                    {% endif %}
-                    {% endfor %}
-
-                    {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}"
-                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
-                        التالي
-                    </a>
-                    {% endif %}
-
-                </nav>
-            </div>
-            {% endif %}
         </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="flex justify-center py-6 border-t border-white/5">
+            <nav class="inline-flex gap-1">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"
+                    class="btn-secondary px-4 py-2 rounded-lg text-sm">السابق</a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <span class="btn-primary px-4 py-2 rounded-lg text-sm">{{ num }}</span>
+                {% else %}
+                <a href="?page={{ num }}" class="btn-secondary px-4 py-2 rounded-lg text-sm">{{ num }}</a>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                    class="btn-secondary px-4 py-2 rounded-lg text-sm">التالي</a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
     </div>
 
     {% else %}
-    <!-- EMPTY STATE -->
-    <div class="bg-white rounded-lg p-10 text-center border border-gray-100">
-        <p class="text-gray-500 text-lg mb-4">لا توجد كروت حالياً</p>
-
+    <!-- Empty State -->
+    <div class="glass-card rounded-2xl p-12 text-center">
+        <div class="w-20 h-20 mx-auto rounded-2xl bg-accent/10 flex items-center justify-center mb-6">
+            <i data-lucide="credit-card" class="w-10 h-10 text-accent"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-2">لا توجد كروت</h3>
+        <p class="text-dark-400 mb-6">ابدأ بإنشاء مجموعة كروت جديدة</p>
         <a href="{% url 'vouchers:voucher_generate' %}"
-            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
-            + إضافة كروت جديدة
+            class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+            إضافة كروت جديدة
         </a>
     </div>
     {% endif %}
@@ -201,4 +199,6 @@
 {% else %}
 {% include "dashboard/suspended.html" %}
 {% endif %}
+
+<script>lucide.createIcons();</script>
 {% endblock %}

@@ -4,37 +4,22 @@
 
 {% block content %}
 <style>
-    body {
-        background: #f4f6f8;
-    }
-
-    .page-wrapper {
-        display: flex;
-        gap: 24px;
-        align-items: flex-start;
-    }
-
     /* -------- CONTROL PANEL -------- */
     .control-panel {
         width: 320px;
-        background: #ffffff;
+        /* background: #ffffff; REMOVED */
         padding: 20px;
-        border-radius: 14px;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        /* border-radius: 14px; REMOVED */
+        /* box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08); REMOVED */
     }
 
     .control-panel label {
-        font-weight: 600;
+        font-weight: 500;
         margin-top: 14px;
         display: block;
-    }
-
-    .control-panel input {
-        width: 100%;
-        margin-top: 6px;
-        padding: 9px 12px;
-        border-radius: 10px;
-        border: 1px solid #d0d0d0;
+        color: #d1d5db;
+        /* text-dark-300 */
+        font-size: 0.875rem;
     }
 
     /* -------- SAVE BUTTON -------- */
@@ -45,33 +30,38 @@
         border-radius: 12px;
         border: none;
         font-size: 16px;
-        font-weight: 700;
+        font-weight: 600;
         color: #fff;
-        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        background: linear-gradient(135deg, #14b8a6, #0d9488);
+        /* Using accent colors */
         cursor: pointer;
         transition: all 0.25s ease;
-        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
+        box-shadow: 0 8px 20px rgba(20, 184, 166, 0.25);
     }
 
     .save-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 12px 28px rgba(79, 70, 229, 0.45);
+        box-shadow: 0 12px 28px rgba(20, 184, 166, 0.35);
     }
 
     /* -------- DESIGN BOARD -------- */
     .design-board {
         flex: 1;
-        background: #ffffff;
+        /* background: #ffffff; REMOVED */
         padding: 20px;
-        border-radius: 14px;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        /* border-radius: 14px; REMOVED */
+        /* box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08); REMOVED */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
 
     .preview-title {
         text-align: center;
         font-weight: 700;
-        margin-bottom: 14px;
-        color: #555;
+        margin-bottom: 20px;
+        color: #fff;
     }
 
     /* -------- CARD SIZE (A4 / 50) -------- */
@@ -79,11 +69,12 @@
         position: relative;
         width: 160px;
         height: 113px;
-        border: 1px dashed #cfcfcf;
-        background: #ffffff;
-
+        border: 1px dashed rgba(255, 255, 255, 0.2);
+        background: #1e1e1e;
+        /* Dark background for canvas area */
         transform: scale(3);
         transform-origin: center;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     }
 
     #designCanvas {
@@ -116,6 +107,14 @@
         background: none;
         box-shadow: none;
         border-radius: 0;
+        color: #000;
+        /* Default color, can be changed via input */
+    }
+
+    .page-wrapper {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
     }
 
     /* -------- RESPONSIVE (≤ 640px) -------- */
@@ -129,8 +128,8 @@
 
         .control-panel,
         .design-board {
-            width: calc(100% - 24px);
-            max-width: 420px;
+            width: 100%;
+            max-width: none;
         }
 
         .design-board {
@@ -168,29 +167,54 @@
 <div class="page-wrapper">
 
     <!-- LEFT PANEL -->
-    <form method="POST" enctype="multipart/form-data" class="control-panel">
+    <form method="POST" enctype="multipart/form-data"
+        class="control-panel glass-card rounded-2xl border border-white/10">
         {% csrf_token %}
 
-        <label>اسم التصميم</label>
-        {{ form.name }}
+        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <i data-lucide="layout-template" class="w-5 h-5 text-accent"></i>
+            إعدادات التصميم
+        </h3>
 
-        <label>الخلفية</label>
-        {{ form.background_image }}
+        <div class="space-y-4">
+            <div>
+                <label>اسم التصميم</label>
+                {{ form.name }}
+            </div>
 
-        <label>حجم الخط</label>
-        {{ form.serial_font_size }}
+            <div>
+                <label>الخلفية</label>
+                <div class="mt-2">
+                    {{ form.background_image }}
+                </div>
+            </div>
 
-        <label>اللون</label>
-        {{ form.serial_color }}
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label>حجم الخط</label>
+                    {{ form.serial_font_size }}
+                </div>
+                <div>
+                    <label>اللون</label>
+                    {{ form.serial_color }}
+                </div>
+            </div>
 
-        {{ form.serial_x }}
-        {{ form.serial_y }}
+            <!-- Hidden inputs -->
+            <div class="hidden">
+                {{ form.serial_x }}
+                {{ form.serial_y }}
+            </div>
+        </div>
 
-        <button class="save-btn">💾 حفظ التصميم</button>
+        <button class="save-btn flex items-center justify-center gap-2 mt-6">
+            <i data-lucide="save" class="w-5 h-5"></i>
+            حفظ التصميم
+        </button>
     </form>
 
     <!-- RIGHT PANEL -->
-    <div class="design-board">
+    <div class="design-board glass-card rounded-2xl border border-white/10">
         <div class="preview-title">معاينة بطاقة واحدة (A4 / 50)</div>
 
         <div class="zoom-wrapper">
@@ -202,9 +226,37 @@
                 </div>
             </div>
         </div>
+
+        <p class="text-dark-400 text-sm mt-6 text-center">
+            اسحب الرقم التسلسلي لتغيير موضعه على البطاقة
+        </p>
     </div>
 
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        lucide.createIcons();
+
+        // Apply cyber-input to fields
+        const inputs = document.querySelectorAll('.control-panel input:not([type="file"]):not([type="color"])');
+        inputs.forEach(input => {
+            input.classList.add('cyber-input', 'w-full', 'rounded-xl', 'px-4', 'py-3', 'text-sm', 'mt-1');
+        });
+
+        // File input styling
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        fileInputs.forEach(input => {
+            input.classList.add('block', 'w-full', 'text-sm', 'text-dark-300', 'file:mr-4', 'file:py-2', 'file:px-4', 'file:rounded-full', 'file:border-0', 'file:text-sm', 'file:font-semibold', 'file:bg-accent/10', 'file:text-accent', 'hover:file:bg-accent/20');
+        });
+
+        // Color input styling
+        const colorInputs = document.querySelectorAll('input[type="color"]');
+        colorInputs.forEach(input => {
+            input.classList.add('h-10', 'w-full', 'rounded-lg', 'border', 'border-white/10', 'bg-dark-800', 'cursor-pointer', 'mt-1');
+        });
+    });
+</script>
 
 <script>
     /* ===============================

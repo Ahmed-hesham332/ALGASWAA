@@ -5,69 +5,89 @@
 {% block content %}
 <div class="p-6 max-w-3xl mx-auto">
 
-    <h2 class="text-2xl font-bold mb-6 text-gray-900">إعدادات الحساب</h2>
+    <h2 class="text-2xl font-bold mb-6 text-white flex items-center gap-2">
+        <i data-lucide="user-cog" class="w-7 h-7 text-accent"></i>
+        إعدادات الحساب
+    </h2>
 
-    <div class="bg-white shadow rounded-lg p-6 border border-gray-100">
+    <div class="glass-card rounded-2xl p-8 border border-white/10">
 
         <!-- Profile Info -->
         <form method="POST">
             {% csrf_token %}
-            <h3 class="text-lg font-semibold mb-4">المعلومات الشخصية</h3>
+            <h3 class="text-lg font-bold text-white mb-5 flex items-center gap-2">
+                <i data-lucide="id-card" class="w-5 h-5 text-accent"></i>
+                المعلومات الشخصية
+            </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm mb-2">اسم الشبكة</label>
+                    <label class="block text-sm font-medium text-dark-300 mb-2">اسم الشبكة</label>
                     {{ form.Network_Name }}
                 </div>
 
                 <div>
-                    <label class="block text-sm mb-2">اسم المدير</label>
+                    <label class="block text-sm font-medium text-dark-300 mb-2">اسم المدير</label>
                     {{ form.Manager_Name }}
                 </div>
 
                 <div>
-                    <label class="block text-sm mb-2">رقم الجوال (الواتس اب)</label>
+                    <label class="block text-sm font-medium text-dark-300 mb-2">رقم الجوال (الواتس اب)</label>
                     {{ form.Phone_Number }}
                 </div>
             </div>
 
             <button name="save_info"
-                class="mt-5 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                class="mt-6 px-6 py-2.5 bg-accent text-white rounded-xl hover:bg-accent/90 transition shadow-lg shadow-accent/20 font-medium">
                 حفظ التغييرات
             </button>
         </form>
 
-        <hr class="my-8">
+        <hr class="my-8 border-white/10">
 
         <!-- Password Change -->
         <form method="POST">
             {% csrf_token %}
-            <h3 class="text-lg font-semibold mb-4">تغيير كلمة المرور</h3>
+            <h3 class="text-lg font-bold text-white mb-5 flex items-center gap-2">
+                <i data-lucide="lock" class="w-5 h-5 text-accent"></i>
+                تغيير كلمة المرور
+            </h3>
 
-            <div class="space-y-4">
+            <div class="space-y-5">
                 <div>
-                    <label class="block text-sm mb-2">كلمة المرور القديمة</label>
+                    <label class="block text-sm font-medium text-dark-300 mb-2">كلمة المرور القديمة</label>
                     {{ pass_form.old_password }}
                 </div>
 
                 <div>
-                    <label class="block text-sm mb-2">كلمة المرور الجديدة</label>
+                    <label class="block text-sm font-medium text-dark-300 mb-2">كلمة المرور الجديدة</label>
                     {{ pass_form.new_password }}
                 </div>
 
                 <div>
-                    <label class="block text-sm mb-2">تأكيد كلمة المرور</label>
+                    <label class="block text-sm font-medium text-dark-300 mb-2">تأكيد كلمة المرور</label>
                     {{ pass_form.confirm_password }}
                 </div>
             </div>
 
             <button name="change_password"
-                class="mt-5 px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                class="mt-6 px-6 py-2.5 bg-danger text-white rounded-xl hover:bg-danger/90 transition shadow-lg shadow-danger/20 font-medium">
                 تغيير كلمة المرور
             </button>
         </form>
 
     </div>
-
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        lucide.createIcons();
+
+        // Add cyber-input class to all inputs
+        const inputs = document.querySelectorAll('input[type="text"], input[type="password"], input[type="number"]');
+        inputs.forEach(input => {
+            input.classList.add('cyber-input', 'w-full', 'rounded-xl', 'px-4', 'py-3', 'text-sm');
+        });
+    });
+</script>
 {% endblock %}

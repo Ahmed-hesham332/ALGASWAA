@@ -1,21 +1,33 @@
-{% block content %}
-<div class="flex items-center justify-center min-h-[70vh]">
-    <div class="bg-white shadow-lg rounded-lg p-8 text-center max-w-md">
-
-        <h2 class="text-2xl font-bold text-red-600 mb-4">
-            الشبكة موقوفة مؤقتاً
-        </h2>
-
-        <p class="text-gray-600 mb-6">
-            تم إيقاف حسابك مؤقتاً بسبب عدم إتمام الدفع.
-            <br>
-            يرجى التواصل مع الإدارة لإعادة التفعيل.
-        </p>
-
-        <div class="text-sm text-gray-500">
-            الشبكة موقوفة مؤقتاً
+<!-- Suspended Account Template -->
+<div class="min-h-[60vh] flex items-center justify-center">
+    <div class="glass-card rounded-2xl p-10 text-center max-w-md mx-auto glow-border">
+        <div class="w-24 h-24 mx-auto rounded-2xl bg-danger/20 flex items-center justify-center mb-6">
+            <i data-lucide="shield-off" class="w-12 h-12 text-danger"></i>
         </div>
 
+        <h2 class="text-2xl font-bold text-danger mb-3">الحساب موقوف</h2>
+
+        <p class="text-dark-300 leading-relaxed mb-6">
+            تم إيقاف حسابك مؤقتاً. يرجى التواصل مع الدعم الفني لمعرفة السبب وإعادة تفعيل الحساب.
+        </p>
+
+        <div class="space-y-3">
+            <a href="https://wa.me/{{ tech_support.phone }}" target="_blank"
+                class="btn-primary w-full py-3 rounded-xl font-medium inline-flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12.04 2.01C6.58 2.01 2.15 6.44 2.15 11.9c0 1.93.5 3.82 1.45 5.5L2 22l4.7-1.53c1.6.87 3.4 1.32 5.34 1.32h.01c5.46 0 9.89-4.43 9.89-9.89S17.5 2.01 12.04 2.01z" />
+                </svg>
+                تواصل عبر واتساب
+            </a>
+
+            <a href="{% url 'logout' %}"
+                class="btn-secondary w-full py-3 rounded-xl font-medium inline-flex items-center justify-center gap-2">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+                تسجيل الخروج
+            </a>
+        </div>
     </div>
 </div>
-{% endblock %}
+
+<script>lucide.createIcons();</script>

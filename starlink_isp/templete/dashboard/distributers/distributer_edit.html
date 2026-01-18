@@ -4,108 +4,128 @@
 
 {% block content %}
 <div class="max-w-3xl mx-auto p-6">
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-6">{{ title }}</h2>
+    <div class="glass-card rounded-2xl p-8 border border-white/10">
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+            <i data-lucide="user-cog" class="w-6 h-6 text-accent"></i>
+            {{ title }}
+        </h2>
 
         <form method="POST" class="space-y-6">
             {% csrf_token %}
 
             <!-- User Form Errors -->
             {% if user_form.errors %}
-            <div class="bg-red-50 text-red-600 p-4 rounded-lg text-sm">
+            <div class="bg-danger/10 text-danger p-4 rounded-xl text-sm border border-danger/20">
                 {{ user_form.errors }}
             </div>
             {% endif %}
 
             <!-- Permissions Form Errors -->
             {% if perm_form.errors %}
-            <div class="bg-red-50 text-red-600 p-4 rounded-lg text-sm">
+            <div class="bg-danger/10 text-danger p-4 rounded-xl text-sm border border-danger/20">
                 {{ perm_form.errors }}
             </div>
             {% endif %}
 
             <!-- User Fields -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">الاسم</label>
+                    <label class="block text-sm font-medium text-dark-300 mb-2">الاسم</label>
                     {{ user_form.first_name }}
-                    <div class="mt-1 text-xs text-red-500">{{ user_form.first_name.errors }}</div>
+                    <div class="mt-1 text-xs text-danger">{{ user_form.first_name.errors }}</div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">اسم المستخدم</label>
+                    <label class="block text-sm font-medium text-dark-300 mb-2">اسم المستخدم</label>
                     {{ user_form.username }}
-                    <div class="mt-1 text-xs text-red-500">{{ user_form.username.errors }}</div>
+                    <div class="mt-1 text-xs text-danger">{{ user_form.username.errors }}</div>
                 </div>
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
+                    <label class="block text-sm font-medium text-dark-300 mb-2">كلمة المرور</label>
                     {{ user_form.password }}
                     {% if user_form.password.help_text %}
-                    <p class="text-xs text-gray-500 mt-1">{{ user_form.password.help_text }}</p>
+                    <p class="text-xs text-dark-400 mt-1">{{ user_form.password.help_text }}</p>
                     {% endif %}
-                    <div class="mt-1 text-xs text-red-500">{{ user_form.password.errors }}</div>
+                    <div class="mt-1 text-xs text-danger">{{ user_form.password.errors }}</div>
                 </div>
             </div>
 
-            <hr class="my-6 border-gray-100">
+            <hr class="my-6 border-white/10">
 
             <!-- Permissions & Status -->
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">الصلاحيات والإعدادات</h3>
+            <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <i data-lucide="shield" class="w-5 h-5 text-accent"></i>
+                الصلاحيات والإعدادات
+            </h3>
 
-            <div class="space-y-4">
-                <div class="flex items-center gap-2">
+            <div class="space-y-5">
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
                     {{ perm_form.status }}
-                    <label class="text-sm text-gray-700">{{ perm_form.status.label }}</label>
+                    <label class="text-sm font-medium text-dark-200 cursor-pointer">{{ perm_form.status.label }}</label>
                 </div>
 
-                <h4 class="font-medium text-gray-700 mt-4">العروض والكروت</h4>
-                <div class="grid grid-cols-2 gap-4">
-                    <label class="flex items-center gap-2 text-sm text-gray-600">
-                        {{ perm_form.can_view_offers }} {{ perm_form.can_view_offers.label }}
-                    </label>
-                    <label class="flex items-center gap-2 text-sm text-gray-600">
-                        {{ perm_form.can_add_offer }} {{ perm_form.can_add_offer.label }}
-                    </label>
-                    <label class="flex items-center gap-2 text-sm text-gray-600">
-                        {{ perm_form.can_edit_offer }} {{ perm_form.can_edit_offer.label }}
-                    </label>
-                    <label class="flex items-center gap-2 text-sm text-gray-600">
-                        {{ perm_form.can_delete_offer }} {{ perm_form.can_delete_offer.label }}
-                    </label>
-                    <label class="flex items-center gap-2 text-sm text-gray-600">
-                        {{ perm_form.can_view_vouchers }} {{ perm_form.can_view_vouchers.label }}
-                    </label>
-                    <label class="flex items-center gap-2 text-sm text-gray-600">
-                        {{ perm_form.can_add_voucher }} {{ perm_form.can_add_voucher.label }}
-                    </label>
+                <div class="permission-group">
+                    <h4 class="font-medium text-accent mb-3 text-sm">العروض والكروت</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label
+                            class="flex items-center gap-2 text-sm text-dark-300 p-2 rounded-lg hover:bg-white/5 transition cursor-pointer">
+                            {{ perm_form.can_view_offers }} {{ perm_form.can_view_offers.label }}
+                        </label>
+                        <label
+                            class="flex items-center gap-2 text-sm text-dark-300 p-2 rounded-lg hover:bg-white/5 transition cursor-pointer">
+                            {{ perm_form.can_add_offer }} {{ perm_form.can_add_offer.label }}
+                        </label>
+                        <label
+                            class="flex items-center gap-2 text-sm text-dark-300 p-2 rounded-lg hover:bg-white/5 transition cursor-pointer">
+                            {{ perm_form.can_edit_offer }} {{ perm_form.can_edit_offer.label }}
+                        </label>
+                        <label
+                            class="flex items-center gap-2 text-sm text-dark-300 p-2 rounded-lg hover:bg-white/5 transition cursor-pointer">
+                            {{ perm_form.can_delete_offer }} {{ perm_form.can_delete_offer.label }}
+                        </label>
+                        <label
+                            class="flex items-center gap-2 text-sm text-dark-300 p-2 rounded-lg hover:bg-white/5 transition cursor-pointer">
+                            {{ perm_form.can_view_vouchers }} {{ perm_form.can_view_vouchers.label }}
+                        </label>
+                        <label
+                            class="flex items-center gap-2 text-sm text-dark-300 p-2 rounded-lg hover:bg-white/5 transition cursor-pointer">
+                            {{ perm_form.can_add_voucher }} {{ perm_form.can_add_voucher.label }}
+                        </label>
+                    </div>
                 </div>
 
-                <h4 class="font-medium text-gray-700 mt-4">التصاميم</h4>
-                <div class="grid grid-cols-2 gap-4">
-                    <label class="flex items-center gap-2 text-sm text-gray-600">
-                        {{ perm_form.can_view_designs }} {{ perm_form.can_view_designs.label }}
-                    </label>
-                    <label class="flex items-center gap-2 text-sm text-gray-600">
-                        {{ perm_form.can_add_design }} {{ perm_form.can_add_design.label }}
-                    </label>
-                    <label class="flex items-center gap-2 text-sm text-gray-600">
-                        {{ perm_form.can_delete_design }} {{ perm_form.can_delete_design.label }}
-                    </label>
+                <div class="permission-group">
+                    <h4 class="font-medium text-accent mb-3 text-sm">التصاميم</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label
+                            class="flex items-center gap-2 text-sm text-dark-300 p-2 rounded-lg hover:bg-white/5 transition cursor-pointer">
+                            {{ perm_form.can_view_designs }} {{ perm_form.can_view_designs.label }}
+                        </label>
+                        <label
+                            class="flex items-center gap-2 text-sm text-dark-300 p-2 rounded-lg hover:bg-white/5 transition cursor-pointer">
+                            {{ perm_form.can_add_design }} {{ perm_form.can_add_design.label }}
+                        </label>
+                        <label
+                            class="flex items-center gap-2 text-sm text-dark-300 p-2 rounded-lg hover:bg-white/5 transition cursor-pointer">
+                            {{ perm_form.can_delete_design }} {{ perm_form.can_delete_design.label }}
+                        </label>
+                    </div>
                 </div>
 
-                <h4 class="font-medium text-gray-700 mt-4">الخوادم المتاحة</h4>
-                <div class="border border-gray-200 rounded-lg p-3 h-32 overflow-y-auto">
-                    {{ perm_form.servers }}
+                <div>
+                    <h4 class="font-medium text-accent mb-3 text-sm">الخوادم المتاحة</h4>
+                    <div class="cyber-input rounded-xl p-3 h-32 overflow-y-auto">
+                        {{ perm_form.servers }}
+                    </div>
+                    {% if perm_form.servers.errors %}
+                    <div class="text-xs text-danger mt-1">{{ perm_form.servers.errors }}</div>
+                    {% endif %}
                 </div>
-                {% if perm_form.servers.errors %}
-                <div class="text-xs text-red-500">{{ perm_form.servers.errors }}</div>
-                {% endif %}
             </div>
 
-            <div class="pt-6 flex justify-end gap-3">
+            <div class="pt-6 flex justify-end gap-3 border-t border-white/10 mt-6">
                 <a href="{% url 'distributers:distributer_list' %}"
-                    class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">إلغاء</a>
-                <button type="submit"
-                    class="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-600/20">
+                    class="btn-secondary px-6 py-2.5 rounded-xl font-medium">إلغاء</a>
+                <button type="submit" class="btn-primary px-6 py-2.5 rounded-xl font-medium shadow-lg shadow-accent/20">
                     حفظ البيانات
                 </button>
             </div>
@@ -113,44 +133,27 @@
     </div>
 </div>
 
-<style>
-    /* Reusing styles from add page */
-    input[type="text"],
-    input[type="password"] {
-        width: 100%;
-        border: 1px solid #e5e7eb;
-        border-radius: 0.5rem;
-        padding: 0.5rem 0.75rem;
-        outline: none;
-        transition: border-color 0.2s;
-    }
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        lucide.createIcons();
 
-    input[type="text"]:focus,
-    input[type="password"]:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
-    }
+        // Add cyber-input class to text/password inputs
+        const inputs = document.querySelectorAll('input[type="text"], input[type="password"], select');
+        inputs.forEach(input => {
+            input.classList.add('cyber-input', 'w-full', 'rounded-xl', 'px-4', 'py-3', 'text-sm');
+        });
 
-    input[type="checkbox"] {
-        width: 1rem;
-        height: 1rem;
-        border-radius: 0.25rem;
-        border: 1px solid #d1d5db;
-    }
+        // Style checkboxes
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(box => {
+            box.classList.add('w-5', 'h-5', 'rounded', 'border-white/20', 'bg-white/5', 'text-accent', 'focus:ring-accent');
+        });
 
-    ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    ul li label {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.875rem;
-        color: #4b5563;
-        margin-bottom: 0.25rem;
-    }
-</style>
+        // Style server checkbox list
+        const serverListItems = document.querySelectorAll('ul li label');
+        serverListItems.forEach(label => {
+            label.classList.add('flex', 'items-center', 'gap-3', 'p-2', 'rounded-lg', 'hover:bg-white/5', 'cursor-pointer', 'transition');
+        });
+    });
+</script>
 {% endblock %}

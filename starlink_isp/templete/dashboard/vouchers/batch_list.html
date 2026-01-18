@@ -1,91 +1,118 @@
 {% extends "dashboard/base.html" %}
-{% block title %}مجموعات الكروت — Dashboard{% endblock %}
-{% block page_title %}مجموعات الكروت{% endblock %}
+{% block title %}مجموعات الكروت{% endblock %}
+{% block page_subtitle %}عرض المجموعات{% endblock %}
 
 {% block content %}
-<div class="p-6">
-    <div class="mb-6 flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-gray-900">مجموعات الكروت المنتجة</h2>
+<div class="space-y-6">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold">مجموعات الكروت المنتجة</h2>
+            <p class="text-dark-400 text-sm mt-1">استعرض جميع مجموعات الكروت التي تم إنشاؤها</p>
+        </div>
         <a href="{% url 'vouchers:voucher_generate' %}"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-            + إنشاء مجموعة كروت
+            class="btn-primary inline-flex items-center gap-2 px-5 py-3 rounded-xl font-medium">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+            إنشاء مجموعة كروت
         </a>
     </div>
 
     {% if batches %}
-    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+    <!-- Batches Table -->
+    <div class="cyber-table rounded-2xl overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-right text-sm">
-                <thead class="bg-gray-50 border-b border-gray-200">
+                <thead>
                     <tr>
-                        <th class="px-4 py-3 font-semibold text-gray-700">#</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">اسم المجموعة</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">إجمالي الكروت</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">غير مستخدم</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">مستخدم</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">منتهي</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">اسم العرض</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">الموزع</th>
-                        <th class="px-4 py-3 font-semibold text-gray-700">تاريخ الإنشاء</th>
+                        <th class="px-4 py-4 font-semibold">#</th>
+                        <th class="px-4 py-4 font-semibold">اسم المجموعة</th>
+                        <th class="px-4 py-4 font-semibold">إجمالي الكروت</th>
+                        <th class="px-4 py-4 font-semibold">غير مستخدم</th>
+                        <th class="px-4 py-4 font-semibold">مستخدم</th>
+                        <th class="px-4 py-4 font-semibold">منتهي</th>
+                        <th class="px-4 py-4 font-semibold">اسم العرض</th>
+                        <th class="px-4 py-4 font-semibold">الموزع</th>
+                        <th class="px-4 py-4 font-semibold">تاريخ الإنشاء</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200">
+                <tbody>
                     {% for batch in batches %}
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="px-4 py-3 text-gray-600">{{ forloop.counter }}</td>
-                        <td class="px-4 py-3 text-gray-900 font-medium">{{ batch.name }}</td>
-                        <td class="px-4 py-3 text-gray-900">{{ batch.total_cards }}</td>
-                        <td class="px-4 py-3 text-green-600 font-medium">{{ batch.unused_cards }}</td>
-                        <td class="px-4 py-3 text-blue-600 font-medium">{{ batch.used_cards }}</td>
-                        <td class="px-4 py-3 text-red-600 font-medium">{{ batch.expired_cards }}</td>
-                        <td class="px-4 py-3 text-gray-600">{{ batch.offer.name }}</td>
-                        <td class="px-6 py-4 text-gray-600 text-sm">
+                    <tr>
+                        <td class="px-4 py-3 text-dark-400">{{ forloop.counter }}</td>
+                        <td class="px-4 py-3 font-medium">{{ batch.name }}</td>
+                        <td class="px-4 py-3">
+                            <span class="bg-white/5 px-3 py-1.5 rounded-lg font-bold">{{ batch.total_cards }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="badge-success px-3 py-1.5 rounded-lg font-medium">{{ batch.unused_cards
+                                }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="badge-info px-3 py-1.5 rounded-lg font-medium">{{ batch.used_cards }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="badge-danger px-3 py-1.5 rounded-lg font-medium">{{ batch.expired_cards
+                                }}</span>
+                        </td>
+                        <td class="px-4 py-3 text-dark-300">{{ batch.offer.name }}</td>
+                        <td class="px-4 py-3 text-dark-400">
                             {% if batch.distributer %}
                             {{ batch.distributer.user.username }}
                             {% else %}
-                            غير محدد
+                            <span class="text-dark-500">غير محدد</span>
                             {% endif %}
                         </td>
-                        <td class="px-4 py-3 text-gray-600 text-xs" dir="ltr">{{ batch.created_at|date:"Y-m-d H:i" }}
+                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr">{{ batch.created_at|date:"Y-m-d H:i" }}
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-
-            {% if page_obj.has_other_pages %}
-            <div class="flex justify-center mt-6 mb-6">
-                <nav class="inline-flex space-x-1">
-                    {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}"
-                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">السابق</a>
-                    {% endif %}
-
-                    {% for num in page_obj.paginator.page_range %}
-                    {% if page_obj.number == num %}
-                    <span class="px-3 py-1 bg-blue-600 text-white rounded">{{ num }}</span>
-                    {% else %}
-                    <a href="?page={{ num }}" class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">{{ num }}</a>
-                    {% endif %}
-                    {% endfor %}
-
-                    {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}"
-                        class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">التالي</a>
-                    {% endif %}
-                </nav>
-            </div>
-            {% endif %}
         </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="flex justify-center py-6 border-t border-white/5">
+            <nav class="inline-flex gap-1">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"
+                    class="btn-secondary px-4 py-2 rounded-lg text-sm">السابق</a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <span class="btn-primary px-4 py-2 rounded-lg text-sm">{{ num }}</span>
+                {% else %}
+                <a href="?page={{ num }}" class="btn-secondary px-4 py-2 rounded-lg text-sm">{{ num }}</a>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                    class="btn-secondary px-4 py-2 rounded-lg text-sm">التالي</a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
     </div>
+
     {% else %}
-    <div class="bg-white rounded-lg p-10 text-center border border-gray-100">
-        <p class="text-gray-500 text-lg mb-4">لا توجد مجموعات كروت حالياً</p>
+    <!-- Empty State -->
+    <div class="glass-card rounded-2xl p-12 text-center">
+        <div class="w-20 h-20 mx-auto rounded-2xl bg-accent/10 flex items-center justify-center mb-6">
+            <i data-lucide="layers" class="w-10 h-10 text-accent"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-2">لا توجد مجموعات كروت</h3>
+        <p class="text-dark-400 mb-6">ابدأ بإنشاء مجموعة كروت جديدة</p>
         <a href="{% url 'vouchers:voucher_generate' %}"
-            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
-            + إضافة مجموعة جديدة
+            class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+            إضافة مجموعة جديدة
         </a>
     </div>
     {% endif %}
 </div>
+
+<script>lucide.createIcons();</script>
 {% endblock %}

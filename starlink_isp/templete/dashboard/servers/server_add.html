@@ -1,27 +1,64 @@
 {% extends "dashboard/base.html" %}
 {% block title %}إضافة سيرفر جديد{% endblock %}
+{% block page_subtitle %}إضافة سيرفر جديد{% endblock %}
 
 {% block content %}
-<div class="p-6">
+<div class="max-w-2xl mx-auto">
 
-    <h2 class="text-2xl font-bold mb-4">إضافة سيرفر جديد</h2>
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-6">
+        <a href="{% url 'servers:list' %}" class="btn-secondary p-3 rounded-xl hover:text-accent transition-colors">
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </a>
+        <div>
+            <h2 class="text-2xl font-bold">إضافة سيرفر جديد</h2>
+            <p class="text-dark-400 text-sm mt-1">أدخل بيانات السيرفر الجديد</p>
+        </div>
+    </div>
 
-    <div class="bg-white shadow-sm border rounded-lg p-6">
-        <form method="POST" class="space-y-5">
+    <!-- Form Card -->
+    <div class="glass-card rounded-2xl p-6 glow-border">
+        <form method="POST" class="space-y-6">
             {% csrf_token %}
-            {{ form.as_p }}
 
-            <div class="flex gap-3">
-                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            {% if form.errors %}
+            <div class="p-4 rounded-xl bg-danger/10 border border-danger/30">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="alert-circle" class="w-5 h-5 text-danger"></i>
+                    <div>
+                        <p class="font-medium text-danger">يرجى تصحيح الأخطاء التالية:</p>
+                        <ul class="list-disc pr-6 text-sm text-dark-300 mt-2">
+                            {% for field in form %}
+                            {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                            {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="space-y-5">
+                {{ form.as_p }}
+            </div>
+
+            <div class="flex gap-3 pt-4 border-t border-white/10">
+                <button type="submit"
+                    class="btn-primary flex-1 py-3 rounded-xl font-medium inline-flex items-center justify-center gap-2">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
                     إضافة السيرفر
                 </button>
-
-                <a href="{% url 'servers:list' %}" class="px-6 py-2 bg-gray-200 rounded-lg">
+                <a href="{% url 'servers:list' %}" class="btn-secondary flex-1 py-3 rounded-xl font-medium text-center">
                     إلغاء
                 </a>
             </div>
         </form>
     </div>
-
 </div>
+
+<script>lucide.createIcons();</script>
 {% endblock %}

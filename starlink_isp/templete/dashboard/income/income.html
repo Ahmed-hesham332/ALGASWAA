@@ -6,13 +6,14 @@
 <div class="p-6">
 
     <!-- FILTER BAR -->
-    <form method="GET" class="bg-white p-4 rounded-lg shadow-sm border mb-6">
+    <!-- FILTER BAR -->
+    <form method="GET" class="glass-card rounded-2xl p-5 mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
             <!-- SERVER SELECT -->
             <div>
-                <label class="text-sm text-gray-600">اسم السيرفر</label>
-                <select name="server" class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-50">
+                <label class="block text-sm text-dark-400 mb-2">اسم السيرفر</label>
+                <select name="server" class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
                     <option value="all">كل السيرفرات</option>
                     {% for s in servers %}
                     <option value="{{ s.id }}" {% if s.is_selected %}selected{% endif %}>
@@ -24,21 +25,23 @@
 
             <!-- DATE FROM -->
             <div>
-                <label class="text-sm text-gray-600">يبدأ من</label>
+                <label class="block text-sm text-dark-400 mb-2">يبدأ من</label>
                 <input type="date" name="date_from" value="{{ date_from }}"
-                    class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-50">
+                    class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
             </div>
 
             <!-- DATE TO -->
             <div>
-                <label class="text-sm text-gray-600">ينتهي في</label>
+                <label class="block text-sm text-dark-400 mb-2">ينتهي في</label>
                 <input type="date" name="date_to" value="{{ date_to }}"
-                    class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-50">
+                    class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
             </div>
 
             <!-- SUBMIT BUTTON -->
             <div class="flex items-end">
-                <button class="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
+                <button
+                    class="w-full btn-primary px-4 py-3 rounded-xl font-medium inline-flex items-center justify-center gap-2">
+                    <i data-lucide="filter" class="w-4 h-4"></i>
                     عرض المبيعات
                 </button>
             </div>
@@ -46,40 +49,49 @@
     </form>
 
     <!-- TOTAL STATS -->
-    <div class="bg-white p-6 rounded-lg shadow-sm border mb-6">
-        <div class="grid grid-cols-2 text-center">
-            <div>
-                <div class="text-orange-500 text-xl font-bold">{{ total_count }}</div>
-                <div class="text-gray-600">إجمالي عدد الكروت المباعة</div>
+    <!-- TOTAL STATS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+        <div class="glass-card rounded-2xl p-6 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
+                <i data-lucide="credit-card" class="w-6 h-6 text-accent"></i>
             </div>
             <div>
-                <div class="text-red-600 text-xl font-bold">{{ total_income }}</div>
-                <div class="text-gray-600">إجمالي المبلغ</div>
+                <div class="text-dark-400 text-sm">إجمالي الكروت المباعة</div>
+                <div class="text-2xl font-bold gradient-text mt-1">{{ total_count }}</div>
+            </div>
+        </div>
+        <div class="glass-card rounded-2xl p-6 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
+                <i data-lucide="banknote" class="w-6 h-6 text-green-500"></i>
+            </div>
+            <div>
+                <div class="text-dark-400 text-sm">إجمالي المبلغ</div>
+                <div class="text-2xl font-bold text-green-500 mt-1">{{ total_income }}</div>
             </div>
         </div>
     </div>
 
     <!-- SALES TABLE -->
-    <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+    <!-- SALES TABLE -->
+    <div class="cyber-table rounded-2xl overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-right text-sm min-w-max">
-                <!-- ADD min-w-max -->
-                <thead class="bg-gray-50 border-b">
+            <table class="w-full text-right text-sm">
+                <thead>
                     <tr>
-                        <th class="px-6 py-3">#</th>
-                        <th class="px-6 py-3">اليوم</th>
-                        <th class="px-6 py-3">عدد الكروت</th>
-                        <th class="px-6 py-3">السعر</th>
+                        <th class="px-6 py-4 font-semibold">#</th>
+                        <th class="px-6 py-4 font-semibold">اليوم</th>
+                        <th class="px-6 py-4 font-semibold">عدد الكروت</th>
+                        <th class="px-6 py-4 font-semibold">السعر</th>
                     </tr>
                 </thead>
 
-                <tbody class="divide-y">
+                <tbody>
                     {% for row in summary %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4">{{ forloop.counter }}</td>
-                        <td class="px-6 py-4">{{ row.day }}</td>
-                        <td class="px-6 py-4">{{ row.count }}</td>
-                        <td class="px-6 py-4">{{ row.income }}</td>
+                    <tr>
+                        <td class="px-6 py-4 text-dark-400">{{ forloop.counter }}</td>
+                        <td class="px-6 py-4 font-medium text-dark-200">{{ row.day }}</td>
+                        <td class="px-6 py-4 text-accent font-bold">{{ row.count }}</td>
+                        <td class="px-6 py-4 text-green-500 font-bold" dir="ltr">{{ row.income }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

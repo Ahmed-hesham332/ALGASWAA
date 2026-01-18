@@ -5,14 +5,15 @@
 {% block content %}
 {% if request.user.status %}
 <div class="p-6">
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-            <h2 class="text-2xl font-bold text-gray-900">التصاميم</h2>
-            <p class="text-gray-500 text-sm mt-1">إدارة تصاميم الكروت الخاصة بك</p>
+            <h2 class="text-2xl font-bold">التصاميم</h2>
+            <p class="text-dark-400 text-sm mt-1">إدارة تصاميم الكروت الخاصة بك</p>
         </div>
         <a href="{% url 'design:design_add' %}"
-            class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-sm">
-            ➕ تصميم جديد
+            class="btn-primary inline-flex items-center gap-2 px-5 py-3 rounded-xl font-medium">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+            تصميم جديد
         </a>
     </div>
 
@@ -20,33 +21,34 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
         {% for d in designs %}
-        <div class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition overflow-hidden">
+        <div class="glass-card rounded-2xl overflow-hidden group hover:border-accent/30 transition-all duration-300">
 
             <!-- PREVIEW -->
-            <div class="bg-gray-100 relative w-full" style="aspect-ratio: 42 / 29.7;">
+            <div class="bg-black/20 relative w-full" style="aspect-ratio: 42 / 29.7;">
                 {% if d.preview_image %}
                 <img src="{{ d.preview_image.url }}" alt="{{ d.name }}"
                     class="absolute inset-0 w-full h-full object-contain" />
                 {% else %}
-                <div class="absolute inset-0 flex items-center justify-center text-xs text-gray-400">
+                <div class="absolute inset-0 flex items-center justify-center text-xs text-dark-500">
                     لا توجد معاينة
                 </div>
                 {% endif %}
             </div>
 
             <!-- BODY -->
-            <div class="p-4 space-y-3">
+            <div class="p-5 space-y-4">
 
                 <!-- TITLE -->
                 <div>
-                    <div class="font-bold text-gray-900">{{ d.name }}</div>
-                    <div class="text-xs text-gray-500">{{ d.created_at|date:"Y-m-d" }}</div>
+                    <div class="font-bold text-lg">{{ d.name }}</div>
+                    <div class="text-xs text-dark-400 mt-1">{{ d.created_at|date:"Y-m-d" }}</div>
                 </div>
 
                 <!-- BATCH SELECT -->
                 <div>
-                    <label class="text-xs font-medium text-gray-600">اختر الباتش</label>
-                    <select class="batch-select w-full border rounded-md p-1 text-sm" data-design="{{ d.id }}">
+                    <label class="block text-xs font-medium text-dark-400 mb-1.5">اختر الباتش</label>
+                    <select class="batch-select cyber-input w-full rounded-lg px-3 py-2 text-sm"
+                        data-design="{{ d.id }}">
                         <option value="">-- اختر باتش --</option>
                         {% for b in batches %}
                         <option value="{{ b.id }}">
@@ -57,32 +59,34 @@
                 </div>
 
                 <!-- LAYOUT SELECT -->
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="text-xs font-medium text-gray-600">الأعمدة</label>
+                        <label class="block text-xs font-medium text-dark-400 mb-1.5">الأعمدة</label>
                         <input type="number" min="1" value="5"
-                            class="cols-input w-full border rounded-md p-1 text-sm text-center"
+                            class="cols-input cyber-input w-full rounded-lg px-3 py-2 text-sm text-center"
                             data-design="{{ d.id }}">
                     </div>
                     <div>
-                        <label class="text-xs font-medium text-gray-600">الصفوف</label>
+                        <label class="block text-xs font-medium text-dark-400 mb-1.5">الصفوف</label>
                         <input type="number" min="1" value="10"
-                            class="rows-input w-full border rounded-md p-1 text-sm text-center"
+                            class="rows-input cyber-input w-full rounded-lg px-3 py-2 text-sm text-center"
                             data-design="{{ d.id }}">
                     </div>
                 </div>
 
                 <!-- ACTIONS -->
-                <div class="flex justify-between items-center pt-2">
+                <div class="flex justify-between items-center pt-2 border-t border-white/5 mt-4">
                     <button
-                        class="download-btn px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:opacity-50"
+                        class="download-btn btn-secondary px-4 py-2 text-xs rounded-lg hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         data-design="{{ d.id }}" disabled>
+                        <i data-lucide="download" class="w-3.5 h-3.5 inline-block ml-1"></i>
                         تحميل PDF
                     </button>
 
-                    <a href="{% url 'design:delete' d.id %}" class="text-red-600 hover:text-red-800 font-medium"
-                        data-confirm="1" data-msg="هل أنت متأكد من حذف هذا التصميم؟">
-                        حذف
+                    <a href="{% url 'design:delete' d.id %}"
+                        class="text-danger hover:bg-danger/10 p-2 rounded-lg transition-colors" data-confirm="1"
+                        data-msg="هل أنت متأكد من حذف هذا التصميم؟">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </a>
 
 
@@ -96,17 +100,19 @@
 
     {% else %}
     <!-- NO DESIGNS STATE -->
-    <div
-        class="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-dashed border-gray-300 text-center">
-        <div class="text-gray-400 mb-4 text-4xl">🖼</div>
-        <h3 class="text-lg font-bold text-gray-900 mb-2">
+    <div class="glass-card rounded-2xl flex flex-col items-center justify-center py-20 text-center">
+        <div class="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mb-6">
+            <i data-lucide="image" class="w-10 h-10 text-dark-400"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-2">
             لا توجد تصاميم حتى الآن
         </h3>
-        <p class="text-sm text-gray-500 mb-6">
+        <p class="text-dark-400 mb-6">
             قم بإنشاء أول تصميم لطباعة الكروت
         </p>
         <a href="{% url 'design:design_add' %}"
-            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+            class="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium">
+            <i data-lucide="plus" class="w-5 h-5"></i>
             إضافة تصميم جديد
         </a>
     </div>
@@ -188,22 +194,25 @@
 
 
 <div id="confirmModal" class="fixed inset-0 hidden z-50">
-    <div id="cmBack" class="absolute inset-0 bg-black/30"></div>
-
-    <div class="absolute left-1/2 top-1/2 w-[92%] max-w-sm -translate-x-1/2 -translate-y-1/2
-              bg-white border rounded-lg shadow p-5">
-        <p id="cmText" class="text-sm text-gray-800"></p>
-
-        <div class="mt-4 flex justify-end gap-2">
-            <button id="cmCancel" class="px-3 py-2 text-sm rounded-md bg-gray-100 hover:bg-gray-200">
-                إلغاء
-            </button>
-            <a id="cmOk" class="px-3 py-2 text-sm rounded-md bg-red-600 hover:bg-red-700 text-white">
-                حذف
-            </a>
+    <div id="cmBack" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div
+        class="absolute left-1/2 top-1/2 w-[92%] max-w-md -translate-x-1/2 -translate-y-1/2 glass-card rounded-2xl p-6 glow-border">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-danger/20 flex items-center justify-center">
+                <i data-lucide="alert-triangle" class="w-6 h-6 text-danger"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-lg">تأكيد الحذف</h3>
+                <p id="cmText" class="text-sm text-dark-400"></p>
+            </div>
+        </div>
+        <div class="flex gap-3 mt-6">
+            <button id="cmCancel" class="btn-secondary flex-1 py-3 rounded-xl font-medium">إلغاء</button>
+            <a id="cmOk" class="btn-danger flex-1 py-3 rounded-xl font-medium text-center">حذف</a>
         </div>
     </div>
 </div>
+<script>lucide.createIcons();</script>
 
 {% else %}
 {% include "dashboard/suspended.html" %}

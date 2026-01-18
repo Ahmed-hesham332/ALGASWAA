@@ -9,5 +9,11 @@ class LoginForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         set_arabic_error_messages(self)
+        
+        # Tailwind classes for form inputs
+        css_classes = "w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50"
+        
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({'class': css_classes})
 
 
