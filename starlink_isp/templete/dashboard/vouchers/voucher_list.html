@@ -29,6 +29,16 @@
     <!-- Filter Bar -->
     <form method="GET" class="glass-card rounded-2xl p-5">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Search Bar (Added) -->
+            <div class="sm:col-span-2 lg:col-span-4 mb-4">
+                <label class="block text-sm text-dark-400 mb-2">بحث (رقم الكارت)</label>
+                <div class="relative">
+                    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="ابحث عن رقم الكارت..."
+                        class="cyber-input w-full rounded-xl px-4 py-3 pl-10 text-sm">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400"></i>
+                </div>
+            </div>
+
             <!-- Server Filter -->
             <div>
                 <label class="block text-sm text-dark-400 mb-2">السيرفر</label>
@@ -94,38 +104,43 @@
             <table class="w-full text-right text-sm">
                 <thead>
                     <tr>
-                        <th class="px-4 py-4 font-semibold">#</th>
-                        <th class="px-4 py-4 font-semibold">رقم الكارت</th>
-                        <th class="px-4 py-4 font-semibold">العرض</th>
-                        <th class="px-4 py-4 font-semibold">تاريخ الإنشاء</th>
-                        <th class="px-4 py-4 font-semibold">تاريخ الشحن</th>
-                        <th class="px-4 py-4 font-semibold">تاريخ الانتهاء</th>
-                        <th class="px-4 py-4 font-semibold">الكوتا</th>
-                        <th class="px-4 py-4 font-semibold">الحالة</th>
-                        <th class="px-4 py-4 font-semibold">السعر</th>
-                        <th class="px-4 py-4 font-semibold">السيرفر</th>
-                        <th class="px-4 py-4 font-semibold">إجراءات</th>
+                        <th class="px-4 py-4 whitespace-nowrap font-semibold">#</th>
+                        <th class="px-4 py-4 whitespace-nowrap font-semibold">رقم الكارت</th>
+                        <th class="px-4 py-4 whitespace-nowrap font-semibold">العرض</th>
+                        <th class="px-4 py-4 whitespace-nowrap font-semibold">تاريخ الإنشاء</th>
+                        <th class="px-4 py-4 whitespace-nowrap font-semibold">تاريخ الشحن</th>
+                        <th class="px-4 py-4 whitespace-nowrap font-semibold">تاريخ الانتهاء</th>
+                        <th class="px-4 py-4 whitespace-nowrap font-semibold">الكوتا</th>
+                        <th class="px-4 py-4 whitespace-nowrap font-semibold">الحالة</th>
+                        <th class="px-4 py-4 whitespace-nowrap font-semibold">السعر</th>
+                        <th class="px-4 py-4 whitespace-nowrap font-semibold">السيرفر</th>
+                        <th class="px-4 py-4 whitespace-nowrap font-semibold">إجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for v in vouchers %}
                     <tr>
-                        <td class="px-4 py-3 text-dark-400">{{ forloop.counter }}</td>
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3 text-dark-400" data-label="#">{{ forloop.counter }}</td>
+                        <td class="px-4 py-3" data-label="رقم الكارت">
                             <span class="font-mono text-xs bg-white/5 px-2 py-1 rounded">{{ v.serial }}</span>
                         </td>
-                        <td class="px-4 py-3 text-dark-300">{{ v.offer.name }}</td>
-                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr">{{ v.created_at }}</td>
-                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr">{{ v.activated_at|default:"—" }}</td>
-                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr">{{ v.expires_at|default:"—" }}</td>
-                        <td class="px-4 py-3 text-dark-300">
-                            {% if v.offer.quota_type != "none" %}
+                        <td class="px-4 py-3 text-dark-300" data-label="العرض">{{ v.offer.name }}</td>
+                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr" data-label="تاريخ الإنشاء">
+                            {{ v.created_at }}</td>
+                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr" data-label="تاريخ الشحن">
+                            {{ v.activated_at|default:"—" }}</td>
+                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr" data-label="تاريخ الانتهاء">
+                            {{ v.expires_at|default:"—" }}</td>
+                        <td class="px-4 py-3 text-dark-300" data-label="الكوتا">
+                            {% if v.offer.quota_type == "MB" %}
+                            {{ v.offer.quota_amount }}MB
+                            {% elif v.offer.quota_type == "fixed" %}
                             {{ v.offer.quota_amount }}GB
                             {% else %}
                             <span class="text-accent">∞</span>
                             {% endif %}
                         </td>
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3" data-label="الحالة">
                             {% if v.is_used == "unused" %}
                             <span class="badge-success px-2.5 py-1 rounded-lg text-xs">غير مستخدم</span>
                             {% elif v.is_used == "used" %}
@@ -134,19 +149,21 @@
                             <span class="badge-danger px-2.5 py-1 rounded-lg text-xs">منتهي</span>
                             {% endif %}
                         </td>
-                        <td class="px-4 py-3 font-medium text-accent">{{ v.batch.offer.price }}</td>
-                        <td class="px-4 py-3 text-dark-300">{{ v.batch.server.name }}</td>
-                        <td class="px-4 py-3">
-                            {% if v.is_used == "unused" %}
-                            <a href="{% url 'vouchers:reconnect' v.id %}"
-                                onclick="return confirm('هل أنت متأكد من رغبتك في إعادة توصيل هذا الكارت؟')"
-                                class="btn-secondary px-3 py-1.5 rounded-lg text-xs inline-flex items-center gap-1.5">
-                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                                إعادة توصيل
-                            </a>
-                            {% else %}
-                            <span class="text-dark-500 text-xs">—</span>
-                            {% endif %}
+                        <td class="px-4 py-3 font-medium text-accent" data-label="السعر">{{ v.batch.offer.price }}</td>
+                        <td class="px-4 py-3 text-dark-300" data-label="السيرفر">{{ v.batch.server.name }}</td>
+                        <td class="px-4 py-3" data-label="إجراءات">
+                            <div class="flex justify-end w-full">
+                                {% if v.is_used == "unused" %}
+                                <a href="{% url 'vouchers:reconnect' v.id %}"
+                                    onclick="return confirm('هل أنت متأكد من رغبتك في إعادة توصيل هذا الكارت؟')"
+                                    class="btn-secondary px-3 py-1.5 rounded-lg text-xs inline-flex items-center gap-1.5 w-full justify-center">
+                                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                    إعادة توصيل
+                                </a>
+                                {% else %}
+                                <span class="text-dark-500 text-xs">—</span>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}

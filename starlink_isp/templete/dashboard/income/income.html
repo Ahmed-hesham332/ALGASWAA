@@ -78,20 +78,21 @@
             <table class="w-full text-right text-sm">
                 <thead>
                     <tr>
-                        <th class="px-6 py-4 font-semibold">#</th>
-                        <th class="px-6 py-4 font-semibold">اليوم</th>
-                        <th class="px-6 py-4 font-semibold">عدد الكروت</th>
-                        <th class="px-6 py-4 font-semibold">السعر</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">#</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">اليوم</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">عدد الكروت</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">السعر</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     {% for row in summary %}
                     <tr>
-                        <td class="px-6 py-4 text-dark-400">{{ forloop.counter }}</td>
-                        <td class="px-6 py-4 font-medium text-dark-200">{{ row.day }}</td>
-                        <td class="px-6 py-4 text-accent font-bold">{{ row.count }}</td>
-                        <td class="px-6 py-4 text-green-500 font-bold" dir="ltr">{{ row.income }}</td>
+                        <td class="px-6 py-4 text-dark-400" data-label="#">{{ forloop.counter }}</td>
+                        <td class="px-6 py-4 font-medium text-dark-200" data-label="اليوم">{{ row.day }}</td>
+                        <td class="px-6 py-4 text-accent font-bold" data-label="عدد الكروت">{{ row.count }}</td>
+                        <td class="px-6 py-4 text-green-500 font-bold" dir="ltr" data-label="السعر">{{ row.income }}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

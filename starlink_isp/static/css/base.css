@@ -10,9 +10,15 @@
     --gray-light: #E2E8F0;
 }
 
-html,
+html {
+    min-height: 100%;
+}
+
 body {
-    height: 100%;
+    min-height: 100vh;
+    /* Optional: If using gradient, use fixed attachment */
+    background-attachment: fixed;
+    height: auto;
 }
 
 body {
@@ -385,29 +391,91 @@ select:focus {
 
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .header h1 {
         margin: 0;
-        font-size: 0px;
+        font-size: 0px; 
         font-weight: 700;
         color: var(--dark);
     }   
-    .content {
-        overflow-x: auto !important;
+    
+    /* TRANSFORM TABLE TO RESPONSIVE CARDS (User Example Logic) */
+    
+    /* 1. Hide Header */
+    .cyber-table thead {
+        display: none !important;
     }
 
-    table {
-        display: block;
-        width: max-content !important; 
-        overflow-x: auto;
+    /* 2. Block Layout for Containers */
+    .cyber-table table, 
+    .cyber-table tbody, 
+    .cyber-table tr, 
+    .cyber-table td {
+        display: block !important;
+        width: 100% !important;
+        min-width: 0 !important; /* Reset rigid width */
     }
 
-    .content-wrapper {
-        overflow-x: auto !important;
+    /* 3. Card Style for Rows */
+    .cyber-table tr {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        margin-bottom: 1rem;
+        padding: 1rem;
     }
 
+    /* 4. Cell Style: Flexbox Label ----- Value */
+    .cyber-table td {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 0.75rem 0 !important;
+        text-align: left !important;
+        border: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        white-space: normal !important; /* Allow text wrapping if needed */
+    }
+
+    .cyber-table td:last-child {
+        border-bottom: none !important;
+        padding-bottom: 0 !important;
+    }
+
+    /* 5. The Label (from data-label) */
+    .cyber-table td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: var(--dark-300); /* Use variable or lighter color */
+        margin-left: 1rem;
+    }
+
+    /* Fix Actions Column Alignment */
+    .cyber-table td:last-child {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.5rem;
+    }
+    
+    .cyber-table td:last-child::before {
+        margin-bottom: 0.5rem;
+    }
+
+    .cyber-table td:last-child > div {
+        width: 100%;
+        justify-content: flex-end; /* actions buttons */
+    }
+
+    /* Reset container constraints from previous fix */
+    .cyber-table {
+        max-width: 100% !important;
+        overflow-x: visible !important;
+    }
+    
+    .glass-card {
+        padding: 1rem !important;
+    }
 }
-
 label.block {
     display: block !important;
     font-size: 0.875rem !important; 

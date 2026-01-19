@@ -55,30 +55,30 @@
             <table class="w-full text-right text-sm">
                 <thead>
                     <tr>
-                        <th class="px-6 py-4 font-semibold">#</th>
-                        <th class="px-6 py-4 font-semibold">رقم الكارت</th>
-                        <th class="px-6 py-4 font-semibold">الماك</th>
-                        <th class="px-6 py-4 font-semibold">IP</th>
-                        <th class="px-6 py-4 font-semibold">الاستهلاك</th>
-                        <th class="px-6 py-4 font-semibold">المدة</th>
-                        <th class="px-6 py-4 font-semibold">السيرفر</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">#</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">رقم الكارت</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">الماك</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">IP</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">الاستهلاك</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">المدة</th>
+                        <th class="px-6 py-4 whitespace-nowrap font-semibold">السيرفر</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     {% for s in sessions %}
                     <tr>
-                        <td class="px-6 py-4 text-dark-400">{{ forloop.counter }}</td>
-                        <td class="px-6 py-4 font-mono text-accent">{{ s.serial }}</td>
-                        <td class="px-6 py-4 font-mono text-dark-300">{{ s.mac }}</td>
-                        <td class="px-6 py-4 text-dark-300">{{ s.ip }}</td>
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-4 text-dark-400" data-label="#">{{ forloop.counter }}</td>
+                        <td class="px-6 py-4 font-mono text-accent" data-label="رقم الكارت">{{ s.serial }}</td>
+                        <td class="px-6 py-4 font-mono text-dark-300" data-label="الماك">{{ s.mac }}</td>
+                        <td class="px-6 py-4 text-dark-300" data-label="IP">{{ s.ip }}</td>
+                        <td class="px-6 py-4" data-label="الاستهلاك">
                             <span class="badge-info px-2 py-1 rounded-lg text-xs font-mono">
                                 {{ s.usage_mb }}MB
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-dark-300">{{ s.duration|default:"—" }}</td>
-                        <td class="px-6 py-4 text-dark-300">{{ s.server_name }}</td>
+                        <td class="px-6 py-4 text-dark-300" data-label="المدة">{{ s.duration|default:"—" }}</td>
+                        <td class="px-6 py-4 text-dark-300" data-label="السيرفر">{{ s.server_name }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
