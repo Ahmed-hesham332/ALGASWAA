@@ -39,31 +39,35 @@
                 <tbody>
                     {% for batch in batches %}
                     <tr>
-                        <td class="px-4 py-3 text-dark-400">{{ forloop.counter }}</td>
-                        <td class="px-4 py-3 font-medium">{{ batch.name }}</td>
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3 text-dark-400" data-label="#">{{ forloop.counter }}</td>
+                        <td class="px-4 py-3 font-medium" data-label="اسم المجموعة">{{ batch.name }}</td>
+                        <td class="px-4 py-3" data-label="إجمالي الكروت">
                             <span class="bg-white/5 px-3 py-1.5 rounded-lg font-bold">{{ batch.total_cards }}</span>
                         </td>
-                        <td class="px-4 py-3">
-                            <span class="badge-success px-3 py-1.5 rounded-lg font-medium">{{ batch.unused_cards
-                                }}</span>
+                        <td class="px-4 py-3" data-label="غير مستخدم">
+                            <span class="badge-success px-3 py-1.5 rounded-lg font-medium">
+                                {{ batch.unused_cards }}
+                            </span>
                         </td>
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3" data-label="مستخدم">
                             <span class="badge-info px-3 py-1.5 rounded-lg font-medium">{{ batch.used_cards }}</span>
                         </td>
-                        <td class="px-4 py-3">
-                            <span class="badge-danger px-3 py-1.5 rounded-lg font-medium">{{ batch.expired_cards
-                                }}</span>
+                        <td class="px-4 py-3" data-label="منتهي">
+                            <span class="badge-danger px-3 py-1.5 rounded-lg font-medium">
+                                {{ batch.expired_cards }}
+                            </span>
                         </td>
-                        <td class="px-4 py-3 text-dark-300">{{ batch.offer.name }}</td>
-                        <td class="px-4 py-3 text-dark-400">
+                        <td class="px-4 py-3 text-dark-300" data-label="اسم العرض">{{ batch.offer.name }}</td>
+                        <td class="px-4 py-3 text-dark-400" data-label="الموزع">
                             {% if batch.distributer %}
                             {{ batch.distributer.user.username }}
                             {% else %}
                             <span class="text-dark-500">غير محدد</span>
                             {% endif %}
                         </td>
-                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr">{{ batch.created_at|date:"Y-m-d H:i" }}
+                        <td class="px-4 py-3 text-dark-400 text-xs" data-label="تاريخ الإنشاء"
+                            style="flex-direction: row !important; align-items: center !important; justify-content: space-between !important;">
+                            <span dir="ltr">{{ batch.created_at|date:"Y-m-d H:i" }}</span>
                         </td>
                     </tr>
                     {% endfor %}

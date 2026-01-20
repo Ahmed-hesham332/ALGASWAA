@@ -8,7 +8,7 @@
     <title>{% block title %}لوحة التحكم{% endblock %} — القصواء</title>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}?v=14.0">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -803,19 +803,23 @@
         lucide.createIcons();
 
         // Mobile Menu Toggle
-        const hamburgerBtn = document.getElementById('hamburgerBtn');
-        const sidebar = document.getElementById('sidebar');
-        const menuOverlay = document.getElementById('menuOverlay');
+        const sidebar = document.querySelector('.sidebar');
+        const toggleBtn = document.getElementById('hamburgerBtn'); // Assuming hamburgerBtn is the toggle button
+        const overlay = document.getElementById('menuOverlay'); // Assuming menuOverlay is the overlay
 
-        hamburgerBtn?.addEventListener('click', () => {
+        function toggleSidebar() {
             sidebar.classList.toggle('active');
-            menuOverlay.classList.toggle('active');
-        });
+            overlay.classList.toggle('active'); // Use 'active' class for overlay as per original
+            // Lock/Unlock body scroll
+            if (sidebar.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
 
-        menuOverlay?.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-            menuOverlay.classList.remove('active');
-        });
+        toggleBtn?.addEventListener('click', toggleSidebar);
+        overlay?.addEventListener('click', toggleSidebar);
 
         // Close menu on link click (mobile)
         document.querySelectorAll('.menu-link').forEach(link => {

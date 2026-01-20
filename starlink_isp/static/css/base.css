@@ -476,14 +476,7 @@ select:focus {
         padding: 1rem !important;
     }
 }
-label.block {
-    display: block !important;
-    font-size: 0.875rem !important; 
-    font-weight: 500 !important;    
-    color: #1f2937 !important;    
-    text-align: right !important;
-    opacity: 1 !important;
-}
+/* Removed aggressive label.block overrides to allow Tailwind classes to work */
 
 input, select {
     border: 1px solid #d1d5db !important;

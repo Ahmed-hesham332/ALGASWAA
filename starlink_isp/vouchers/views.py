@@ -42,6 +42,11 @@ def voucher_list(request):
     selected_offer = request.GET.get("offer", "")
     selected_group = request.GET.get("group", "")
     selected_status = request.GET.get("status", "")
+    search_query = request.GET.get("search", "")
+
+    # Filter by search query (serial)
+    if search_query:
+        vouchers = vouchers.filter(serial__icontains=search_query)
 
     # Filter by server
     if selected_server:

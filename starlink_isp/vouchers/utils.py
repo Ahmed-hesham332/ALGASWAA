@@ -49,54 +49,52 @@ def update_voucher_status():
                 serial=voucher_number
             )
 
+            if activated_at is not None:
+                # Convert MySQL naive datetime → aware
+                activated_at_aware = timezone.make_aware(activated_at)
+                voucher.activated_at = activated_at_aware
+
+                offer = voucher.offer
+
+                # ---- calculate expires_at ----
+                if offer.duration_type == "minutes":
+                    voucher.expires_at = activated_at_aware + relativedelta(
+                        minutes=offer.duration_value
+                    )
+
+                elif offer.duration_type == "hours":
+                    voucher.expires_at = activated_at_aware + relativedelta(
+                        hours=offer.duration_value
+                    )
+
+                elif offer.duration_type == "days":
+                    voucher.expires_at = activated_at_aware + relativedelta(
+                        days=offer.duration_value
+                    )
+
+                elif offer.duration_type == "months":
+                    voucher.expires_at = activated_at_aware + relativedelta(
+                        months=offer.duration_value
+                    )
+
+                else:
+                    voucher.expires_at = None
+
+                    voucher.expires_at = expires_at
+
             if status == 1:
                 # ---------------------------
                 # ACTIVATED
                 # ---------------------------
 
-                if activated_at is not None:
-                    # Convert MySQL naive datetime → aware
-                    activated_at_aware = timezone.make_aware(activated_at)
-                    voucher.activated_at = activated_at_aware
-
-                    offer = voucher.offer
-
-                    # ---- calculate expires_at ----
-                    if offer.duration_type == "minutes":
-                        expires_at = activated_at_aware + relativedelta(
-                            minutes=offer.duration_value
-                        )
-
-                    elif offer.duration_type == "hours":
-                        expires_at = activated_at_aware + relativedelta(
-                            hours=offer.duration_value
-                        )
-
-                    elif offer.duration_type == "days":
-                        expires_at = activated_at_aware + relativedelta(
-                            days=offer.duration_value
-                        )
-
-                    elif offer.duration_type == "months":
-                        expires_at = activated_at_aware + relativedelta(
-                            months=offer.duration_value
-                        )
-
-                    else:
-                        expires_at = None
-
-                    voucher.expires_at = expires_at
-
-                    # ---- determine status ----
-                    if expires_at and expires_at < timezone.now():
-                        voucher.is_used = "expired"
-                    else:
-                        voucher.is_used = "used"
-
+                # ---- determine status ----
+                if expires_at and expires_at < timezone.now():
+                    voucher.is_used = "expired"
                 else:
-                    # Activated but no timestamp (edge case)
                     voucher.is_used = "used"
 
+            elif status == 2:
+                voucher.is_used = "expired"
             else:
                 # ---------------------------
                 # NOT USED

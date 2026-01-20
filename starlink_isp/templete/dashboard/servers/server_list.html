@@ -160,18 +160,48 @@
     document.getElementById("cmCancel")?.addEventListener("click", closeConfirmModal);
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeConfirmModal(); });
 
-    // Copy Script
+    // Robust Copy Script with Fallback
     document.querySelectorAll("button[data-copy-url]").forEach(btn => {
         btn.addEventListener("click", async () => {
             const url = btn.dataset.copyUrl;
             const originalHTML = btn.innerHTML;
+
             try {
                 btn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> جاري النسخ...';
                 lucide.createIcons();
+
+                // 1. Fetch the content
                 const response = await fetch(url);
-                if (!response.ok) throw new Error("Network error");
+                if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
                 const text = await response.text();
-                await navigator.clipboard.writeText(text);
+                if (!text) throw new Error("Empty response");
+
+                // 2. Try Async Clipboard API (Secure Context only)
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                } else {
+                    // 3. Fallback for HTTP/Non-Secure Contexts
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+
+                    // Ensure it's not visible but part of DOM
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-9999px";
+                    textArea.style.top = "0";
+                    document.body.appendChild(textArea);
+
+                    textArea.focus();
+                    textArea.select();
+
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (!successful) throw new Error("Fallback copy failed");
+                    } finally {
+                        document.body.removeChild(textArea);
+                    }
+                }
+
+                // Success State
                 btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> تم النسخ!';
                 btn.classList.add("text-green-500");
                 lucide.createIcons();
@@ -180,13 +210,17 @@
                     btn.classList.remove("text-green-500");
                     lucide.createIcons();
                 }, 2000);
+
             } catch (err) {
-                btn.innerHTML = '<i data-lucide="x" class="w-4 h-4"></i> فشل النسخ';
+                console.error("Copy failed:", err);
+                btn.innerHTML = `<i data-lucide="x" class="w-4 h-4"></i> فشل (${err.message})`;
+                btn.classList.add("text-danger");
                 lucide.createIcons();
                 setTimeout(() => {
                     btn.innerHTML = originalHTML;
+                    btn.classList.remove("text-danger");
                     lucide.createIcons();
-                }, 2000);
+                }, 3000);
             }
         });
     });

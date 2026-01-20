@@ -31,9 +31,10 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Search Bar (Added) -->
             <div class="sm:col-span-2 lg:col-span-4 mb-4">
-                <label class="block text-sm text-dark-400 mb-2">بحث (رقم الكارت)</label>
+                <label class="block text-sm text-gray-300 mb-2">بحث (رقم الكارت)</label>
                 <div class="relative">
-                    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="ابحث عن رقم الكارت..."
+                    <input type="text" name="search" value="{{ request.GET.search }}"
+                        placeholder="ابحث عن رقم الكارت..."
                         class="cyber-input w-full rounded-xl px-4 py-3 pl-10 text-sm">
                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400"></i>
                 </div>
@@ -41,7 +42,7 @@
 
             <!-- Server Filter -->
             <div>
-                <label class="block text-sm text-dark-400 mb-2">السيرفر</label>
+                <label class="block text-sm text-gray-300 mb-2">السيرفر</label>
                 <select name="server" class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
                     <option value="">كل السيرفرات</option>
                     {% for s in servers %}
@@ -52,7 +53,7 @@
 
             <!-- Offer Filter -->
             <div>
-                <label class="block text-sm text-dark-400 mb-2">العرض</label>
+                <label class="block text-sm text-gray-300 mb-2">العرض</label>
                 <select name="offer" class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
                     <option value="">كل العروض</option>
                     {% for o in offers %}
@@ -63,7 +64,7 @@
 
             <!-- Group Filter -->
             <div>
-                <label class="block text-sm text-dark-400 mb-2">المجموعة</label>
+                <label class="block text-sm text-white mb-2">المجموعة</label>
                 <select name="group" class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
                     <option value="">كل المجموعات</option>
                     {% for g in groups %}
@@ -125,12 +126,15 @@
                             <span class="font-mono text-xs bg-white/5 px-2 py-1 rounded">{{ v.serial }}</span>
                         </td>
                         <td class="px-4 py-3 text-dark-300" data-label="العرض">{{ v.offer.name }}</td>
-                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr" data-label="تاريخ الإنشاء">
-                            {{ v.created_at }}</td>
-                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr" data-label="تاريخ الشحن">
-                            {{ v.activated_at|default:"—" }}</td>
-                        <td class="px-4 py-3 text-dark-400 text-xs" dir="ltr" data-label="تاريخ الانتهاء">
-                            {{ v.expires_at|default:"—" }}</td>
+                        <td class="px-4 py-3 text-dark-400 text-xs" data-label="تاريخ الإنشاء">
+                            <span dir="ltr">{{ v.created_at }}</span>
+                        </td>
+                        <td class="px-4 py-3 text-dark-400 text-xs" data-label="تاريخ الشحن">
+                            <span dir="ltr">{{ v.activated_at|default:"—" }}</span>
+                        </td>
+                        <td class="px-4 py-3 text-dark-400 text-xs" data-label="تاريخ الانتهاء">
+                            <span dir="ltr">{{ v.expires_at|default:"—" }}</span>
+                        </td>
                         <td class="px-4 py-3 text-dark-300" data-label="الكوتا">
                             {% if v.offer.quota_type == "MB" %}
                             {{ v.offer.quota_amount }}MB
