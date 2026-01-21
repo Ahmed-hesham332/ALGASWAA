@@ -37,14 +37,14 @@
                         <td class="px-6 py-4 whitespace-nowrap font-medium" data-label="اسم العرض">{{ o.name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-accent font-bold" data-label="السعر">{{ o.price }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-dark-300" data-label="السرعة">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="السرعة">
                             {% if o.unlimited_speed %}
                             <span class="badge-success px-2 py-1 rounded-lg text-xs">سرعة مفتوحة</span>
                             {% else %}
                             <span dir="ltr">{{ o.download_speed }} / {{ o.upload_speed }}</span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-dark-300" data-label="الكوتا">
+                        <td class="px-6 py-4 whitespace-nowrap" data-label="الكوتا">
                             {% if o.quota_type == "none" %}
                             <span class="badge-success px-2 py-1 rounded-lg text-xs">
                                 غير محدود
@@ -70,7 +70,8 @@
 
                                 <a href="{% url 'offers:offer_delete' o.id %}"
                                     class="px-3 py-2 rounded-lg text-xs inline-flex items-center gap-1.5 bg-danger/10 text-danger hover:bg-danger/20 transition-all"
-                                    data-confirm="1" data-msg="هل أنت متأكد من حذف هذا العرض؟">
+                                    data-confirm="1"
+                                    data-msg="هل أنت متأكد من حذف هذا العرض؟ سيتم حذف الكروت غير المستخدمة، وسيتم الاحتفاظ بالكروت المستخدمة/المنتهية في الأرشيف (بدون عرض).">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                     حذف
                                 </a>

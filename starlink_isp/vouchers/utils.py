@@ -37,20 +37,21 @@ def update_voucher_status():
         SELECT 
             voucher_number, 
             status, 
-            activated_at
+            activated_at,
+            data
         FROM vouchers
     """)
 
     rows = cursor.fetchall()
 
-    for voucher_number, status, activated_at in rows:
+    for voucher_number, status, activated_at, data in rows:
         try:
             voucher = Voucher.objects.select_related("offer").get(
                 serial=voucher_number
             )
 
             if activated_at is not None:
-                # Convert MySQL naive datetime → aware
+                
                 activated_at_aware = timezone.make_aware(activated_at)
                 voucher.activated_at = activated_at_aware
 
@@ -80,20 +81,25 @@ def update_voucher_status():
                 else:
                     voucher.expires_at = None
 
-                    voucher.expires_at = expires_at
 
             if status == 1:
                 # ---------------------------
                 # ACTIVATED
                 # ---------------------------
 
-                # ---- determine status ----
-                if expires_at and expires_at < timezone.now():
+                # ---- update usage ----
+                if data:
+                    data =  round(data / 1024 / 1024, 2)
+                    voucher.usage_mb = data
+                if voucher.expires_at < timezone.now():
                     voucher.is_used = "expired"
                 else:
                     voucher.is_used = "used"
 
             elif status == 2:
+                if data:
+                    data =  round(data / 1024 / 1024, 2)
+                    voucher.usage_mb = data
                 voucher.is_used = "expired"
             else:
                 # ---------------------------

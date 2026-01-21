@@ -24,35 +24,18 @@ def update_voucher_usage(username):
         # Default to GB
         quota_mb = (offer.quota_amount or 0) * 1024
 
-    with connections["radius"].cursor() as cursor:
-        cursor.execute("""
-            SELECT COALESCE(SUM(acctinputoctets + acctoutputoctets), 0)
-            FROM radacct
-            WHERE username = %s
-        """, [username])
-
-        used_bytes = cursor.fetchone()[0]
-
-    used_mb = round(used_bytes / 1024 / 1024, 2)
-
-    voucher.usage_mb = used_mb
-    voucher.save(update_fields=["usage_mb"])
-
     # 2. Calculate Remaining & Percentage
     if quota_mb is None:
         remaining_mb = None # Unlimited
-        percentage = 0
     else:
-        remaining_mb = max(0, quota_mb - used_mb)
-        percentage = round((used_mb / quota_mb) * 100, 2) if quota_mb > 0 else 0
+        remaining_mb = max(0, quota_mb - voucher.usage_mb)
 
     # 7️⃣ Return useful data
     return {
         "username": username,
-        "used_mb": used_mb,
+        "used_mb": voucher.usage_mb,
         "quota_mb": quota_mb,
         "remaining_mb": round(remaining_mb, 2) if remaining_mb is not None else None,
-        "percentage": percentage,
     }
 
 @require_GET

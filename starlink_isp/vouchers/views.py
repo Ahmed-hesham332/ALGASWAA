@@ -285,3 +285,48 @@ def reconnect_voucher(request, voucher_id):
         messages.error(request, f"حدث خطأ أثناء إعادة التوصيل: {e}")
 
     return redirect("vouchers:list")
+
+
+@login_required
+def delete_unused_vouchers(request, batch_id):
+    batch = get_object_or_404(VoucherBatch, id=batch_id)
+    user = request.user
+
+    # Permission check
+    if user.is_distributer:
+        if batch.distributer != user.distributer_profile:
+             messages.error(request, "ليس لديك صلاحية على هذه المجموعة")
+             return redirect("vouchers:batch_list")
+    else:
+        if batch.reseller != user:
+             messages.error(request, "ليس لديك صلاحية على هذه المجموعة")
+             return redirect("vouchers:batch_list")
+
+    # Get unused vouchers ONLY
+    unused_vouchers = batch.vouchers.filter(is_used="unused")
+    count_unused = unused_vouchers.count()
+    
+    # Calculate others (that will be preserved)
+    count_others = batch.vouchers.exclude(is_used="unused").count()
+
+    try:
+        # 1. Delete Unused Vouchers
+        for voucher in unused_vouchers:
+            voucher_radius_delete(voucher.serial)
+            voucher.delete()
+        
+        # 2. Delete the Batch
+        # Because on_delete=SET_NULL, any remaining vouchers (used/expired) 
+        # will validly remain in DB with batch=None.
+        batch.delete()
+        
+        msg = f"تم حذف المجموعة بنجاح. تم حذف {count_unused} كارت غير مستخدم."
+        if count_others > 0:
+            msg += f" وتم الاحتفاظ بـ {count_others} كارت (مستخدم/منتهي) في الأرشيف."
+            
+        messages.success(request, msg)
+
+    except Exception as e:
+        messages.error(request, f"حدث خطأ أثناء الحذف: {e}")
+
+    return redirect("vouchers:batch_list")

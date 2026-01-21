@@ -23,7 +23,7 @@ V_COL_NAS      = "nas_identifier"  # voucher linked to NAS id
 V_COL_USEDUP   = "status"         # 0/1
 V_COL_USEDUPAT = "activated_at"      # nullable datetime
 
-SSTP_TABLE = "sstpTunnel"
+SSTP_TABLE = "nas_tunnel_map"
 S_COL_NAS  = "nas_identifier"
 S_COL_IP   = "tunnel_ip"
 
@@ -95,6 +95,12 @@ def run_quota_enforce():
             used = int(cursor.fetchone()["total"] or 0)
 
             if used < quota:
+                cursor.execute(f"""
+                    update vouchers
+                    set data = %s 
+                    where voucher_number = %s
+                """, (used, code))
+                cnx.commit()
                 continue
 
             # 3) find current active session (for best disconnect reliability)
@@ -118,6 +124,12 @@ def run_quota_enforce():
                 INSERT INTO radcheck (username, attribute, op, value)
                 VALUES (%s, 'Auth-Type', ':=', 'Reject')
             """, (code,))
+
+            cursor.execute(f"""
+                    update vouchers
+                    set data = %s 
+                    where voucher_number = %s
+                """, (used, code))
 
             # 6) mark used_up in vouchers (prevents repeated CoA spam)
             cursor.execute(f"""

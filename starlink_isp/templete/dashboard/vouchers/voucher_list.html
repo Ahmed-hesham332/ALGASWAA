@@ -104,7 +104,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-right text-sm">
                 <thead>
-                    <tr>
+                    <tr class="text-dark-400">
                         <th class="px-4 py-4 whitespace-nowrap font-semibold">#</th>
                         <th class="px-4 py-4 whitespace-nowrap font-semibold">رقم الكارت</th>
                         <th class="px-4 py-4 whitespace-nowrap font-semibold">العرض</th>
@@ -112,6 +112,7 @@
                         <th class="px-4 py-4 whitespace-nowrap font-semibold">تاريخ الشحن</th>
                         <th class="px-4 py-4 whitespace-nowrap font-semibold">تاريخ الانتهاء</th>
                         <th class="px-4 py-4 whitespace-nowrap font-semibold">الكوتا</th>
+                        <th class="px-4 py-4 whitespace-nowrap font-semibold">الاستهلاك</th>
                         <th class="px-4 py-4 whitespace-nowrap font-semibold">الحالة</th>
                         <th class="px-4 py-4 whitespace-nowrap font-semibold">السعر</th>
                         <th class="px-4 py-4 whitespace-nowrap font-semibold">السيرفر</th>
@@ -125,7 +126,7 @@
                         <td class="px-4 py-3" data-label="رقم الكارت">
                             <span class="font-mono text-xs bg-white/5 px-2 py-1 rounded">{{ v.serial }}</span>
                         </td>
-                        <td class="px-4 py-3 text-dark-300" data-label="العرض">{{ v.offer.name }}</td>
+                        <td class="px-4 py-3" data-label="العرض">{{ v.offer.name }}</td>
                         <td class="px-4 py-3 text-dark-400 text-xs" data-label="تاريخ الإنشاء">
                             <span dir="ltr">{{ v.created_at }}</span>
                         </td>
@@ -142,6 +143,17 @@
                             {{ v.offer.quota_amount }}GB
                             {% else %}
                             <span class="text-accent">∞</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-dark-300" data-label="الاستهلاك">
+                            {% if v.usage_mb %}
+                            <span class="badge-info px-2 py-1 rounded-lg text-xs font-mono">
+                                {{ v.usage_mb }}MB
+                            </span>
+                            {% else %}
+                            <span class="badge-danger px-2 py-1 rounded-lg text-xs font-mono">
+                                0MB
+                            </span>
                             {% endif %}
                         </td>
                         <td class="px-4 py-3" data-label="الحالة">

@@ -34,6 +34,7 @@
                         <th class="px-4 py-4 font-semibold">اسم العرض</th>
                         <th class="px-4 py-4 font-semibold">الموزع</th>
                         <th class="px-4 py-4 font-semibold">تاريخ الإنشاء</th>
+                        <th class="px-4 py-4 font-semibold">إجراءات</th> <!-- Added Action Column -->
                     </tr>
                 </thead>
                 <tbody>
@@ -68,6 +69,17 @@
                         <td class="px-4 py-3 text-dark-400 text-xs" data-label="تاريخ الإنشاء"
                             style="flex-direction: row !important; align-items: center !important; justify-content: space-between !important;">
                             <span dir="ltr">{{ batch.created_at|date:"Y-m-d H:i" }}</span>
+                        </td>
+                        <td class="px-4 py-3" data-label="إجراءات">
+                            <div class="flex justify-start w-full">
+                                <button data-delete-url="{% url 'vouchers:delete_unused' batch.id %}"
+                                    onclick="openConfirmModal('هل أنت متأكد من حذف المجموعة؟ سيتم حذف الكروت غير المستخدمة، وحفظ الكروت المستخدمة/المنتهية في الأرشيف.', this.dataset.deleteUrl)"
+                                    class="px-3 py-2 rounded-lg text-xs inline-flex items-center gap-1.5 bg-danger/10 text-danger hover:bg-danger/20 transition-all font-medium"
+                                    title="حذف المجموعة (مع حفظ الأرشيف)">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    حذف
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -118,5 +130,66 @@
     {% endif %}
 </div>
 
-<script>lucide.createIcons();</script>
+<!-- Modern Confirm Modal -->
+<div id="confirmModal" class="fixed inset-0 hidden z-[100] transition-opacity duration-300">
+    <!-- Backdrop -->
+    <div id="cmBack" class="absolute inset-0 bg-dark-900/80 backdrop-blur-md"></div>
+
+    <!-- Modal Content -->
+    <div class="absolute left-1/2 top-1/2 w-[90%] max-w-md -translate-x-1/2 -translate-y-1/2">
+        <div
+            class="relative bg-[#0f1219] border border-danger/30 rounded-2xl p-6 shadow-[0_0_40px_rgba(220,38,38,0.15)] transform transition-all scale-100 overflow-hidden">
+            <!-- Decorative Background Glow -->
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-danger/10 rounded-full blur-3xl pointer-events-none">
+            </div>
+
+            <div class="relative flex flex-col items-center text-center gap-4">
+                <!-- Icon -->
+                <div
+                    class="w-16 h-16 rounded-2xl bg-danger/10 flex items-center justify-center mb-2 ring-1 ring-danger/20">
+                    <i data-lucide="alert-octagon" class="w-8 h-8 text-danger animate-pulse"></i>
+                </div>
+
+                <!-- Title & Text -->
+                <div>
+                    <h3 class="font-bold text-xl text-white mb-2">تأكيد الإجراء</h3>
+                    <p id="cmText" class="text-dark-300 text-sm leading-relaxed px-4"></p>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3 w-full mt-4">
+                    <button id="cmCancel"
+                        class="flex-1 py-3 px-4 rounded-xl font-medium text-dark-300 hover:text-white hover:bg-white/5 transition-colors border border-transparent hover:border-white/10">
+                        إلغاء
+                    </button>
+                    <a id="cmOk"
+                        class="flex-1 py-3 px-4 rounded-xl font-bold bg-danger text-white hover:bg-danger-600 shadow-lg shadow-danger/20 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        نعم، احذف
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openConfirmModal(message, href) {
+        const modal = document.getElementById("confirmModal");
+        const txt = document.getElementById("cmText");
+        const ok = document.getElementById("cmOk");
+        txt.textContent = message;
+        ok.setAttribute("href", href);
+        modal.classList.remove("hidden");
+    }
+
+    function closeConfirmModal() {
+        document.getElementById("confirmModal").classList.add("hidden");
+    }
+
+    document.getElementById("cmBack")?.addEventListener("click", closeConfirmModal);
+    document.getElementById("cmCancel")?.addEventListener("click", closeConfirmModal);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeConfirmModal(); });
+    lucide.createIcons();
+</script>
 {% endblock %}

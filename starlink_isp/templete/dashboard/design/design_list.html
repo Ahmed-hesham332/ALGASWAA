@@ -7,8 +7,8 @@
 <div class="p-6">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-            <h2 class="text-2xl font-bold">التصاميم</h2>
-            <p class="text-dark-400 text-sm mt-1">إدارة تصاميم الكروت الخاصة بك</p>
+            <h2 class="text-2xl font-bold">التصاميم و الطباعة</h2>
+            <p class="text-dark-400 text-sm mt-1">إدارة تصاميم الكروت الخاصة بك و طباعتها</p>
         </div>
         <a href="{% url 'design:design_add' %}"
             class="btn-primary inline-flex items-center gap-2 px-5 py-3 rounded-xl font-medium">
@@ -46,10 +46,10 @@
 
                 <!-- BATCH SELECT -->
                 <div>
-                    <label class="block text-xs font-medium text-dark-400 mb-1.5">اختر الباتش</label>
+                    <label class="block text-xs font-medium text-dark-400 mb-1.5">اختر المجموعة</label>
                     <select class="batch-select cyber-input w-full rounded-lg px-3 py-2 text-sm"
                         data-design="{{ d.id }}">
-                        <option value="">-- اختر باتش --</option>
+                        <option value="">-- اختر مجموعة --</option>
                         {% for b in batches %}
                         <option value="{{ b.id }}">
                             {{ b.name }} ({{ b.quantity }})

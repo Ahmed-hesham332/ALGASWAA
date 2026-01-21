@@ -16,23 +16,23 @@ class ProfileForm(forms.ModelForm):
         }
 
         widgets = {
-            "Network_Name": forms.TextInput(attrs={"class": "form-input"}),
-            "Manager_Name": forms.TextInput(attrs={"class": "form-input"}),
-            "Phone_Number": forms.TextInput(attrs={"class": "form-input"}),
+            "Network_Name": forms.TextInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
+            "Manager_Name": forms.TextInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
+            "Phone_Number": forms.TextInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
         }
 
 
 class PasswordChangeCustomForm(forms.Form):
     old_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-input"}),
+        widget=forms.PasswordInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
         label="كلمة المرور القديمة"
     )
     new_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-input"}),
+        widget=forms.PasswordInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
         label="كلمة المرور الجديدة"
     )
     confirm_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": "form-input"}),
+        widget=forms.PasswordInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
         label="تأكيد كلمة المرور"
     )
 

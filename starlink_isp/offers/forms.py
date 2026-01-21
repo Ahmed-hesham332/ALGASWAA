@@ -28,13 +28,14 @@ class OfferForm(forms.ModelForm):
         ]
 
         widgets = {
-            "price": forms.NumberInput(attrs={"step": "0.01"}),
-            "download_speed": forms.NumberInput(attrs={"placeholder": "kbps"}),
-            "upload_speed": forms.NumberInput(attrs={"placeholder": "kbps"}),
-            "duration_value": forms.NumberInput(attrs={"min": 1}),
-            "quota_amount": forms.NumberInput(attrs={"placeholder": "GB"}),
-            "duration_type": forms.Select(choices=Offer.DURATION_CHOICES),
-            "quota_type": forms.Select(choices=Offer.QUOTA_CHOICES),
+            "name": forms.TextInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
+            "price": forms.NumberInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm", "step": "0.01"}),
+            "download_speed": forms.NumberInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm", "placeholder": "kbps"}),
+            "upload_speed": forms.NumberInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm", "placeholder": "kbps"}),
+            "duration_value": forms.NumberInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm", "min": 1}),
+            "quota_amount": forms.NumberInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm", "placeholder": "GB"}),
+            "duration_type": forms.Select(choices=Offer.DURATION_CHOICES, attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
+            "quota_type": forms.Select(choices=Offer.QUOTA_CHOICES, attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
         }
 
         labels = {

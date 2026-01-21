@@ -13,7 +13,7 @@ class VoucherBatch(models.Model):
         blank=True
     )
     server = models.ForeignKey(Server, on_delete=models.CASCADE)
-    offer = models.ForeignKey(Offer, on_delete=models.CASCADE)
+    offer = models.ForeignKey(Offer, on_delete=models.SET_NULL, null=True, blank=True)
 
     name = models.CharField(max_length=100)
     quantity = models.PositiveIntegerField()
@@ -35,9 +35,9 @@ class Voucher(models.Model):
     ("used", "مستخدم"),
     ("expired", "منتهي"),
     ]
-    batch = models.ForeignKey(VoucherBatch, on_delete=models.CASCADE, related_name="vouchers")
+    batch = models.ForeignKey(VoucherBatch, on_delete=models.SET_NULL, null=True, blank=True, related_name="vouchers")
     server = models.ForeignKey(Server, on_delete=models.CASCADE)
-    offer = models.ForeignKey(Offer, on_delete=models.CASCADE)
+    offer = models.ForeignKey(Offer, on_delete=models.SET_NULL, null=True, blank=True)
 
     serial = models.CharField(max_length=50, unique=True)
 

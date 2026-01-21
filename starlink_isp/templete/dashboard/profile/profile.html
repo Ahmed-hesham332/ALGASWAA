@@ -79,15 +79,6 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        lucide.createIcons();
 
-        // Add cyber-input class to all inputs
-        const inputs = document.querySelectorAll('input[type="text"], input[type="password"], input[type="number"]');
-        inputs.forEach(input => {
-            input.classList.add('cyber-input', 'w-full', 'rounded-xl', 'px-4', 'py-3', 'text-sm');
-        });
-    });
-</script>
+<script>lucide.createIcons();</script>
 {% endblock %}

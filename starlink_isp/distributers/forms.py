@@ -5,7 +5,7 @@ from .models import Distributer
 from servers.models import Server
 
 class DistributerUserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput, required=False, label="كلمة السر")
+    password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}), required=False, label="كلمة السر")
     
     class Meta:
         model = CustomUser
@@ -13,6 +13,11 @@ class DistributerUserForm(forms.ModelForm):
         labels = {
             "username": "اسم المستخدم",
             "first_name": "الاسم",
+        }
+        widgets = {
+            "username": forms.TextInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
+            "first_name": forms.TextInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
+            "password": forms.PasswordInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
         }
     
     def __init__(self, *args, **kwargs):
@@ -24,7 +29,7 @@ class DistributerUserForm(forms.ModelForm):
 class DistributerPermissionsForm(forms.ModelForm):
     servers = forms.ModelMultipleChoiceField(
         queryset=Server.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "cyber-checkbox"}), 
         required=False,
         label="الخوادم المتاحة"
     )
@@ -37,6 +42,19 @@ class DistributerPermissionsForm(forms.ModelForm):
             "can_view_designs", "can_add_design", "can_delete_design",
             "can_view_vouchers", "can_add_voucher"
         ]
+        
+        widgets = {
+            "status": forms.CheckboxInput(attrs={"class": "cyber-checkbox"}),
+            "can_view_offers": forms.CheckboxInput(attrs={"class": "cyber-checkbox"}),
+            "can_add_offer": forms.CheckboxInput(attrs={"class": "cyber-checkbox"}),
+            "can_edit_offer": forms.CheckboxInput(attrs={"class": "cyber-checkbox"}),
+            "can_delete_offer": forms.CheckboxInput(attrs={"class": "cyber-checkbox"}),
+            "can_view_designs": forms.CheckboxInput(attrs={"class": "cyber-checkbox"}),
+            "can_add_design": forms.CheckboxInput(attrs={"class": "cyber-checkbox"}),
+            "can_delete_design": forms.CheckboxInput(attrs={"class": "cyber-checkbox"}),
+            "can_view_vouchers": forms.CheckboxInput(attrs={"class": "cyber-checkbox"}),
+            "can_add_voucher": forms.CheckboxInput(attrs={"class": "cyber-checkbox"}),
+        }
         labels = {
             "status": "مفعل",
             "can_view_offers": "عرض العروض",

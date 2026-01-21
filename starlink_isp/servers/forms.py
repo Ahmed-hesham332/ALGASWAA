@@ -15,5 +15,9 @@ class ServerForm(forms.ModelForm):
             "ip_address": "عنوان IP",
             
         }
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
+            "ip_address": forms.TextInput(attrs={"class": "cyber-input w-full rounded-xl px-4 py-3 text-sm"}),
+        }
 
 

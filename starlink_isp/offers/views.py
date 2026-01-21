@@ -85,6 +85,9 @@ def offer_edit(request, offer_id):
     return render(request, "dashboard/offers/offer_edit.html", {"form": form, "offer": offer})
 
 
+from radius_integration.services import voucher_radius_delete
+from vouchers.models import Voucher
+
 @login_required
 def offer_delete(request, offer_id):
     user = request.user
@@ -103,6 +106,28 @@ def offer_delete(request, offer_id):
     else:
         offer = get_object_or_404(Offer, id=offer_id, reseller=user)
         
+    # Get unused vouchers associated with this offer
+    # Note: Vouchers might belong to different batches but linked to this offer
+    unused_vouchers = Voucher.objects.filter(offer=offer, is_used="unused")
+    count_unused = unused_vouchers.count()
+    
+    # Calculate others (that will be preserved)
+    count_others = Voucher.objects.filter(offer=offer).exclude(is_used="unused").count()
+
+    try:
+        # Delete unused vouchers from Radius and DB
+        for voucher in unused_vouchers:
+            voucher_radius_delete(voucher.serial)
+            voucher.delete()
+    except Exception as e:
+         messages.error(request, f"حدث خطأ أثناء حذف الكروت: {e}")
+         return redirect("offers:offer_list")
+        
     offer.delete()
-    messages.success(request, "تم حذف العرض.")
+
+    msg = f"تم حذف العرض بنجاح. تم حذف {count_unused} كارت غير مستخدم."
+    if count_others > 0:
+        msg += f" وتم الاحتفاظ بـ {count_others} كارت (مستخدم/منتهي) في الأرشيف."
+
+    messages.success(request, msg)
     return redirect("offers:offer_list")
