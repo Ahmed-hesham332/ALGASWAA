@@ -13,7 +13,21 @@ def update_voucher_usage(username):
 
     voucher = get_object_or_404(Voucher, serial=username)
 
+    cursor = connections['radius'].cursor()
+    cursor.execute("""
+        SELECT 
+            data
+        FROM vouchers
+        WHERE voucher_number = %s
+    """, [username])
+
+    data = cursor.fetchone()
+
     offer = voucher.offer
+
+    usage_bytes = data[0] if data else 0
+    mb_used = 0 if usage_bytes == 0 else usage_bytes / (1024 * 1024) 
+    mb_used = round(mb_used, 2)
     
     # 1. Determine Quota in MB
     if offer.quota_type == 'none':
@@ -21,20 +35,19 @@ def update_voucher_usage(username):
     elif offer.quota_type == 'MB':
         quota_mb = offer.quota_amount
     else:
-        # Default to GB
-        quota_mb = (offer.quota_amount or 0) * 1024
+        # Default to GB -> MB
+        quota_mb = offer.quota_amount * 1024
 
     # 2. Calculate Remaining & Percentage
     if quota_mb is None:
         remaining_mb = None # Unlimited
     else:
-        remaining_mb = max(0, quota_mb - voucher.usage_mb)
+        remaining_mb = max(0, quota_mb - mb_used)
 
     # 7️⃣ Return useful data
     return {
         "username": username,
-        "used_mb": voucher.usage_mb,
-        "quota_mb": quota_mb,
+        "used_mb": mb_used,    
         "remaining_mb": round(remaining_mb, 2) if remaining_mb is not None else None,
     }
 

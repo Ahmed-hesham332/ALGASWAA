@@ -5,116 +5,211 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>تسجيل الدخول</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #14b8a6;
+            --primary-dark: #0f766e;
+            --bg-dark: #111827;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
         * {
             box-sizing: border-box;
+            outline: none;
         }
 
         body {
             margin: 0;
-            font-family: Tahoma, Arial, sans-serif;
+            font-family: 'Tajawal', Tahoma, Arial, sans-serif;
             background: radial-gradient(circle at left, #6b0f14 0%, #0e0f11 45%);
-            color: #fff;
+            color: var(--text-main);
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
         }
 
+
         .page {
-            min-height: 100vh;
-            padding: 24px 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         /* ===== HEADER ===== */
         .top-badge {
-            border: 1px solid #fff;
-            border-radius: 999px;
-            padding: 6px 14px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
+            background: rgba(20, 184, 166, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(20, 184, 166, 0.2);
+            border-radius: 99px;
+            padding: 6px 16px;
             font-size: 13px;
-            margin-bottom: px;
+            font-weight: 500;
+            margin-bottom: 25px;
         }
 
         .top-badge svg {
             width: 16px;
             height: 16px;
-            fill: #25D366;
-            /* WhatsApp green */
+            fill: currentColor;
         }
 
         /* ===== TITLE ===== */
         .title {
-            font-size: 36px;
-            font-weight: bold;
-            line-height: 1.2;
-            text-align: center;
-            margin-bottom: 100px;
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #fff, #9ca3af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .phone {
-            font-size: 14px;
-            color: #ccc;
-            margin-top: 10px;
-            margin-bottom: 100px;
-            text-align: center;
+        .subtitle {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 40px;
         }
 
         /* ===== FORM ===== */
-        .form {
-            width: 100%;
-            max-width: 320px;
-            text-align: center;
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
         }
 
         .input {
             width: 100%;
-            height: 50px;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            background: transparent;
+            height: 54px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.3);
             color: #fff;
+            padding: 0 20px;
             font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
             text-align: center;
-            outline: none;
-            margin-bottom: 16px;
+        }
+
+        .input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+            background: rgba(0, 0, 0, 0.5);
         }
 
         .input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.3);
         }
 
         .button {
-            width: 140px;
-            height: 42px;
-            border-radius: 999px;
-            border: 1px solid #fff;
-            background: transparent;
+            width: 100%;
+            height: 54px;
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: #fff;
-            font-size: 15px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .button:hover {
-            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(20, 184, 166, 0.4);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .phone-number {
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            margin-top: 4px;
+            display: block;
+            direction: ltr;
+            /* Force number formatting */
         }
 
         /* ===== ERROR ===== */
         .alert {
-            background: rgba(255, 0, 0, 0.15);
-            border: 1px solid #ff4d4d;
-            color: #fff;
-            padding: 10px;
-            border-radius: 10px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 12px;
+            border-radius: 12px;
             font-size: 14px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 
 <body>
+    <div class="background-glow"></div>
+
+    <!-- DO NOT MODIFY THIS SCRIPT, IT IS WORKING -->
     $(if chap-id)
     <form name="sendin" action="$(link-login-only)" method="post" style="display:none">
         <input type="hidden" name="username">
@@ -131,36 +226,75 @@
             return false;
         }
     </script>
+    <!-- END OF SCRIPT -->
     $(endif)
 
     <div class="page">
-        <!-- TOP BADGE -->
-        <div class="top-badge">
-            <svg viewBox="0 0 24 24">
-                <path
-                    d="M20.52 3.48A11.93 11.93 0 0012 0 12 12 0 000 12a11.9 11.9 0 001.67 6L0 24l6.2-1.63A11.9 11.9 0 0012 24a12 12 0 008.52-20.52z" />
-            </svg>
-            Tech Support
-        </div>
-        <div class="phone">0120100102</div>
+        <div class="card">
+            <!-- TOP BADGE -->
+            <div class="top-badge">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                </svg>
+                بوابة الإنترنت
+            </div>
 
-        <!-- TITLE -->
-        <div class="title">
-            شبكة<br>{{ network_name }}
-        </div>
+            <!-- TITLE -->
+            <div class="title">
+                شبكة<br>{{ network_name }}
+            </div>
 
-        <!-- FORM -->
-        <div class="form">
-            $(if error)
-            <div class="alert">$(error)</div>
-            $(endif)
+            <div class="subtitle">
+                مرحباً بك، يرجى تسجيل الدخول للمتابعة
+            </div>
 
-            <form name="login" method="post" action="$(link-status)" $(if chap-id) onsubmit="return doLogin()" $(endif)>
-                <input type="hidden" name="dst" value="$(link-orig)">
-                <input type="hidden" name="popup" value="true">
-                <input class="input" type="text" name="voucher" placeholder="أدخل رقم الكرت" required autofocus>
-                <button class="button" type="submit">تسجيل الدخول</button>
-            </form>
+            <!-- FORM -->
+            <div class="form-container">
+                $(if error)
+                <div class="alert">
+                    <div style="font-weight: bold; margin-bottom: 4px;">خطأ في الدخول</div>
+                    $(error)
+                </div>
+                $(endif)
+
+                <form name="login" method="post" action="$(link-status)" $(if chap-id) onsubmit="return doLogin()"
+                    $(endif)>
+                    <input type="hidden" name="dst" value="$(link-orig)">
+                    <input type="hidden" name="popup" value="true">
+
+                    <div class="input-group">
+                        <input class="input" type="text" name="voucher" placeholder="أدخل رقم الكرت هنا" required
+                            autofocus autocomplete="off">
+                    </div>
+
+                    <button class="button" type="submit">
+                        تسجيل الدخول
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="footer-info">
+                تركيب و برمجة شبكات المايكروتيك
+                <div style="margin-top: 8px;">
+                    <span class="top-badge"
+                        style="margin-bottom: 0px; font-size: 12px; background: rgba(255,255,255,0.05); color: var(--text-muted); border-color: var(--border);">
+                        <svg viewBox="0 0 24 24" style="fill: currentColor">
+                            <path
+                                d="M20.52 3.48A11.93 11.93 0 0012 0 12 12 0 000 12a11.9 11.9 0 001.67 6L0 24l6.2-1.63A11.9 11.9 0 0012 24a12 12 0 008.52-20.52z">
+                            </path>
+                        </svg>
+                        Tech Support
+                    </span>
+                    <span class="phone-number">0120100102</span>
+                </div>
+            </div>
         </div>
     </div>
 </body>

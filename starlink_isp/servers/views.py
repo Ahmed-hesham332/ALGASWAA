@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Server
 from .forms import ServerForm
-from radius_integration.services import generate_mikrotik_config, add_radius_client, radius_delete_client, voucher_radius_delete, add_tunnel_client
+from radius_integration.services import radius_delete_client, voucher_radius_delete, add_tunnel_client, remove_tunnel_client
 from django.http import HttpResponse
 from .utils import allocate_tunnel_ip
 from django.db import connections
@@ -87,7 +87,7 @@ def server_edit(request, server_id):
 @login_required
 def server_delete(request, server_id):
     server = get_object_or_404(Server, id=server_id, owner=request.user)
-
+    remove_tunnel_client(server.hostname, server.tunnel_ip)
     # DELETE VOUCHERS FROM RADIUS
     vouchers = server.voucher_set.all()
     for voucher in vouchers:

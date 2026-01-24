@@ -70,15 +70,13 @@ def _get_server_and_support_info(request, token):
     
     ts_name = "Support"
     ts_phone = "0000000000"
-    network_name = "شبكة القصواء" # Default fallback
+    
+    # Set network_name to server.name
+    network_name = server.name if server.name else "شبكة القصواء"
 
     if server.owner.tech_support_assigned:
         ts_name = server.owner.tech_support_assigned.name
         ts_phone = server.owner.tech_support_assigned.phone
-    
-    # Get Network Name from owner if set, distinct from default
-    if server.owner.Network_Name and server.owner.Network_Name.strip() != "":
-         network_name = server.owner.Network_Name
 
     return ts_name, ts_phone, network_name
 

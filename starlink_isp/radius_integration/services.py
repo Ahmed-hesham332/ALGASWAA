@@ -137,19 +137,20 @@ def generate_mikrotik_config(
 # ---------- DETECT LAN BRIDGE ----------
 :global LANBRIDGE ""
 
-:if ([/interface bridge find name="bridgeLocal"] != "") do={{
-    :set LANBRIDGE "bridgeLocal"
+:if ([/interface bridge find name="bridge-lan"] != "") do={{
+    :set LANBRIDGE "bridge-lan"
 }} else={{
     :set LANBRIDGE "algaswaa-bridge"
     :if ([/interface bridge find name=$LANBRIDGE] = "") do={{
         /interface bridge add name=$LANBRIDGE
         /interface bridge port add bridge=$LANBRIDGE interface=ether2
+        /interface bridge set $LANBRIDGE name=LAN
     }}
 }}
 
 # ---------- LAN IP ----------
-:if ([/ip address find interface=$LANBRIDGE] = "") do={{
-    /ip address add address=10.10.10.1/24 interface=$LANBRIDGE
+:if ([/ip address find interface=LAN] = "") do={{
+    /ip address add address=10.10.10.1/24 interface=LAN
 }}
 
 # ---------- DHCP ----------
@@ -158,7 +159,7 @@ def generate_mikrotik_config(
 }}
 
 :if ([/ip dhcp-server find name="algaswaa_dhcp"] = "") do={{
-    /ip dhcp-server add name=algaswaa_dhcp interface=$LANBRIDGE address-pool=algaswaa_pool lease-time=1h disabled=no
+    /ip dhcp-server add name=algaswaa_dhcp interface=LAN address-pool=algaswaa_pool lease-time=1h disabled=no
 }}
 
 :if ([/ip dhcp-server network find address=10.10.10.0/24] = "") do={{
@@ -183,7 +184,7 @@ def generate_mikrotik_config(
 
 # ---------- HOTSPOT SERVER ----------
 :if ([/ip hotspot find name="algaswaa_hotspot"] = "") do={{
-    /ip hotspot add name=algaswaa_hotspot interface=$LANBRIDGE profile=algaswaa_hotspot address-pool=algaswaa_pool
+    /ip hotspot add name=algaswaa_hotspot interface=LAN profile=algaswaa_hotspot address-pool=algaswaa_pool
 }}
 
 # ---------- HOTSPOT ENABLE ----------
@@ -254,6 +255,18 @@ def add_tunnel_client(hostname, tunnel_ip):
     cursor.execute("""
         INSERT INTO nas_tunnel_map (nas_identifier, tunnel_ip)
         VALUES (%s, %s)
+    """, [hostname, tunnel_ip])
+
+    conn.commit()
+    cursor.close()
+
+def remove_tunnel_client(hostname, tunnel_ip):
+    conn = connections["radius"]
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        DELETE FROM nas_tunnel_map 
+        WHERE nas_identifier = %s AND tunnel_ip = %s
     """, [hostname, tunnel_ip])
 
     conn.commit()
