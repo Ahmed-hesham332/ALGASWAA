@@ -192,6 +192,7 @@ def voucher_generate(request):
                     serial=serial,
                     ip_address=batch.server.ip_address,
                     token=batch.server.hostname,
+                    sold_price=batch.offer.price,
                 )
 
                 radius_add_user(serial, batch.offer, v.token)

@@ -57,9 +57,7 @@ def run_quota_enforce():
         return
 
     try:
-        # 1) get vouchers that are not used up (active)
-        #    Use LEFT JOIN on radreply so we get ALL active vouchers,
-        #    even if they don't have the Mikrotik-Total-Limit attribute.
+        # 1) get vouchers that are not used up AND have a quota in radreply
         cursor.execute(f"""
             SELECT v.{V_COL_CODE} AS code,
                    v.{V_COL_NAS}  AS nas,
@@ -68,7 +66,7 @@ def run_quota_enforce():
             FROM {VOUCHERS_TABLE} v
             JOIN {SSTP_TABLE} s
               ON s.{S_COL_NAS} = v.{V_COL_NAS}
-            LEFT JOIN radreply rr
+            JOIN radreply rr
               ON rr.username = v.{V_COL_CODE}
              AND rr.attribute = %s
             WHERE (v.{V_COL_USEDUP} = 1)
@@ -76,23 +74,17 @@ def run_quota_enforce():
         vouchers = cursor.fetchall()
 
         if not vouchers:
-            print("OK: No active vouchers found.")
+            print("OK: No vouchers with quota to check.")
             return
 
         for v in vouchers:
             code = str(v["code"])
             nas  = str(v["nas"])
             tip  = str(v["tunnel_ip"])
-            
-            # Parse quota validity
-            quota = None
-            if v["quota_bytes"] is not None:
-                try:
-                    quota = int(v["quota_bytes"])
-                except Exception:
-                    # If attribute exists but isn't an integer, treat as no limit active
-                    # or handle as error? usually treat as no effective limit for safety.
-                    quota = None
+            try:
+                quota = int(v["quota_bytes"])
+            except Exception:
+                continue
 
             # 2) total used bytes across radacct (all sessions)
             cursor.execute("""
@@ -102,16 +94,13 @@ def run_quota_enforce():
             """, (code,))
             used = int(cursor.fetchone()["total"] or 0)
 
-            # ALWAYS update consumption in vouchers table
-            cursor.execute(f"""
-                update vouchers
-                set data = %s 
-                where voucher_number = %s
-            """, (used, code))
-            cnx.commit()
-
-            # If user has no quota limit, or hasn't exceeded it, we are done for this user
-            if (quota is None) or (used < quota):
+            if used < quota:
+                cursor.execute(f"""
+                    update vouchers
+                    set data = %s 
+                    where voucher_number = %s
+                """, (used, code))
+                cnx.commit()
                 continue
 
             # 3) find current active session (for best disconnect reliability)
@@ -135,6 +124,12 @@ def run_quota_enforce():
                 INSERT INTO radcheck (username, attribute, op, value)
                 VALUES (%s, 'Auth-Type', ':=', 'Reject')
             """, (code,))
+
+            cursor.execute(f"""
+                    update vouchers
+                    set data = %s 
+                    where voucher_number = %s
+                """, (used, code))
 
             # 6) mark used_up in vouchers (prevents repeated CoA spam)
             cursor.execute(f"""

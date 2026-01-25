@@ -134,38 +134,6 @@ def generate_mikrotik_config(
 # ---------- SYSTEM ID ----------
 /system identity set name={nas_identifier}
 
-# ---------- DETECT LAN BRIDGE ----------
-:global LANBRIDGE ""
-
-:if ([/interface bridge find name="bridge-lan"] != "") do={{
-    :set LANBRIDGE "bridge-lan"
-}} else={{
-    :set LANBRIDGE "algaswaa-bridge"
-    :if ([/interface bridge find name=$LANBRIDGE] = "") do={{
-        /interface bridge add name=$LANBRIDGE
-        /interface bridge port add bridge=$LANBRIDGE interface=ether2
-        /interface bridge set $LANBRIDGE name=LAN
-    }}
-}}
-
-# ---------- LAN IP ----------
-:if ([/ip address find interface=LAN] = "") do={{
-    /ip address add address=10.10.10.1/24 interface=LAN
-}}
-
-# ---------- DHCP ----------
-:if ([/ip pool find name="algaswaa_pool"] = "") do={{
-    /ip pool add name=algaswaa_pool ranges=10.10.10.10-10.10.10.200
-}}
-
-:if ([/ip dhcp-server find name="algaswaa_dhcp"] = "") do={{
-    /ip dhcp-server add name=algaswaa_dhcp interface=LAN address-pool=algaswaa_pool lease-time=1h disabled=no
-}}
-
-:if ([/ip dhcp-server network find address=10.10.10.0/24] = "") do={{
-    /ip dhcp-server network add address=10.10.10.0/24 gateway=10.10.10.1 dns-server=8.8.8.8,1.1.1.1
-}}
-
 # ---------- DNS ----------
 /ip dns set allow-remote-requests=yes servers=8.8.8.8,1.1.1.1
 
@@ -177,18 +145,8 @@ def generate_mikrotik_config(
 /radius incoming set accept=yes port=3799
 
 # ---------- HOTSPOT PROFILE ----------
-:if ([/ip hotspot profile find name="algaswaa_hotspot"] = "") do={{
-    /ip hotspot profile add name=algaswaa_hotspot use-radius=yes login-by=http-pap,http-chap,cookie,mac-cookie radius-interim-update=1m
-    /ip hotspot user profile set [find name="algaswaa_hotspot"] shared-users=1
-}}
-
-# ---------- HOTSPOT SERVER ----------
-:if ([/ip hotspot find name="algaswaa_hotspot"] = "") do={{
-    /ip hotspot add name=algaswaa_hotspot interface=LAN profile=algaswaa_hotspot address-pool=algaswaa_pool
-}}
-
-# ---------- HOTSPOT ENABLE ----------
-/ip hotspot enable algaswaa_hotspot
+/ip hotspot profile set [find] use-radius=yes login-by=http-pap,http-chap,cookie,mac-cookie radius-interim-update=1m
+/ip hotspot user profile set [find] shared-users=1
 
 # ---------- NAT ----------
 :if ([/ip firewall nat find chain=srcnat out-interface=ether1] = "") do={{
@@ -276,11 +234,16 @@ def add_radius_client(nasname, shortname, secret):
     conn = connections["radius"]
     cursor = conn.cursor()
 
-    cursor.execute("""
-        INSERT INTO nas (nasname, shortname, type, secret)
-        VALUES (%s, %s, 'mikrotik', %s)
-        ON DUPLICATE KEY UPDATE secret = VALUES(secret);
-    """, [nasname, shortname, secret])
+    # 1️⃣ Check if NAS IP already exists
+    cursor.execute("SELECT id FROM nas WHERE nasname = %s", [nasname])
+    existing_by_ip = cursor.fetchone()
+
+    if not existing_by_ip:
+        # Insert New ONLY if not exists
+        cursor.execute("""
+            INSERT INTO nas (nasname, shortname, type, secret)
+            VALUES (%s, %s, 'mikrotik', %s)
+        """, [nasname, shortname, secret])
 
     conn.commit()
     cursor.close()

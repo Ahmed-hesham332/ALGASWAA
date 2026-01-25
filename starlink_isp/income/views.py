@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from vouchers.models import Voucher
 from servers.models import Server
+from django.db.models import Count, Sum, F
 
 @login_required
 def income_report(request):
@@ -35,17 +36,16 @@ def income_report(request):
 
     # ---- TOTALS ----
     total_count = sold_vouchers.count()
-    total_income = sum(v.batch.offer.price for v in sold_vouchers)
+    # Use the static sold_price field
+    total_income = sum(v.sold_price for v in sold_vouchers)
 
     # ---- DAILY SUMMARY ----
-    from django.db.models import Count, Sum, F
-
     daily_summary = (
         sold_vouchers
         .values("activated_at__date")
         .annotate(
             count=Count("id"),
-            income=Sum(F("batch__offer__price"))
+            income=Sum("sold_price")
         )
         .order_by("activated_at__date")
     )

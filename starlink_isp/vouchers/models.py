@@ -40,6 +40,7 @@ class Voucher(models.Model):
     offer = models.ForeignKey(Offer, on_delete=models.SET_NULL, null=True, blank=True)
 
     serial = models.CharField(max_length=50, unique=True)
+    sold_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     created_at = models.DateTimeField(auto_now_add=True)
     activated_at = models.DateTimeField(null=True, blank=True)
