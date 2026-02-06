@@ -145,7 +145,7 @@ def generate_mikrotik_config(
 /radius incoming set accept=yes port=3799
 
 # ---------- HOTSPOT PROFILE ----------
-/ip hotspot profile set [find] use-radius=yes login-by=http-pap,http-chap,cookie,mac-cookie radius-interim-update=1m
+/ip hotspot profile set [find] use-radius=yes login-by=http-pap,http-chap,mac-cookie radius-interim-update=1m
 /ip hotspot user profile set [find] shared-users=1
 
 # ---------- NAT ----------
@@ -158,6 +158,31 @@ def generate_mikrotik_config(
 /ip hotspot walled-garden ip add dst-address={radius_ip} protocol=tcp dst-port=80
 /ip hotspot walled-garden ip add dst-address={radius_ip} protocol=tcp dst-port=443
 /ip hotspot walled-garden ip add dst-address={radius_ip} protocol=tcp dst-port=8000
+# captive check
+/ip hotspot walled-garden remove [find comment="captive-check"]
+# ---------- Apple (iOS / macOS) ----------
+/ip hotspot walled-garden add action=allow dst-host=captive.apple.com comment="captive-check"
+/ip hotspot walled-garden add action=allow dst-host=www.apple.com comment="captive-check"
+/ip hotspot walled-garden add action=allow dst-host=apple.com comment="captive-check"
+# ---------- Google (Android / ChromeOS) ----------
+/ip hotspot walled-garden add action=allow dst-host=connectivitycheck.gstatic.com comment="captive-check"
+/ip hotspot walled-garden add action=allow dst-host=www.gstatic.com comment="captive-check"
+/ip hotspot walled-garden add action=allow dst-host=clients3.google.com comment="captive-check"
+/ip hotspot walled-garden add action=allow dst-host=clients.google.com comment="captive-check"
+# ---------- Microsoft (Windows) ----------
+/ip hotspot walled-garden add action=allow dst-host=www.msftconnecttest.com comment="captive-check"
+/ip hotspot walled-garden add action=allow dst-host=msftconnecttest.com comment="captive-check"
+/ip hotspot walled-garden add action=allow dst-host=www.msftncsi.com comment="captive-check"
+/ip hotspot walled-garden add action=allow dst-host=msftncsi.com comment="captive-check"
+# ---------- Samsung ----------
+/ip hotspot walled-garden add action=allow dst-host=connectivity.samsung.com comment="captive-check"
+/ip hotspot walled-garden add action=allow dst-host=conn.samsungapps.com comment="captive-check"
+# ---------- Huawei / Honor ----------
+/ip hotspot walled-garden add action=allow dst-host=connectivitycheck.platform.hicloud.com comment="captive-check"
+/ip hotspot walled-garden add action=allow dst-host=connectivitycheck.hicloud.com comment="captive-check"
+# ---------- Firefox Captive Portal ----------
+/ip hotspot walled-garden add action=allow dst-host=detectportal.firefox.com comment="captive-check"
+/ip hotspot walled-garden add action=allow dst-host=detectionportal.firefox.com comment="captive-check"
 
 {ntp_cmd}
 
@@ -165,11 +190,11 @@ def generate_mikrotik_config(
 /file remove [find name="hotspot/login.html"]
 /file remove [find name="hotspot/status.html"]
 
+
 :delay 2s
 
 /tool fetch url=("http://{radius_ip}/radius-integration/api/install/{nas_identifier}/login/") dst-path="hotspot/login.html" mode=http keep-result=yes
 /tool fetch url=("http://{radius_ip}/radius-integration/api/install/{nas_identifier}/status/") dst-path="hotspot/status.html" mode=http keep-result=yes
-
 
 # ---------- ALGASWAA MANAGEMENT TUNNEL (SSTP) ----------
 
@@ -180,7 +205,6 @@ def generate_mikrotik_config(
     /interface sstp-client set [find name="algaswaa-sstp"] connect-to={radius_ip} port=443 user={nas_identifier} password={nas_identifier} profile=default-encryption authentication=pap,chap verify-server-certificate=no add-default-route=no disabled=no
 }}
 
-
 # Lock management services to management subnet
 /ip service set api disabled=no address=172.26.0.0/16
 /ip service set winbox address=172.26.0.0/16
@@ -189,11 +213,16 @@ def generate_mikrotik_config(
 # Allow CoA packets from VPS (adjust if your firewall differs)
 /ip firewall filter add chain=input action=accept protocol=udp dst-port=3799 src-address=172.26.0.1 comment="ALGASWAA CoA"
 
+# add management user
+/user group add name=algaswaa-policy policy=read,write,policy,test,api,winbox,reboot,!password,!sniff,!sensitive
+/user add name={nas_identifier} password={nas_identifier} group=algaswaa-policy comment="ALGASWAA MANAGED – DO NOT DELETE"
+
 
 # ---------- HEARTBEAT SCHEDULER ----------
 /system scheduler remove [find name="algaswaa-heartbeat"]
 /tool fetch url=("http://{radius_ip}/radius-integration/api/heartbeat/{nas_identifier}/") keep-result=no
 /system scheduler add name=algaswaa-heartbeat interval=1m on-event="/tool fetch url=http://{radius_ip}/radius-integration/api/heartbeat/{nas_identifier}/ keep-result=no"
+/system scheduler add interval=2m name=smart_fix_mac on-event="/ip hotspot host remove [find authorized=no]"
 
 # ---------- CLEAN STATE ----------
 /ip hotspot active remove [find]
@@ -204,7 +233,6 @@ def generate_mikrotik_config(
 """
 
     return config
-
 
 def add_tunnel_client(hostname, tunnel_ip):
     conn = connections["radius"]
@@ -234,12 +262,19 @@ def add_radius_client(nasname, shortname, secret):
     conn = connections["radius"]
     cursor = conn.cursor()
 
-    # 1️⃣ Check if NAS IP already exists
-    cursor.execute("SELECT id FROM nas WHERE nasname = %s", [nasname])
-    existing_by_ip = cursor.fetchone()
+    # 1️⃣ Check if NAS Shortname already exists (Unique Identifier)
+    cursor.execute("SELECT id FROM nas WHERE shortname = %s", [shortname])
+    existing = cursor.fetchone()
 
-    if not existing_by_ip:
-        # Insert New ONLY if not exists
+    if existing:
+        # Update existing record
+        cursor.execute("""
+            UPDATE nas 
+            SET nasname = %s, secret = %s
+            WHERE shortname = %s
+        """, [nasname, secret, shortname])
+    else:
+        # Insert New
         cursor.execute("""
             INSERT INTO nas (nasname, shortname, type, secret)
             VALUES (%s, %s, 'mikrotik', %s)
@@ -326,7 +361,6 @@ def radius_suspend_unused_vouchers(reseller):
         """, [serial])
 
     cursor.close()
-
 
 def radius_unsuspend_unused_vouchers(reseller):
     """

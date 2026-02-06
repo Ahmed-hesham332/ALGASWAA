@@ -29,8 +29,9 @@
     <!-- Filter Bar -->
     <form method="GET" class="glass-card rounded-2xl p-5">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Search Bar (Added) -->
-            <div class="sm:col-span-2 lg:col-span-4 mb-4">
+
+            <!-- Search -->
+            <div class="sm:col-span-2 lg:col-span-4 mb-2">
                 <label class="block text-sm text-gray-300 mb-2">بحث (رقم الكارت)</label>
                 <div class="relative">
                     <input type="text" name="search" value="{{ request.GET.search }}"
@@ -40,7 +41,6 @@
                 </div>
             </div>
 
-            <!-- Server Filter -->
             <div>
                 <label class="block text-sm text-gray-300 mb-2">السيرفر</label>
                 <select name="server" class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
@@ -51,7 +51,6 @@
                 </select>
             </div>
 
-            <!-- Offer Filter -->
             <div>
                 <label class="block text-sm text-gray-300 mb-2">العرض</label>
                 <select name="offer" class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
@@ -62,7 +61,6 @@
                 </select>
             </div>
 
-            <!-- Group Filter -->
             <div>
                 <label class="block text-sm text-white mb-2">المجموعة</label>
                 <select name="group" class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
@@ -73,7 +71,6 @@
                 </select>
             </div>
 
-            <!-- Status Filter -->
             <div>
                 <label class="block text-sm text-dark-400 mb-2">الحالة</label>
                 <select name="status" class="cyber-input w-full rounded-xl px-4 py-3 text-sm">
@@ -100,43 +97,51 @@
 
     {% if vouchers %}
     <!-- Vouchers Table -->
-    <div class="cyber-table rounded-2xl overflow-hidden">
-        <div class="overflow-x-auto">
+    <div class="cyber-table voucher-table rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto voucher-table-scroll">
             <table class="w-full text-right text-sm">
                 <thead>
                     <tr class="text-dark-400">
-                        <th class="px-4 py-4 whitespace-nowrap font-semibold">#</th>
-                        <th class="px-4 py-4 whitespace-nowrap font-semibold">رقم الكارت</th>
-                        <th class="px-4 py-4 whitespace-nowrap font-semibold">العرض</th>
-                        <th class="px-4 py-4 whitespace-nowrap font-semibold">تاريخ الإنشاء</th>
-                        <th class="px-4 py-4 whitespace-nowrap font-semibold">تاريخ الشحن</th>
-                        <th class="px-4 py-4 whitespace-nowrap font-semibold">تاريخ الانتهاء</th>
-                        <th class="px-4 py-4 whitespace-nowrap font-semibold">الكوتا</th>
-                        <th class="px-4 py-4 whitespace-nowrap font-semibold">الاستهلاك</th>
-                        <th class="px-4 py-4 whitespace-nowrap font-semibold">الحالة</th>
-                        <th class="px-4 py-4 whitespace-nowrap font-semibold">السعر</th>
-                        <th class="px-4 py-4 whitespace-nowrap font-semibold">السيرفر</th>
-                        <th class="px-4 py-4 whitespace-nowrap font-semibold">إجراءات</th>
+                        <th class="px-4 py-3">#</th>
+                        <th class="px-4 py-3">رقم الكارت</th>
+                        <th class="px-4 py-3">العرض</th>
+                        <th class="px-4 py-3">تاريخ الإنشاء</th>
+                        <th class="px-4 py-3">تاريخ الشحن</th>
+                        <th class="px-4 py-3">تاريخ الانتهاء</th>
+                        <th class="px-4 py-3">الكوتا</th>
+                        <th class="px-4 py-3">الاستهلاك</th>
+                        <th class="px-4 py-3">الحالة</th>
+                        <th class="px-4 py-3">السعر</th>
+                        <th class="px-4 py-3">السيرفر</th>
+                        <th class="px-4 py-3">إجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for v in vouchers %}
                     <tr>
                         <td class="px-4 py-3 text-dark-400" data-label="#">{{ forloop.counter }}</td>
+
                         <td class="px-4 py-3" data-label="رقم الكارت">
-                            <span class="font-mono text-xs bg-white/5 px-2 py-1 rounded">{{ v.serial }}</span>
+                            <span class="font-mono text-xs bg-white/5 px-2 py-1 rounded break-all">
+                                {{ v.serial }}
+                            </span>
                         </td>
+
                         <td class="px-4 py-3" data-label="العرض">{{ v.offer.name }}</td>
-                        <td class="px-4 py-3 text-dark-400 text-xs" data-label="تاريخ الإنشاء">
+
+                        <td class="px-4 py-3 text-xs" data-label="تاريخ الإنشاء">
                             <span dir="ltr">{{ v.created_at }}</span>
                         </td>
-                        <td class="px-4 py-3 text-dark-400 text-xs" data-label="تاريخ الشحن">
+
+                        <td class="px-4 py-3 text-xs" data-label="تاريخ الشحن">
                             <span dir="ltr">{{ v.activated_at|default:"—" }}</span>
                         </td>
-                        <td class="px-4 py-3 text-dark-400 text-xs" data-label="تاريخ الانتهاء">
+
+                        <td class="px-4 py-3 text-xs" data-label="تاريخ الانتهاء">
                             <span dir="ltr">{{ v.expires_at|default:"—" }}</span>
                         </td>
-                        <td class="px-4 py-3 text-dark-300" data-label="الكوتا">
+
+                        <td class="px-4 py-3" data-label="الكوتا">
                             {% if v.offer.quota_type == "MB" %}
                             {{ v.offer.quota_amount }}MB
                             {% elif v.offer.quota_type == "fixed" %}
@@ -145,17 +150,15 @@
                             <span class="text-accent">∞</span>
                             {% endif %}
                         </td>
-                        <td class="px-4 py-3 text-dark-300" data-label="الاستهلاك">
+
+                        <td class="px-4 py-3" data-label="الاستهلاك">
                             {% if v.usage_mb %}
-                            <span class="badge-info px-2 py-1 rounded-lg text-xs font-mono">
-                                {{ v.usage_mb }}MB
-                            </span>
+                            <span class="badge-info px-2 py-1 rounded-lg text-xs font-mono">{{ v.usage_mb }}MB</span>
                             {% else %}
-                            <span class="badge-danger px-2 py-1 rounded-lg text-xs font-mono">
-                                0MB
-                            </span>
+                            <span class="badge-danger px-2 py-1 rounded-lg text-xs font-mono">0MB</span>
                             {% endif %}
                         </td>
+
                         <td class="px-4 py-3" data-label="الحالة">
                             {% if v.is_used == "unused" %}
                             <span class="badge-success px-2.5 py-1 rounded-lg text-xs">غير مستخدم</span>
@@ -165,53 +168,62 @@
                             <span class="badge-danger px-2.5 py-1 rounded-lg text-xs">منتهي</span>
                             {% endif %}
                         </td>
-                        <td class="px-4 py-3 font-medium text-accent" data-label="السعر">{{ v.batch.offer.price }}</td>
-                        <td class="px-4 py-3 text-dark-300" data-label="السيرفر">{{ v.batch.server.name }}</td>
+
+                        <td class="px-4 py-3 font-medium text-accent" data-label="السعر">
+                            {{ v.batch.offer.price }}
+                        </td>
+
+                        <td class="px-4 py-3" data-label="السيرفر">
+                            {{ v.batch.server.name }}
+                        </td>
+
                         <td class="px-4 py-3" data-label="إجراءات">
-                            <div class="flex justify-end w-full">
-                                {% if v.is_used == "unused" %}
-                                <a href="{% url 'vouchers:reconnect' v.id %}"
-                                    onclick="return confirm('هل أنت متأكد من رغبتك في إعادة توصيل هذا الكارت؟')"
-                                    class="btn-secondary px-3 py-1.5 rounded-lg text-xs inline-flex items-center gap-1.5 w-full justify-center">
-                                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                                    إعادة توصيل
-                                </a>
-                                {% else %}
-                                <span class="text-dark-500 text-xs">—</span>
-                                {% endif %}
-                            </div>
+                            {% if v.is_used == "unused" %}
+                            <a href="{% url 'vouchers:reconnect' v.id %}"
+                                onclick="return confirm('هل أنت متأكد من رغبتك في إعادة توصيل هذا الكارت؟')"
+                                class="btn-secondary px-3 py-2 rounded-lg text-xs inline-flex items-center gap-1.5 whitespace-nowrap">
+                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                إعادة توصيل
+                            </a>
+                            {% else %}
+                            <span class="text-dark-500 text-xs">—</span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+    </div>
 
-        <!-- Pagination -->
-        {% if page_obj.has_other_pages %}
-        <div class="flex justify-center py-6 border-t border-white/5">
-            <nav class="inline-flex gap-1">
-                {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}"
-                    class="btn-secondary px-4 py-2 rounded-lg text-sm">السابق</a>
-                {% endif %}
+    <!-- Pagination (Desktop + Mobile) -->
+    {% if page_obj and page_obj.has_other_pages %}
+    <div class="flex justify-center py-6 border-t border-white/5">
+        <nav class="flex flex-wrap justify-center gap-2">
 
-                {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.server %}&server={{ request.GET.server }}{% endif %}{% if request.GET.offer %}&offer={{ request.GET.offer }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                class="btn-secondary px-4 py-2 rounded-lg text-sm">السابق</a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %} {% if page_obj.number==num %}
                 <span class="btn-primary px-4 py-2 rounded-lg text-sm">{{ num }}</span>
                 {% else %}
-                <a href="?page={{ num }}" class="btn-secondary px-4 py-2 rounded-lg text-sm">{{ num }}</a>
+                <a href="?page={{ num }}{% if request.GET.server %}&server={{ request.GET.server }}{% endif %}{% if request.GET.offer %}&offer={{ request.GET.offer }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                    class="btn-secondary px-4 py-2 rounded-lg text-sm">{{ num }}</a>
+                {% endif %}
                 {% endif %}
                 {% endfor %}
 
                 {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}"
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.server %}&server={{ request.GET.server }}{% endif %}{% if request.GET.offer %}&offer={{ request.GET.offer }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
                     class="btn-secondary px-4 py-2 rounded-lg text-sm">التالي</a>
                 {% endif %}
-            </nav>
-        </div>
-        {% endif %}
+
+        </nav>
     </div>
+    {% endif %}
 
     {% else %}
     <!-- Empty State -->
@@ -228,6 +240,7 @@
         </a>
     </div>
     {% endif %}
+
 </div>
 {% else %}
 {% include "dashboard/suspended.html" %}

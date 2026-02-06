@@ -14,7 +14,7 @@ def income_report(request):
     date_from = request.GET.get("date_from")
     date_to = request.GET.get("date_to")
 
-    vouchers = Voucher.objects.filter(batch__reseller=user)
+    vouchers = Voucher.objects.filter(server__owner=user)
 
     # ---- Server Filter ----
     servers = Server.objects.filter(owner=user)

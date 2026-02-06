@@ -12,6 +12,9 @@ def online_list(request):
     selected_server = request.GET.get("server", "all")
     search_query = request.GET.get("search", "").strip()
 
+    # Update voucher data from RADIUS
+    update_voucher_status()
+
     if user.is_distributer:
         distributer = user.distributer_profile
         if not distributer.can_view_vouchers:

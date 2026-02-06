@@ -92,8 +92,18 @@ def voucher_list(request):
         "expired": selected_status == "منتهي"
     }
 
-    # PAGINATION — 50 per page
-    paginator = Paginator(vouchers, 50)
+    statuses = {
+        "used": selected_status == "مُستخدم",
+        "unused": selected_status == "غير مستخدم",
+        "expired": selected_status == "منتهي"
+    }
+
+    # PAGINATION — 50 per page (desktop), 10 for mobile
+    user_agent = request.META.get('HTTP_USER_AGENT', '').lower()
+    is_mobile = 'mobile' in user_agent or 'android' in user_agent or 'iphone' in user_agent
+    per_page = 10 if is_mobile else 50
+    
+    paginator = Paginator(vouchers, per_page)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
